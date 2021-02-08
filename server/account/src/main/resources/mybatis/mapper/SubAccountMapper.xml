@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.account.dao.ISubAccountDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.account.SubAccountEntity" id="subAccountMap">
+        <result property="id" column="id"/>
+        <result property="pname" column="pname"/>
+        <result property="pid" column="pid"/>
+        <result property="hid" column="hid"/>
+        <result property="subAccountNo" column="sub_account_no"/>
+        <result property="custNo" column="cust_no"/>
+        <result property="subAccountType" column="sub_account_type"/>
+        <result property="subAccountName" column="sub_account_name"/>
+        <result property="subAccountStatus" column="sub_account_status"/>
+        <result property="interestFlag" column="interest_flag"/>
+        <result property="currentBalance" column="current_balance"/>
+        <result property="preAmount" column="pre_amount"/>
+        <result property="freezeAmount" column="freeze_amount"/>
+        <result property="interestAmount" column="interest_amount"/>
+        <result property="returnAmount" column="return_amount"/>
+        <result property="donateAmount" column="donate_amount"/>
+        <result property="finalAmount" column="final_amount"/>
+        <result property="openBranch" column="open_branch"/>
+        <result property="openOrg" column="open_org"/>
+        <result property="communityName" column="community_name"/>
+        <result property="custName" column="cust_name"/>
+        <result property="status" column="status"/>
+		<result property="buildId" column="build_id"/>
+		<result property="buildName" column="build_name"/>
+		<result property="cellId" column="cell_id"/>
+		<result property="cellName" column="cell_name"/>
+		<result property="houseCode" column="house_code"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="pname != null and pname != '' "> and `pname` = #{pname} </if>
+			<if test="pid != null and pid != '' "> and `pid` = #{pid} </if>
+			<if test="hid != null and hid != '' "> and `hid` = #{hid} </if>
+			<if test="subAccountNo != null and subAccountNo != '' "> and `sub_account_no` = #{subAccountNo} </if>
+			<if test="custNo != null and custNo != '' "> and `cust_no` = #{custNo} </if>
+			<if test="subAccountType != null and subAccountType != '' "> and `sub_account_type` = #{subAccountType} </if>
+			<if test="subAccountName != null and subAccountName != '' "> and `sub_account_name` = #{subAccountName} </if>
+			<if test="subAccountStatus != null and subAccountStatus != '' "> and `sub_account_status` = #{subAccountStatus} </if>
+			<if test="interestFlag != null and interestFlag != '' "> and `interest_flag` = #{interestFlag} </if>
+			<if test="currentBalance != null and currentBalance != '' "> and `current_balance` = #{currentBalance} </if>
+			<if test="preAmount != null and preAmount != '' "> and `pre_amount` = #{preAmount} </if>
+			<if test="freezeAmount != null and freezeAmount != '' "> and `freeze_amount` = #{freezeAmount} </if>
+			<if test="interestAmount != null and interestAmount != '' "> and `interest_amount` = #{interestAmount} </if>
+			<if test="returnAmount != null and returnAmount != '' "> and `return_amount` = #{returnAmount} </if>
+			<if test="donateAmount != null and donateAmount != '' "> and `donate_amount` = #{donateAmount} </if>
+			<if test="finalAmount != null and finalAmount != '' "> and `final_amount` = #{finalAmount} </if>
+			<if test="openBranch != null and openBranch != '' "> and `open_branch` = #{openBranch} </if>
+			<if test="openOrg != null and openOrg != '' "> and `open_org` = #{openOrg} </if>
+			<if test="communityName != null and communityName != '' "> and `community_name` = #{communityName} </if>
+			<if test="custName != null and custName != '' "> and `cust_name` = #{custName} </if>
+			<if test="status != null and status != '' "> and `status` = #{status}</if>
+			<if test="buildId != null and buildId != '' "> and `build_id` = #{buildId} </if>
+			<if test="buildName != null and buildName != '' "> and `build_name` = #{buildName} </if>
+			<if test="cellId != null and cellId != '' "> and `cell_id` = #{cellId} </if>
+			<if test="cellName != null and cellName != '' "> and `cell_name` = #{cellName} </if>
+			<if test="houseCode != null and houseCode != '' "> and `house_code` like concat('%',#{houseCode},'%') </if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into a_sub_account
+		(
+			`id`, 
+			`pname`, 
+			`pid`, 
+			`hid`, 
+			`sub_account_no`, 
+			`cust_no`, 
+			`sub_account_type`, 
+			`sub_account_name`, 
+			`sub_account_status`, 
+			`interest_flag`, 
+			`current_balance`, 
+			`pre_amount`, 
+			`freeze_amount`, 
+			`interest_amount`, 
+			`return_amount`, 
+			`donate_amount`, 
+			`final_amount`, 
+			`open_branch`,
+			`community_name`,
+			`open_org`, 
+			`cust_name`,
+			`status`,
+			`build_id`,
+			`build_name`,
+			`cell_id`,
+			`cell_name`,
+			`house_code`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.pname}, 
+			#{item.pid}, 
+			#{item.hid}, 
+			#{item.subAccountNo}, 
+			#{item.custNo}, 
+			#{item.subAccountType}, 
+			#{item.subAccountName}, 
+			#{item.subAccountStatus}, 
+			#{item.interestFlag}, 
+			#{item.currentBalance}, 
+			#{item.preAmount}, 
+			#{item.freezeAmount}, 
+			#{item.interestAmount}, 
+			#{item.returnAmount}, 
+			#{item.donateAmount}, 
+			#{item.finalAmount}, 
+			#{item.openBranch},
+			#{item.communityName},
+			#{item.openOrg}, 
+			#{item.custName},
+			#{item.status},
+			#{item.buildId},
+			#{item.buildName},
+			#{item.cellId},
+			#{item.cellName},
+			#{item.houseCode}
+        )
+		</foreach>
+	</insert>
+
+
+	<update id="updateBatch"  parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+			update a_sub_account
+			<set>
+				<if test="item.pname != null">`pname` = #{item.pname}, </if>
+				<if test="item.pid != null">`pid` = #{item.pid}, </if>
+				<if test="item.subAccountNo != null">`sub_account_no` = #{item.subAccountNo}, </if>
+				<if test="item.custNo != null">`cust_no` = #{item.custNo}, </if>
+				<if test="item.subAccountType != null">`sub_account_type` = #{item.subAccountType}, </if>
+				<if test="item.subAccountName != null">`sub_account_name` = #{item.subAccountName}, </if>
+				<if test="item.subAccountStatus != null">`sub_account_status` = #{item.subAccountStatus}, </if>
+				<if test="item.interestFlag != null">`interest_flag` = #{item.interestFlag}, </if>
+				<if test="item.currentBalance != null">`current_balance` = #{item.currentBalance}, </if>
+				<if test="item.preAmount != null">`pre_amount` = #{item.preAmount}, </if>
+				<if test="item.freezeAmount != null">`freeze_amount` = #{item.freezeAmount}, </if>
+				<if test="item.interestAmount != null">`interest_amount` = #{item.interestAmount}, </if>
+				<if test="item.returnAmount != null">`return_amount` = #{item.returnAmount}, </if>
+				<if test="item.donateAmount != null">`donate_amount` = #{item.donateAmount}, </if>
+				<if test="item.finalAmount != null">`final_amount` = #{item.finalAmount}, </if>
+				<if test="item.openBranch != null">`open_branch` = #{item.openBranch}, </if>
+				<if test="item.openOrg != null">`open_org` = #{item.openOrg}, </if>
+				<if test="item.communityName != null">`community_name` = #{item.communityName}, </if>
+				<if test="item.custName != null">`cust_name` = #{item.custName}, </if>
+				<if test="item.tenantId != null">`tenant_id` = #{item.tenantId}, </if>
+				<if test="item.status != null">`status` = #{item.status}, </if>
+				<if test="item.createUser != null">`create_user` = #{item.createUser}, </if>
+				<if test="item.createDate != null">`create_date` = #{item.createDate}, </if>
+				<if test="item.modifyUser != null">`modify_user` = #{item.modifyUser}, </if>
+				<if test="item.modifyDate != null">`modify_date` = #{item.modifyDate}, </if>
+				<if test="item.delFlag != null">`del_flag` = #{item.delFlag}</if>
+				<if test="item.buildId != null">`build_id` = #{item.buildId}, </if>
+				<if test="item.buildName != null">`build_name` = #{item.buildName}, </if>
+				<if test="item.cellId != null">`cell_id` = #{item.cellId}, </if>
+				<if test="item.cellName != null">`cell_name` = #{item.cellName}, </if>
+				<if test="item.houseCode != null">`house_code` = #{item.houseCode}</if>
+			</set>
+			where hid = #{item.hid}
+		</foreach>
+	</update>
+
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="subAccountMap"
+		parameterType="com.spring.base.entity.account.SubAccountEntity">
+		select * from a_sub_account
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+</mapper>

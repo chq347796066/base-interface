@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.saas.dao.ITenantDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.saas.TenantEntity" id="tenantMap">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="mobile" column="mobile"/>
+        <result property="password" column="password"/>
+        <result property="companyName" column="company_name"/>
+        <result property="province" column="province"/>
+        <result property="provinceCode" column="province_code"/>
+        <result property="city" column="city"/>
+		<result property="cityCode" column="city_code"/>
+        <result property="area" column="area"/>
+        <result property="areaCode" column="area_code"/>
+        <result property="address" column="address"/>
+        <result property="scaleId" column="scale_id"/>
+        <result property="industryId" column="industry_id"/>
+        <result property="businessLicenseNum" column="business_license_num"/>
+        <result property="businessLicensePic" column="business_license_pic"/>
+        <result property="contactPeople" column="contact_people"/>
+        <result property="contactPhone" column="contact_phone"/>
+        <result property="contactEmail" column="contact_email"/>
+        <result property="tenantStatus" column="tenant_status"/>
+        <result property="registerTime" column="register_time"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="tenantCode != null and tenantCode != '' "> and `tenant_code` = #{tenantCode} </if>
+			<if test="mobile != null and mobile != '' "> and `mobile` = #{mobile} </if>
+			<if test="password != null and password != '' "> and `password` = #{password} </if>
+			<if test="companyName != null and companyName != '' "> and `company_name` = #{companyName} </if>
+			<if test="province != null and province != '' "> and `province` = #{province} </if>
+			<if test="provinceCode != null and provinceCode != '' "> and `province_code` = #{provinceCode} </if>
+			<if test="city != null and city != '' "> and `city` = #{city} </if>
+			<if test="cityCode != null and cityCode != '' "> and `city_code` = #{cityCode} </if>
+			<if test="area != null and area != '' "> and `area` = #{area} </if>
+			<if test="areaCode != null and areaCode != '' "> and `area_code` = #{areaCode} </if>
+			<if test="address != null and address != '' "> and `address` = #{address} </if>
+			<if test="scaleId != null and scaleId != '' "> and `scale_id` = #{scaleId} </if>
+			<if test="industryId != null and industryId != '' "> and `industry_id` = #{industryId} </if>
+			<if test="businessLicenseNum != null and businessLicenseNum != '' "> and `business_license_num` = #{businessLicenseNum} </if>
+			<if test="businessLicensePic != null and businessLicensePic != '' "> and `business_license_pic` = #{businessLicensePic} </if>
+			<if test="contactPeople != null and contactPeople != '' "> and `contact_people` = #{contactPeople} </if>
+			<if test="contactPhone != null and contactPhone != '' "> and `contact_phone` = #{contactPhone} </if>
+			<if test="contactEmail != null and contactEmail != '' "> and `contact_email` = #{contactEmail} </if>
+			<if test="tenantStatus != null and tenantStatus != '' "> and `tenant_status` = #{tenantStatus} </if>
+			<if test="startTime !=null and startTime !=''">
+				and to_char(register_time,'yyyy-MM-dd') &gt;=#{startTime}
+			</if>
+			<if test="endTime !=null and endTime !=''">
+				and to_char(register_time,'yyyy-MM-dd') &lt;=#{endTime}
+			</if>
+			and del_flag=0
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into s_tenant
+		(
+			`id`, 
+			`tenant_code`, 
+			`mobile`, 
+			`password`, 
+			`company_name`, 
+			`province`, 
+			`province_code`, 
+			`city`,
+			`city_code`,
+			`area`,
+			`area_code`, 
+			`address`, 
+			`scale_id`, 
+			`industry_id`, 
+			`business_license_num`, 
+			`business_license_pic`, 
+			`contact_people`, 
+			`contact_phone`, 
+			`contact_email`, 
+			`tenant_status`, 
+			`register_time`,
+			`create_user`,
+			`create_date`,
+			`modify_user`,
+			`modify_date`,
+			`tenant_id`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.tenantCode}, 
+			#{item.mobile}, 
+			#{item.password}, 
+			#{item.companyName}, 
+			#{item.province}, 
+			#{item.provinceCode}, 
+			#{item.city},
+			#{item.cityCode,},
+			#{item.area},
+			#{item.areaCode}, 
+			#{item.address}, 
+			#{item.scaleId}, 
+			#{item.industryId}, 
+			#{item.businessLicenseNum}, 
+			#{item.businessLicensePic}, 
+			#{item.contactPeople}, 
+			#{item.contactPhone}, 
+			#{item.contactEmail}, 
+			#{item.tenantStatus}, 
+			#{item.registerTime},
+			#{item.createUser},
+			#{item.createDate},
+			#{item.modifyUser},
+			#{item.modifyDate},
+			#{item.tenantId}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryTenantList" resultType="com.spring.base.entity.saas.TenantEntity"
+		parameterType="com.spring.base.vo.saas.TenantQueryVo">
+		select
+			id,
+			tenant_code as tenantCode,
+			company_name as companyName,
+			contact_people as contactPeople,
+			contact_phone as contactPhone,
+			tenant_status as tenantStatus,
+			register_time as registerTime
+		from
+			s_tenant
+		where
+			del_flag=0
+		<if test="tenantCode !=null and tenantCode !=''" >
+			and tenant_code=#{tenantCode}
+		</if>
+		<if test="companyName !=null and companyName !=''" >
+			and company_name=#{companyName}
+		</if>
+		<if test="contactPeople !=null and contactPeople !=''" >
+			and contact_people=#{contactPeople}
+		</if>
+		<if test="contactPhone !=null and contactPhone !=''" >
+			and contact_phone=#{contactPhone}
+		</if>
+		<if test="tenantStatus !=null and tenantStatus !=''" >
+			and tenant_status=#{tenantStatus}
+		</if>
+		<if test="startTime !=null and startTime !=''" >
+			and date_format(register_time,'%Y-%m-%d %H-%i-%s')&gt;=#{startTime}
+		</if>
+		<if test="endTime !=null and endTime !=''" >
+			and date_format(register_time,'%Y-%m-%d %H-%i-%s')&lt;=#{endTime}
+		</if>
+		order by register_time desc
+	</select>
+
+	<!--根据id查询租户详细信息-->
+	<select id="queryTenantDetail" resultType="com.spring.base.vo.saas.TenantResponseVo" parameterType="java.lang.String">
+		select
+			main.company_name as companyName,
+			main.province,
+			mian.province_code as provinceCode,
+			main.city,
+			main.city_code as cityCode,
+			main.area,
+			main.area_code as areaCode,
+			main.address,
+			t1.scale_name as scaleName,
+			t2.industry_name as industryName,
+			main.business_license_num as businessLicenseNum,
+			main.business_license_pic as businessLicensePic,
+			main.contact_people as contactPeople,
+			main.contact_phone as contactPhone,
+			main.contact_email as contactEmail,
+			main.tenant_status as tenantStatus
+		from
+			s_tenant main
+		left join
+			s_company_scale t1 on main.scale_id=t1.id
+		left join
+			s_industry t2 on main.industry_id=t2.id
+		where
+			main.del_flag=0
+		and
+			main.id=#{id}
+	</select>
+
+	<!-- 用户自定义开始 -->
+	<!--租户登录-->
+	<select id="getUserByUserIdPassword" resultType="com.spring.base.vo.saas.LoginTenantVo">
+        select id as tenantId,mobile as userId,contact_people as userName,tenant_status as tenantStatus from s_tenant
+		where mobile=#{userId} and password=#{password} and del_flag=0
+	</select>
+
+	<!--查询个人账户信息-->
+    <select id="queryMyAccount" resultType="com.spring.base.vo.saas.MyAccountVo" parameterType="java.lang.String">
+		select
+			company_name as companyName,
+			tenant_code as serviceNum,
+			application_id as applicationId,
+			audit_time as startTime,
+			tenant_status as tenantStatus
+		from
+			s_tenant
+		where
+			mobile=#{mobile}
+		and
+			del_flag=0
+	</select>
+
+	<!--更新-->
+	<update id="updateTenantApp" parameterType="java.lang.String">
+		update
+			s_tenant
+		set
+			application_id=#{appId},
+			tenant_status=4
+		where
+			mobile=#{mobile}
+		and
+			del_flag=0
+	</update>
+
+	<!-- 查询当月续费租户数 -->
+	<select id="queryTenantRenewalNumByThisMonth" resultType="java.lang.Long">
+		select count(1) as renewTenementNum
+		from (
+			select st.id
+			from s_tenant st
+					 inner join s_order so on so.tenant_id = st.id and so.del_flag = 0
+			where st.del_flag = 0
+			  and so.order_type = 3
+			  and date_format(so.pay_date, '%Y-%m') = date_format(now(), '%Y-%m')
+			group by st.id
+		) as t
+	</select>
+
+	<!-- 查询上月续费租户数 -->
+	<select id="queryTenantRenewalNumByLastMonth" resultType="java.lang.Long">
+		select count(1) as lastRenewTenementNum
+		from (
+			select st.id
+			from s_tenant st
+					 inner join s_order so on so.tenant_id = st.id and so.del_flag = 0
+			where st.del_flag = 0
+			  and so.order_type = 3
+			  and date_format(so.pay_date, '%Y-%m') = date_format(date_sub(now(), interval 1 month), '%Y-%m')
+			group by st.id
+		) as t
+	</select>
+
+	<!-- 查询当月新增租户数 -->
+	<select id="queryNewTenantNumByThisMonth" resultType="java.lang.Long">
+		select count(1) as newTenantNum
+		from (
+			select st.id
+			from s_tenant st
+					 inner join s_order so on so.tenant_id = st.id and so.del_flag = 0
+			where st.del_flag = 0
+			  and so.order_type = 2
+			  and date_format(so.pay_date, '%Y-%m') = date_format(now(), '%Y-%m')
+			group by st.id
+		) as t
+	</select>
+
+	<!-- 查询上月新增租户数 -->
+	<select id="queryNewTenantNumByLastMonth" resultType="java.lang.Long">
+		select count(1) as lastNewTenantNum
+		from (
+			select st.id
+			from s_tenant st
+					 inner join s_order so on so.tenant_id = st.id and so.del_flag = 0
+			where st.del_flag = 0
+			  and so.order_type = 2
+			  and date_format(so.pay_date, '%Y-%m') = date_format(date_sub(now(), interval 1 month), '%Y-%m')
+			group by st.id
+		) as t
+	</select>
+
+	<!-- 查询当月到期租户数 -->
+	<select id="queryTenantsDueNumByThisMonth" resultType="java.lang.Long">
+		select count(1) as tenantDueNum
+		from (
+			select st.id
+			from s_tenant st
+					 inner join s_order so on so.tenant_id = st.id and so.del_flag = 0
+			where st.del_flag = 0
+			  and so.order_type in (2, 3, 4)
+			  and date_format(so.expire_date, '%Y-%m') = date_format(now(), '%Y-%m')
+			group by st.id
+		) as t
+	</select>
+
+	<!-- 查询上月到期租户数 -->
+	<select id="queryTenantsDueNumByLastMonth" resultType="java.lang.Long">
+		select count(1) as lastTenantDueNum
+		from (
+			select st.id
+			from s_tenant st
+					 inner join s_order so on so.tenant_id = st.id and so.del_flag = 0
+			where st.del_flag = 0
+			  and so.order_type in (2, 3, 4)
+			  and date_format(so.expire_date, '%Y-%m') = date_format(date_sub(now(), interval 1 month), '%Y-%m')
+			group by st.id
+		) as t
+	</select>
+
+	<!-- 统计有效租户 -->
+	<select id="queryEffectiveTenantCount" resultType="java.lang.Long">
+		select count(1) as lastTenantDueNum
+		from (
+			select id
+			from s_tenant
+			where del_flag = 0
+			  and tenant_status in (2, 4)
+		) as t
+	</select>
+</mapper>

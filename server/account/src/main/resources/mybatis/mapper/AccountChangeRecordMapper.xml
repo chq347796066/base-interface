@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.account.dao.IAccountChangeRecordDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.account.AccountChangeRecordEntity" id="accountChangeRecordMap">
+        <result property="id" column="id"/>
+        <result property="transId" column="trans_id"/>
+        <result property="custNo" column="cust_no"/>
+        <result property="changeTime" column="change_time"/>
+        <result property="changeAccountNo" column="change_account_no"/>
+        <result property="changeBalance" column="change_balance"/>
+        <result property="changeInterestAmount" column="change_interest_amount"/>
+        <result property="changeAmount" column="change_amount"/>
+        <result property="processStatus" column="process_status"/>
+        <result property="changeReason" column="change_reason"/>
+        <result property="changeType" column="change_type"/>
+        <result property="changeMark" column="change_mark"/>
+        <result property="preAmount" column="pre_amount"/>
+        <result property="subAccountType" column="sub_account_type"/>
+        <result property="subAccountName" column="sub_account_name"/>
+        <result property="orgNo" column="org_no"/>
+        <result property="hid" column="hid"/>
+        <result property="status" column="status"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="transId != null and transId != '' "> and `trans_id` = #{transId} </if>
+			<if test="custNo != null and custNo != '' "> and `cust_no` = #{custNo} </if>
+			<if test="changeTime != null and changeTime != '' "> and `change_time` = #{changeTime} </if>
+			<if test="changeAccountNo != null and changeAccountNo != '' "> and `change_account_no` = #{changeAccountNo} </if>
+			<if test="changeBalance != null and changeBalance != '' "> and `change_balance` = #{changeBalance} </if>
+			<if test="changeInterestAmount != null and changeInterestAmount != '' "> and `change_interest_amount` = #{changeInterestAmount} </if>
+			<if test="changeAmount != null and changeAmount != '' "> and `change_amount` = #{changeAmount} </if>
+			<if test="processStatus != null and processStatus != '' "> and `process_status` = #{processStatus} </if>
+			<if test="changeReason != null and changeReason != '' "> and `change_reason` = #{changeReason} </if>
+			<if test="changeType != null and changeType != '' "> and `change_type` = #{changeType} </if>
+			<if test="changeMark != null and changeMark != '' "> and `change_mark` = #{changeMark} </if>
+			<if test="preAmount != null and preAmount != '' "> and `pre_amount` = #{preAmount} </if>
+			<if test="subAccountType != null and subAccountType != '' "> and `sub_account_type` = #{subAccountType} </if>
+			<if test="subAccountName != null and subAccountName != '' "> and `sub_account_name` = #{subAccountName} </if>
+			<if test="orgNo != null and orgNo != '' "> and `org_no` = #{orgNo} </if>
+			<if test="hid != null and hid != '' "> and `hid` = #{hid} </if>
+			<if test="status != null and status != '' "> and `status` = #{status}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into a_account_change_record
+		(
+			`id`, 
+			`trans_id`, 
+			`cust_no`, 
+			`change_time`, 
+			`change_account_no`, 
+			`change_balance`, 
+			`change_interest_amount`, 
+			`change_amount`, 
+			`process_status`, 
+			`change_reason`, 
+			`change_type`, 
+			`change_mark`, 
+			`pre_amount`, 
+			`sub_account_type`, 
+			`sub_account_name`, 
+			`org_no`, 
+			`hid`, 
+			`status`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.transId}, 
+			#{item.custNo}, 
+			#{item.changeTime}, 
+			#{item.changeAccountNo}, 
+			#{item.changeBalance}, 
+			#{item.changeInterestAmount}, 
+			#{item.changeAmount}, 
+			#{item.processStatus}, 
+			#{item.changeReason}, 
+			#{item.changeType}, 
+			#{item.changeMark}, 
+			#{item.preAmount}, 
+			#{item.subAccountType}, 
+			#{item.subAccountName}, 
+			#{item.orgNo}, 
+			#{item.hid}, 
+			#{item.status}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="accountChangeRecordMap"
+		parameterType="com.spring.base.entity.account.AccountChangeRecordEntity">
+		select * from a_account_change_record
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+</mapper>

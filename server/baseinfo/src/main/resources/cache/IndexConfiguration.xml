@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<indexes>
+
+
+	<!--<index entityName="com.icip.framework.common.model.SysSensitive">
+		<property name="senSqlid"></property>
+	</index>-->
+
+</indexes>

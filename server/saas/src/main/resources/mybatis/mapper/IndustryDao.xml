@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.saas.dao.IIndustryDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.saas.IndustryEntity" id="industryMap">
+        <result property="id" column="id"/>
+        <result property="industryName" column="industry_name"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="industryName != null and industryName != '' "> and `industry_name` = #{industryName}</if>
+			 and del_flag=0
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into s_industry
+		(
+			`id`, 
+			`industry_name`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.industryName}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="industryMap"
+		parameterType="com.spring.base.entity.saas.IndustryEntity">
+		select * from s_industry
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.saas.dao.IInvoiceHeadDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.saas.InvoiceHeadEntity" id="invoiceHeadMap">
+        <result property="id" column="id"/>
+        <result property="mobile" column="mobile"/>
+        <result property="companyName" column="company_name"/>
+        <result property="invoiceType" column="invoice_type"/>
+        <result property="taxNum" column="tax_num"/>
+        <result property="openBank" column="open_bank"/>
+        <result property="openAccount" column="open_account"/>
+        <result property="address" column="address"/>
+        <result property="mail" column="mail"/>
+        <result property="tel" column="tel"/>
+        <result property="makeInvoiceType" column="make_invoice_type"/>
+		<result property="isDefault" column="is_default"/>
+    </resultMap>
+
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="mobile != null and mobile != '' "> and `mobile` = #{mobile} </if>
+			<if test="companyName != null and companyName != '' "> and `company_name` = #{companyName} </if>
+			<if test="invoiceType != null and invoiceType != '' "> and `invoice_type` = #{invoiceType} </if>
+			<if test="taxNum != null and taxNum != '' "> and `tax_num` = #{taxNum} </if>
+			<if test="openBank != null and openBank != '' "> and `open_bank` = #{openBank} </if>
+			<if test="openAccount != null and openAccount != '' "> and `open_account` = #{openAccount} </if>
+			<if test="address != null and address != '' "> and `address` = #{address} </if>
+			<if test="mail != null and mail != '' "> and `mail` = #{mail} </if>
+			<if test="tel != null and tel != '' "> and `tel` = #{tel} </if>
+			<if test="makeInvoiceType != null and makeInvoiceType != '' "> and `make_invoice_type` = #{makeInvoiceType}</if>
+			<if test="isDefault != null and isDefault != '' "> and `is_default` = #{isDefault}</if>
+			and del_flag=0
+		</where>
+	</sql>
+
+    <!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="invoiceHeadMap"
+		parameterType="com.spring.base.entity.saas.InvoiceHeadEntity">
+		select * from s_invoice_head
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!--将租户的其他发票头设为非默认-->
+	<update id="deEnableInvoiceHead" parameterType="com.spring.base.entity.saas.InvoiceHeadEntity">
+		update
+			s_invoice_head
+		set
+			is_default=1
+		where
+			mobile=#{mobile}
+		and
+			id !=#{id}
+	</update>
+</mapper>

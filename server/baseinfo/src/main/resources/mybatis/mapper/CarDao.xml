@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.baseinfo.dao.ICarDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.CarEntity" id="carMap">
+        <result property="id" column="id"/>
+        <result property="communityId" column="community_id"/>
+		<result property="customerId" column="customer_id"/>
+        <result property="carCode" column="car_code"/>
+        <result property="carNo" column="car_no"/>
+        <result property="area" column="area"/>
+        <result property="carType" column="car_type"/>
+        <result property="carStatus" column="car_status"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="status" column="status"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+		<result property="communityName" column="communityName"/>
+		<result property="customerName" column="customerName"/>
+		<result property="phone" column="phone"/>
+		<result property="certificatesNumber" column="certificatesNumber"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			 main.status = '1'
+			<if test="id != null and id != '' ">
+				and main.id = #{id}
+			</if>
+			<if test="communityId != null and communityId != '' ">
+			        and main.community_id = #{communityId}
+			</if>
+			<if test="customerId != null and customerId != '' ">
+				and main.customer_id = #{customerId}
+			</if>
+			<if test="carCode != null and carCode != '' ">
+			        and main.car_code like concat('%',#{carCode,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="carNo != null and carNo != '' ">
+			        and main.car_no = #{carNo}
+			</if>
+			<if test="area != null and area != '' ">
+			        and main.area = #{area}
+			</if>
+			<if test="carType != null and carType != '' ">
+			        and main.car_type = #{carType}
+			</if>
+			<if test="carStatus != null and carStatus != '' ">
+			        and main.car_status = #{carStatus}
+			</if>
+			<if test="tenantId != null and tenantId != '' ">
+			        and main.tenant_id = #{tenantId}
+			</if>
+			<if test="companyId != null and companyId != '' ">
+				and main.company_id = #{companyId}
+			</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into b_car
+		(
+			`id`, 
+			`community_id`,
+		    `customer_id`,
+			`car_code`, 
+			`car_no`, 
+			`area`, 
+			`car_type`, 
+			`car_status`,
+			`status`, 
+			`create_user`, 
+			`create_date`, 
+			`modify_user`, 
+			`modify_date`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.communityId},
+			#{item.customerId},
+			#{item.carCode}, 
+			#{item.carNo}, 
+			#{item.area}, 
+			#{item.carType}, 
+			#{item.carStatus},
+			#{item.status}, 
+			#{item.createUser}, 
+			#{item.createDate}, 
+			#{item.modifyUser}, 
+			#{item.modifyDate}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="carMap" parameterType="com.spring.base.entity.baseinfo.CarEntity">
+		select
+		main.id,
+		main.community_id,
+		main.customer_id,
+		main.car_code,
+		main.car_no,
+		main.area,
+		main.car_type,
+		main.car_status,
+		main.tenant_id,
+		main.status,
+		co.community_name as communityName,
+		cu.customer_name as customerName,
+		cu.phone as phone,
+		cu.certificates_number as certificatesNumber
+		from b_car as main
+		left join b_community co on main.community_id = co.id
+		left join b_customer cu  on main.customer_id = cu.id
+		<include refid="Where_Clause" />
+		order by main.modify_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+	<update id="deleteCar" parameterType="com.spring.base.entity.baseinfo.CarEntity">
+		update b_car
+		set status = 2
+		where id = #{id}
+		<if test="tenantId != null and tenantId != '' ">
+			and tenant_id = #{tenantId}
+		</if>
+	</update>
+
+	<select id="queryCar" parameterType="com.spring.base.entity.baseinfo.CarEntity" resultType="com.spring.base.entity.baseinfo.CarEntity">
+		 select * from b_car where status = '1'
+		 and community_id = #{communityId}
+		 and car_code = #{carCode}
+	</select>
+
+</mapper>

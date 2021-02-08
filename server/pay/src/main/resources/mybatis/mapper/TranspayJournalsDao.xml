@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.pay.dao.ITranspayJournalsDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.pay.TranspayJournalsEntity" id="transpayJournalsMap">
+        <result property="id" column="id"/>
+        <result property="transId" column="trans_id"/>
+        <result property="paytype" column="paytype"/>
+        <result property="thirdTranspayId" column="third_transpay_id"/>
+        <result property="recordCompanyName" column="record_company_name"/>
+        <result property="recordCompanyId" column="record_company_id"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="subPaytype" column="sub_paytype"/>
+        <result property="payAccName" column="pay_acc_name"/>
+        <result property="observation" column="observation"/>
+        <result property="status" column="status"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="transId != null and transId != '' "> and `trans_id` = #{transId} </if>
+			<if test="paytype != null and paytype != '' "> and `paytype` = #{paytype} </if>
+			<if test="thirdTranspayId != null and thirdTranspayId != '' "> and `third_transpay_id` = #{thirdTranspayId} </if>
+			<if test="recordCompanyName != null and recordCompanyName != '' "> and `record_company_name` = #{recordCompanyName} </if>
+			<if test="recordCompanyId != null and recordCompanyId != '' "> and `record_company_id` = #{recordCompanyId} </if>
+			<if test="updateTime != null and updateTime != '' "> and `update_time` = #{updateTime} </if>
+			<if test="subPaytype != null and subPaytype != '' "> and `sub_paytype` = #{subPaytype} </if>
+			<if test="payAccName != null and payAccName != '' "> and `pay_acc_name` = #{payAccName} </if>
+			<if test="observation != null and observation != '' "> and `observation` = #{observation} </if>
+			<if test="status != null and status != '' "> and `status` = #{status}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into p_transpay_journals
+		(
+			`id`, 
+			`trans_id`, 
+			`paytype`, 
+			`third_transpay_id`, 
+			`record_company_name`, 
+			`record_company_id`, 
+			`update_time`, 
+			`sub_paytype`, 
+			`pay_acc_name`, 
+			`observation`, 
+			`status`,
+			`create_user`,
+			`create_date`,
+			`modify_user`,
+			`modify_date`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.transId}, 
+			#{item.paytype}, 
+			#{item.thirdTranspayId}, 
+			#{item.recordCompanyName}, 
+			#{item.recordCompanyId}, 
+			#{item.updateTime}, 
+			#{item.subPaytype}, 
+			#{item.payAccName}, 
+			#{item.observation}, 
+			#{item.status},
+			#{item.createUser},
+			#{item.createDate},
+			#{item.modifyUser},
+			#{item.modifyDate}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="transpayJournalsMap"
+		parameterType="com.spring.base.entity.pay.TranspayJournalsEntity">
+		select * from p_transpay_journals
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+</mapper>

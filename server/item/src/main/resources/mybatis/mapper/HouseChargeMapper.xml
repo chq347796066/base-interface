@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.item.mapper.HouseChargeMapper">
+
+  <resultMap id="bHouseChargeMap" type="com.spring.base.entity.item.HouseCharge">
+                  <id property="hcId" column="hc_id"/>
+                        <result property="chargeConfigId" column="charge_config_id"/>
+                        <result property="cid" column="cid"/>
+                        <result property="hid" column="hid"/>
+                        <result property="chargeNo" column="charge_no"/>
+                        <result property="startDate" column="start_date"/>
+                        <result property="endDate" column="end_date"/>
+                          <result property="createDate" column="create_date"/>
+                          <result property="createUser" column="create_user"/>
+                          <result property="modifyDate" column="modify_date"/>
+                          <result property="modifyUser" column="modify_user"/>
+            </resultMap>
+</mapper>

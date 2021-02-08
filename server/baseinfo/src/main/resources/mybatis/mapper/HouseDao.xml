@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.baseinfo.dao.IHouseDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.HouseEntity" id="houseMap">
+        <result property="id" column="id"/>
+        <result property="communityId" column="community_id"/>
+		<result property="customerId" column="customer_id"/>
+        <result property="buildId" column="build_id"/>
+        <result property="cellId" column="cell_id"/>
+        <result property="floor" column="floor"/>
+        <result property="houseNo" column="house_no"/>
+        <result property="houseCode" column="house_code"/>
+        <result property="houseType" column="house_type"/>
+        <result property="houseStatus" column="house_status"/>
+        <result property="architectureArea" column="architecture_area"/>
+		<result property="useArea" column="use_area"/>
+		<result property="ownerName" column="owner_name"/>
+        <result property="ownerMobile" column="owner_mobile"/>
+        <result property="ownerCard" column="owner_card"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="status" column="status"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+		<result property="communityName" column="communityName"/>
+		<result property="buildName" column="buildName"/>
+		<result property="cellName" column="cellName"/>
+		<result property="customerName" column="customerName"/>
+    </resultMap>
+
+	<resultMap type="com.spring.base.vo.baseinfo.house.HouseEntityVo" id="houseResult">
+		<result property="id" column="id"/>
+		<result property="communityId" column="communityId"/>
+		<result property="buildId" column="buildId"/>
+		<result property="cellId" column="cellId"/>
+		<result property="floor" column="floor"/>
+		<result property="houseNo" column="houseNo"/>
+		<result property="houseCode" column="houseCode"/>
+		<result property="houseType" column="houseType"/>
+		<result property="houseStatus" column="houseStatus"/>
+		<result property="architectureArea" column="architectureArea"/>
+		<result property="ownerName" column="ownerName"/>
+		<result property="ownerMobile" column="ownerMobile"/>
+		<result property="ownerCard" column="ownerCard"/>
+		<result property="tenantId" column="tenantId"/>
+		<result property="status" column="status"/>
+		<result property="communityName" column="communityName"/>
+		<result property="buildName" column="buildName"/>
+		<result property="cellName" column="cellName"/>
+	</resultMap>
+
+
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			main.status = '1'
+			<if test="id != null and id != '' ">
+				and main.id = #{id}
+			</if>
+			<if test="communityId != null and communityId != '' ">
+			      and main.community_id = #{communityId}
+			</if>
+			<if test="customerId != null and customerId != '' ">
+				and main.customer_id = #{customerId}
+			</if>
+			<if test="buildId != null and buildId != '' ">
+			      and main.build_id = #{buildId}
+			</if>
+			<if test="cellId != null and cellId != '' ">
+			      and main.cell_id = #{cellId}
+			</if>
+			<if test="floor != null and floor != '' ">
+			      and main.floor = #{floor}
+			</if>
+			<if test="houseNo != null and houseNo != '' ">
+			      and main.house_no = #{houseNo}
+			</if>
+			<if test="houseCode != null and houseCode != '' ">
+			      and main.house_code  like concat('%',#{houseCode,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="houseType != null and houseType != '' ">
+			      and main.house_type = #{houseType}
+			</if>
+			<if test="houseStatus != null and houseStatus != '' ">
+			      and main.house_status = #{houseStatus}
+			</if>
+			<if test="architectureArea != null and architectureArea != '' ">
+			      and main.architecture_area = #{architectureArea}
+			</if>
+			<if test="useArea != null and useArea != '' ">
+				and main.use_area = #{useArea}
+			</if>
+			<if test="ownerName != null and ownerName != '' ">
+			      and main.owner_name like concat('%',#{ownerName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="ownerMobile != null and ownerMobile != '' ">
+			      and main.owner_mobile = #{ownerMobile}
+			</if>
+			<if test="ownerCard != null and ownerCard != '' ">
+			      and main.owner_card = #{ownerCard}
+			</if>
+			<if test="tenantId != null and tenantId != '' ">
+			      and main.tenant_id = #{tenantId}
+			</if>
+			<if test="companyId != null and companyId != '' ">
+				and main.company_id = #{companyId}
+			</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into b_house
+		(
+			`id`, 
+			`community_id`,
+		    `customer_id`,
+			`build_id`, 
+			`cell_id`, 
+			`floor`, 
+			`house_no`, 
+			`house_code`, 
+			`house_type`, 
+			`house_status`, 
+			`architecture_area`,
+			`use_area`,
+			`owner_name`, 
+			`owner_mobile`,
+			`owner_card`,
+			`status`, 
+			`create_user`, 
+			`create_date`, 
+			`modify_user`, 
+			`modify_date`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.communityId},
+			#{item.customerId},
+			#{item.buildId}, 
+			#{item.cellId}, 
+			#{item.floor}, 
+			#{item.houseNo}, 
+			#{item.houseCode}, 
+			#{item.houseType}, 
+			#{item.houseStatus}, 
+			#{item.architectureArea},
+			#{item.useArea},
+			#{item.ownerName}, 
+			#{item.ownerMobile},
+			#{item.ownerCard},
+			#{item.status}, 
+			#{item.createUser}, 
+			#{item.createDate}, 
+			#{item.modifyUser}, 
+			#{item.modifyDate}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="houseMap" parameterType="com.spring.base.entity.baseinfo.HouseEntity">
+		select
+		main.id,
+		main.community_id,
+		main.customer_id,
+		main.build_id,
+		main.cell_id,
+		main.floor,
+		main.house_no,
+		main.house_code,
+		main.house_type,
+		main.house_status,
+		main.architecture_area,
+		main.use_area,
+		main.owner_name,
+		main.owner_mobile,
+		main.owner_card,
+		main.tenant_id,
+		main.status,
+		c.community_name as communityName,
+		d.build_name as buildName,
+		l.cell_name as cellName,
+		cu.customer_name as customerName
+		from b_house as main
+		left join b_community c on main.community_id = c.id
+		left join b_build d on main.build_id = d.id
+		left join b_cell  l on main.cell_id = l.id
+		left join b_customer cu  on main.customer_id = cu.id
+		<include refid="Where_Clause" />
+		order by main.modify_date desc
+	</select>
+
+
+	<select id="queryHouseInfo" resultMap="houseMap" parameterType="com.spring.base.entity.baseinfo.HouseEntity">
+		select
+		main.id,
+		main.community_id,
+		main.customer_id,
+		main.build_id,
+		main.cell_id,
+		main.floor,
+		main.house_no,
+		main.house_code,
+		main.house_type,
+		main.house_status,
+		main.architecture_area,
+		main.use_area,
+		main.owner_name,
+		main.owner_mobile,
+		main.owner_card,
+		main.tenant_id,
+		main.status,
+		c.community_name as communityName,
+		d.build_name as buildName,
+		l.cell_name as cellName,
+		cu.customer_name as customerName
+		from b_house as main
+		left join b_community c on main.community_id = c.id
+		left join b_build d on main.build_id = d.id
+		left join b_cell  l on main.cell_id = l.id
+		left join b_customer cu  on main.customer_id = cu.id
+		<include refid="Where_Clause" />
+		order by main.modify_date desc
+	</select>
+
+
+	<!-- 用户自定义开始 -->
+
+
+	<select id="queryExcelList" resultMap="houseResult" parameterType="com.spring.base.entity.baseinfo.HouseEntity">
+		select
+		b.id as id,
+		b.community_id as communityId,
+		b.build_id as buildId,
+		b.cell_id as cellId,
+		b.floor as floor,
+		b.house_no as houseNo,
+		b.house_code as houseCode,
+		b.house_type as houseType,
+		b.house_status as houseStatus,
+		b.architecture_area as architectureArea,
+		b.owner_name as ownerName,
+		b.owner_mobile as ownerMobile,
+		b.owner_card as owneCard,
+		b.tenant_id as tenant,
+		b.status as status,
+		c.community_name as communityName,
+		d.build_name as buildName,
+		l.cell_name as cellName
+		from b_house b
+		left join b_community c on b.community_id = c.id and c.status =0
+		left join b_build d on b.build_id = d.id and d.status =0
+		left join b_cell  l on b.cell_id = l.id and l.status =0
+		where b.status = 0
+		<if test="houseCode !=null and houseCode !='' ">
+			and b.house_code =  #{houseCode}
+		</if>
+		<if test="communityId !=null and communityId !='' ">
+			and b.community_id = #{communityId}
+		</if>
+		<if test="buildId !=null and buildId !='' ">
+			and b.build_id = #{buildId}
+		</if>
+	</select>
+
+	<update id="deleteHouse" parameterType="com.spring.base.entity.baseinfo.HouseEntity">
+		update b_house
+		set status  = 2
+		where id = #{id}
+		<if test="tenantId != null and tenantId != '' ">
+			and tenant_id = #{tenantId}
+		</if>
+	</update>
+
+	<!-- 房屋审核客户信息 -->
+	<select id="queryOwnerNameMobile" parameterType="com.spring.base.entity.baseinfo.HouseEntity" resultType="com.spring.base.entity.baseinfo.HouseEntity">
+		SELECT
+		     id as id,
+		     insert(owner_mobile,4,4,'****') as ownerMobile,
+			 insert(owner_name,2,1,'*') as ownerName
+        FROM `b_house`
+        where status = '1'
+        and id = #{id}
+	</select>
+
+
+	<!-- 校验房屋编号唯一 -->
+	<select id="queryHouseCodeList" parameterType="com.spring.base.entity.baseinfo.HouseEntity" resultMap="houseMap">
+		select
+		id,community_id,
+		customer_id,build_id,
+		cell_id,floor,
+		house_no,house_code,
+		house_type,house_status,
+		architecture_area,use_area,
+		owner_name,owner_mobile,
+		owner_card,status
+		from b_house
+		where status = '1'
+		<if test="houseCode !=null and houseCode !='' ">
+			and house_code =  #{houseCode}
+		</if>
+		<if test="buildId !=null and buildId !='' ">
+			and build_id = #{buildId}
+		</if>
+		<if test="cellId != null and cellId != '' ">
+			and cell_id = #{cellId}
+		</if>
+		<if test="communityId !=null and communityId !='' ">
+			 and community_id = #{communityId}
+		</if>
+		<if test="id != null and id != '' ">
+			and id != #{id}
+		</if>
+	</select>
+	
+	<select id="queryExportList" resultType="java.util.LinkedHashMap" parameterType="map">
+		select
+		company.company_name AS companyName,
+		house.company_id AS companyId,
+		community.community_name AS communityName,
+		house.community_id AS communityId,
+		build.build_name AS buildName,
+		build.id AS buildId,
+		cell.cell_name AS cellName,
+		cell.id AS cellId,
+		house.house_code AS houseCode,
+		house.id AS hid,
+		house.customer_id AS ownerNo,
+		house.owner_name AS ownerName,
+		house.owner_mobile AS phone,
+		'' AS preparAmount,
+		'' AS prepayTime
+		from b_house AS house
+		left join b_company AS company on house.company_id = company.id
+		left join b_community AS community on community.community_id = house.community_id
+		left join b_build AS build on build.id = house.build_id
+		left join b_cell AS cell on cell.id = house.cell_id
+		<where>
+			<if test="communityId != null">
+				and house.community_id = #{communityId,jdbcType=VARCHAR}
+			</if>
+		</where>
+
+	</select>
+
+	<update id="updateHouserUserStatus" parameterType="com.spring.base.vo.baseinfo.housingcertification.HouseDeleteParamVo">
+		update b_house
+		set del_flag = 1
+		where id = #{houseId}
+		and owner_card = #{certificateNo};
+		update b_customer AS cu
+		left join b_house AS hou on cu.id = hou.customer_id
+		set cu.del_flag = 1
+		where  hou.id = #{houseId}
+		and cu.certificates_number = #{certificateNo}
+	</update>
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryHouseList" resultType="com.spring.base.entity.baseinfo.HouseEntity" parameterType="com.spring.base.entity.baseinfo.HouseEntity">
+		select
+		main.id,
+		main.community_id,
+		main.customer_id,
+		main.build_id,
+		main.cell_id,
+		main.floor,
+		main.house_no,
+		main.house_code,
+		main.house_type,
+		main.house_status,
+		main.architecture_area,
+		main.use_area,
+		main.owner_name,
+		main.owner_mobile,
+		main.owner_card,
+		main.tenant_id,
+		main.status,
+		c.community_name as communityName,
+		d.build_name as buildName,
+		l.cell_name as cellName,
+		cu.customer_name as customerName
+		from b_house as main
+		left join b_community c on (main.community_id = c.id and c.del_flag='0')
+		left join b_build d on (main.build_id = d.id and d.del_flag='0')
+		left join b_cell  l on (main.cell_id = l.id and l.del_flag='0')
+		left join b_customer cu  on (main.customer_id = cu.id and cu.del_flag='0')
+		where 1=1
+		and main.del_flag = '0'
+			<if test="communityId !=null and communityId !=''">
+				and main.community_id=#{communityId}
+			</if>
+		<if test="buildId !=null and buildId !=''">
+			and main.build_id=#{buildId}
+		</if>
+		<if test="communityIds != null and communityIds.size != '' ">
+			and main.community_id in
+			<foreach collection="communityIds" item="id" index="index" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+		</if>
+		<if test="houseCode !=null and houseCode !=''">
+			and main.house_code=#{houseCode}
+		</if>
+		order by main.modify_date desc
+	</select>
+</mapper>

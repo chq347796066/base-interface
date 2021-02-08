@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.pay.dao.IPaidStatisDao">
+
+
+    <select id="queryPaidList" resultType="com.spring.base.vo.pay.paidstatis.PaymentRecordVo">
+        SELECT
+        ptj.cid,
+        ptj.cname,#小区
+        pbj.building,#楼栋
+        pbj.hid, #房屋编号
+        ptj.cust_name  custName, #客户姓名
+        ptj.trans_type AS transType, #交易类型
+        ptj.trans_amount as  transAmount, #交易金额
+        pbj.business_amount AS businessAmount, #费项单笔交易金额
+        pbj.charge_type chargeType, #收费科目编码
+        pbj.charge_type_name chargeTypeName, #费项科目
+        pbj.charge_no chargeNo, #费项编码
+        pbj.charge_name chargeName, #费项名称
+        ptj.trans_time transTime, #收费时间
+        ptpj.paytype  #付款方式
+        from p_trans_journals ptj Inner JOIN p_business_journals pbj  on ptj.trans_id=pbj.trans_id
+        Left JOIN p_transpay_journals ptpj on ptpj.trans_id=pbj.trans_id
+
+        <where>
+            <if test="cid != null and cid != '' ">and ptj.cid = #{cid}</if>
+            <if test="building != null and building != '' ">and pbj.building = #{building}</if>
+            <if test="hid != null and hid != '' ">and pbj.hid = #{hid}</if>
+            <if test="custName != null and custName != '' ">and pbj.pname like CONCAT('%','${custName}','%')</if>
+            <if test="paytype != null and paytype != '' ">and ptpj.paytype = #{paytype}</if>
+            <if test="chargeType != null and chargeType != '' ">and pbj.charge_type  = #{chargeType}</if>
+            <if test="startTransTime != null and startTransTime != '' ">and ptj.trans_time  <![CDATA[ >= ]]> #{startTransTime}</if>
+            <if test="startEndTime != null and startEndTime != '' ">and ptj.trans_time  <![CDATA[ <= ]]> #{startEndTime}</if>
+        </where>
+    </select>
+
+
+</mapper>

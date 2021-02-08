@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.baseinfo.dao.IMenuDao">
+
+    <!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.MenuEntity" id="menuMap">
+        <result property="id" column="id"/>
+        <result property="parent" column="parent"/>
+        <result property="menuCode" column="menu_code"/>
+        <result property="menuTitle" column="menu_title"/>
+        <result property="menuLevel" column="menu_level"/>
+        <result property="routeName" column="route_name"/>
+        <result property="routePath" column="route_path"/>
+        <result property="menuIcon" column="menu_icon"/>
+        <result property="menuDesc" column="menu_desc"/>
+        <result property="menuOrder" column="menu_order"/>
+        <result property="interfaceName" column="interface_name"/>
+        <result property="menuProperty" column="menu_property"/>
+        <result property="component" column="component"/>
+        <result property="menuType" column="menu_type"/>
+        <result property="systemCode" column="system_code"/>
+        <result property="status" column="status"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+    </resultMap>
+
+    <!-- 查询条件 -->
+    <sql id="Where_Clause">
+        <where>
+            <if test="parent != null and parent != '' ">and `parent` = #{parent}</if>
+            <if test="menuCode != null and menuCode != '' ">and `menu_code` = #{menuCode}</if>
+            <if test="menuTitle != null and menuTitle != '' ">and `menu_title` = #{menuTitle}</if>
+            <if test="menuLevel != null and menuLevel != '' ">and `menu_level` = #{menuLevel}</if>
+            <if test="routeName != null and routeName != '' ">and `route_name` = #{routeName}</if>
+            <if test="routePath != null and routePath != '' ">and `route_path` = #{routePath}</if>
+            <if test="menuIcon != null and menuIcon != '' ">and `menu_icon` = #{menuIcon}</if>
+            <if test="menuDesc != null and menuDesc != '' ">and `menu_desc` = #{menuDesc}</if>
+            <if test="menuOrder != null and menuOrder != '' ">and `menu_order` = #{menuOrder}</if>
+            <if test="interfaceName != null and interfaceName != '' ">and `interface_name` = #{interfaceName}</if>
+            <if test="menuType != null and menuType != '' ">and `menu_type` = #{menuType}</if>
+            <if test="systemCode != null and systemCode != '' ">and `system_code` = #{systemCode}</if>
+            <if test="status != null and status != '' ">and `status` = #{status}</if>
+            <if test="createUser != null and createUser != '' ">and `create_user` = #{createUser}</if>
+            <if test="createDate != null and createDate != '' ">and `create_date` = #{createDate}</if>
+            <if test="modifyUser != null and modifyUser != '' ">and `modify_user` = #{modifyUser}</if>
+            <if test="modifyDate != null and modifyDate != '' ">and `modify_date` = #{modifyDate}</if>
+        </where>
+    </sql>
+
+
+    <!-- 批量新增 -->
+    <insert id="addList" parameterType="java.util.List">
+        insert into b_menu
+        (
+        `id`,
+        `parent`,
+        `menu_code`,
+        `menu_title`,
+        `menu_level`,
+        `route_name`,
+        `route_path`,
+        `menu_icon`,
+        `menu_desc`,
+        `menu_order`,
+        `menu_property`,
+        `component`,
+        `interface_name`,
+        `menu_type`,
+        `system_code`,
+        `status`,
+        `create_user`,
+        `create_date`,
+        `modify_user`,
+        `modify_date`
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.parent},
+            #{item.menuCode},
+            #{item.menuTitle},
+            #{item.menuLevel},
+            #{item.routeName},
+            #{item.routePath},
+            #{item.menuIcon},
+            #{item.menuDesc},
+            #{item.menuOrder},
+            #{item.menuProperty},
+            #{item.component},
+            #{item.interfaceName},
+            #{item.menuType},
+            #{item.systemCode},
+            #{item.status},
+            #{item.createUser},
+            #{item.createDate},
+            #{item.modifyUser},
+            #{item.modifyDate}
+            )
+        </foreach>
+    </insert>
+
+
+    <!-- 根据条件查询列表 -->
+    <select id="queryList" resultMap="menuMap"
+            parameterType="com.spring.base.entity.baseinfo.MenuEntity">
+        select * from b_menu
+        <include refid="Where_Clause"/>
+        order by modify_date desc
+    </select>
+
+    <!-- 用户自定义开始 -->
+    <!-- 查询第一级菜单 -->
+    <select id="queryMenuOne" resultType="com.spring.base.vo.baseinfo.menu.MenuOneVo">
+		select id,parent,menu_code as menuCode,menu_title as menuTitle,menu_level as menuLevel,
+		route_name as routeName,route_path as routePath,menu_icon as menuIcon,menu_desc as menuDesc,menu_property as menuProperty,
+		interface_name as interfaceName,menu_order as menuOrder,menu_type as menuType,component,system_code as systemCode
+		  from b_menu
+		 where parent = '0'
+		 and system_code=#{systemCode}
+		 and status=1 and menu_type=1
+		 order by menu_order asc
+	</select>
+
+    <!-- 查询第二级菜单 -->
+    <select id="queryMenuTwo" resultType="com.spring.base.vo.baseinfo.menu.MenuTwoVo">
+		select id,parent,menu_code as menuCode,menu_title as menuTitle,menu_level as menuLevel,
+		route_name as routeName,route_path as routePath,menu_icon as menuIcon,menu_desc as menuDesc,menu_property as menuProperty,
+		interface_name as interfaceName,menu_order as menuOrder,menu_type as menuType,component,system_code as systemCode
+		  from b_menu
+		 where parent = #{menuId}
+		 and system_code=#{systemCode}
+		   and status=1 and menu_type=1
+		 order by menu_order asc
+	</select>
+
+    <!-- 查询按钮列表 -->
+    <select id="queryButton" resultType="com.spring.base.vo.baseinfo.menu.MenuTwoVo">
+		select id,parent,menu_code as menuCode,menu_title as menuTitle,menu_level as menuLevel,
+		route_name as routeName,route_path as routePath,menu_icon as menuIcon,menu_desc as menuDesc,menu_property as menuProperty,
+		interface_name as interfaceName,menu_order as menuOrder,menu_type as menuType,component,system_code as systemCode
+		  from b_menu
+		 where parent = #{menuId} and system_code = #{systemCode}
+		   and status=1 and menu_type=2
+		 order by menu_order asc
+	</select>
+
+    <!--     根据角色ID查询角色第一级菜单 -->
+    <select id="queryRoleMenuOne" resultType="com.spring.base.vo.baseinfo.menu.MenuOneVo">
+        select distinct bm.id,bm.parent,bm.menu_code as menuCode,bm.menu_title as menuTitle,bm.menu_level as menuLevel,
+        bm.route_name as routeName,bm.route_path as routePath,bm.menu_icon as menuIcon,bm.menu_desc as
+        menuDesc,bm.menu_order as menuOrder,
+        bm.interface_name as interfaceName,bm.menu_type as menuType,bm.menu_property as
+        menuProperty,bm.component,brm.system_code as systemCode
+        from b_role_menu brm
+        left join b_menu bm on bm.id = brm.menu_id
+        where brm.role_id in
+        <foreach collection="idList" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and bm.parent = '0'
+        and brm.system_code=#{systemCode}
+        and bm.status=1 and bm.menu_type=1
+        order by bm.menu_order asc
+    </select>
+
+    <!--     根据角色ID查询角色第二级菜单 -->
+    <select id="queryRoleMenuTwo" resultType="com.spring.base.vo.baseinfo.menu.MenuTwoVo">
+        select distinct bm.id,bm.parent,bm.menu_code as menuCode,bm.menu_title as menuTitle,bm.menu_level as menuLevel,
+        bm.route_name as routeName,bm.route_path as routePath,bm.menu_icon as menuIcon,bm.menu_desc as
+        menuDesc,bm.menu_order as menuOrder,
+        bm.interface_name as interfaceName,bm.menu_type as menuType,bm.menu_property as menuProperty,bm.component
+        from b_role_menu brm
+        left join b_menu bm on bm.id = brm.menu_id
+        where brm.role_id in
+        <foreach collection="idList" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and bm.parent = #{parentId}
+        and brm.system_code=#{systemCode}
+        and bm.status=1 and bm.menu_type=1
+        order by bm.menu_order asc
+    </select>
+
+    <!--     根据角色ID查询角色菜单按钮权限 -->
+    <select id="queryRoleButton" resultType="com.spring.base.vo.baseinfo.menu.MenuTwoVo">
+        select distinct bm.id,bm.parent,bm.menu_code as menuCode,bm.menu_title as menuTitle,bm.menu_level as menuLevel,
+        bm.route_name as routeName,bm.route_path as routePath,bm.menu_icon as menuIcon,bm.menu_desc as
+        menuDesc,bm.menu_order as menuOrder,
+        bm.interface_name as interfaceName,bm.menu_type as menuType,bm.menu_property as menuProperty,bm.component
+        from b_role_menu brm
+        left join b_menu bm on bm.id = brm.menu_id
+        where brm.role_id in
+        <foreach collection="idList" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and bm.parent = #{parentId}
+        and brm.system_code=#{systemCode}
+        and bm.status=1 and bm.menu_type=2
+        order by bm.menu_order asc
+    </select>
+
+    <resultMap type="com.spring.base.vo.baseinfo.menu.MenuOneVo"
+               id="MenuNodeMap">
+        <result property="id" column="id"/>
+        <result property="parent" column="parent"/>
+        <result property="menuCode" column="menu_code"/>
+        <result property="menuTitle" column="menu_title"/>
+        <result property="menuLevel" column="menu_level"/>
+        <result property="routeName" column="route_name"/>
+        <result property="routePath" column="route_path"/>
+        <result property="menuIcon" column="menu_icon"/>
+        <result property="menuDesc" column="menu_desc"/>
+        <result property="menuOrder" column="menu_order"/>
+        <result property="interfaceName" column="interface_name"/>
+        <result property="menuProperty" column="menu_property"/>
+        <result property="component" column="component"/>
+        <result property="menuType" column="menu_type"/>
+        <result property="systemCode" column="system_code"/>
+        <collection property="children"
+                    select="queryManageMenu" column="id"/>
+    </resultMap>
+
+    <!--查询管理树形菜单-->
+    <select id="queryManageMenu" resultMap="MenuNodeMap">
+		select *
+		  from b_menu
+		 where parent = #{id} and system_code='manage'
+		   and status=1
+		 order by menu_level,menu_order asc
+	</select>
+
+    <resultMap type="com.spring.base.vo.baseinfo.menu.MenuOneVo"
+               id="MenuPaymentMap">
+        <result property="id" column="id"/>
+        <result property="parent" column="parent"/>
+        <result property="menuCode" column="menu_code"/>
+        <result property="menuTitle" column="menu_title"/>
+        <result property="menuLevel" column="menu_level"/>
+        <result property="routeName" column="route_name"/>
+        <result property="routePath" column="route_path"/>
+        <result property="menuIcon" column="menu_icon"/>
+        <result property="menuDesc" column="menu_desc"/>
+        <result property="menuOrder" column="menu_order"/>
+        <result property="interfaceName" column="interface_name"/>
+        <result property="menuProperty" column="menu_property"/>
+        <result property="component" column="component"/>
+        <result property="menuType" column="menu_type"/>
+        <result property="systemCode" column="system_code"/>
+        <collection property="children"
+                    select="queryPaymentMenu" column="id"/>
+    </resultMap>
+
+    <!--查询收费树形菜单-->
+    <select id="queryPaymentMenu" resultMap="MenuPaymentMap">
+		select *
+		  from b_menu
+		 where parent = #{id} and system_code='payment' and status=1
+		 order by menu_level,menu_order asc
+	</select>
+
+    <resultMap type="com.spring.base.vo.baseinfo.menu.MenuOneVo"
+               id="MenuAppMap">
+        <result property="id" column="id"/>
+        <result property="parent" column="parent"/>
+        <result property="menuCode" column="menu_code"/>
+        <result property="menuTitle" column="menu_title"/>
+        <result property="menuLevel" column="menu_level"/>
+        <result property="routeName" column="route_name"/>
+        <result property="routePath" column="route_path"/>
+        <result property="menuIcon" column="menu_icon"/>
+        <result property="menuDesc" column="menu_desc"/>
+        <result property="menuOrder" column="menu_order"/>
+        <result property="interfaceName" column="interface_name"/>
+        <result property="menuProperty" column="menu_property"/>
+        <result property="component" column="component"/>
+        <result property="menuType" column="menu_type"/>
+        <result property="systemCode" column="system_code"/>
+        <collection property="children"
+                    select="queryAppMenu" column="id"/>
+    </resultMap>
+
+    <!--查询APP树形菜单-->
+    <select id="queryAppMenu" resultMap="MenuAppMap">
+		select *
+		  from b_menu
+		 where parent = #{id} and system_code='app'
+		   and status=1
+		 order by menu_level,menu_order asc
+	</select>
+
+    <!--判断下级是否有页面-->
+    <select id="checkPage" resultType="java.lang.Integer">
+		select count(*) as count
+		  from b_menu
+		 where parent = #{id} and menu_type='1'
+		   and status=1
+	</select>
+</mapper>

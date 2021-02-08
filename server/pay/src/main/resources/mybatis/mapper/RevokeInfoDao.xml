@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.pay.dao.IRevokeInfoDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.pay.RevokeInfoEntity" id="revokeInfoMap">
+        <result property="id" column="id"/>
+        <result property="plotId" column="plot_id"/>
+        <result property="transId" column="trans_id"/>
+        <result property="undoReason" column="undo_reason"/>
+        <result property="operatorNo" column="operator_no"/>
+        <result property="operatorName" column="operator_name"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="revokeTransId" column="revoke_trans_id"/>
+        <result property="status" column="status"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="plotId != null and plotId != '' "> and `plot_id` = #{plotId} </if>
+			<if test="transId != null and transId != '' "> and `trans_id` = #{transId} </if>
+			<if test="undoReason != null and undoReason != '' "> and `undo_reason` = #{undoReason} </if>
+			<if test="operatorNo != null and operatorNo != '' "> and `operator_no` = #{operatorNo} </if>
+			<if test="operatorName != null and operatorName != '' "> and `operator_name` = #{operatorName} </if>
+			<if test="updateTime != null and updateTime != '' "> and `update_time` = #{updateTime} </if>
+			<if test="revokeTransId != null and revokeTransId != '' "> and `revoke_trans_id` = #{revokeTransId} </if>
+			<if test="status != null and status != '' "> and `status` = #{status}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into p_revoke_info
+		(
+			`id`, 
+			`plot_id`, 
+			`trans_id`, 
+			`undo_reason`, 
+			`operator_no`, 
+			`operator_name`, 
+			`update_time`, 
+			`revoke_trans_id`, 
+			`status`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.plotId}, 
+			#{item.transId}, 
+			#{item.undoReason}, 
+			#{item.operatorNo}, 
+			#{item.operatorName}, 
+			#{item.updateTime}, 
+			#{item.revokeTransId}, 
+			#{item.status}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="revokeInfoMap"
+		parameterType="com.spring.base.entity.pay.RevokeInfoEntity">
+		select * from p_revoke_info
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+</mapper>

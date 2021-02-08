@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.item.mapper.ItemChargeMapper">
+
+    <resultMap id="bItemChargeMap" type="com.spring.base.entity.item.ItemCharge">
+        <id property="chargeNo" column="charge_no"/>
+        <result property="chargeName" column="charge_name"/>
+        <result property="chargeType" column="charge_type"/>
+        <result property="chargeTypeName" column="charge_type_name"/>
+        <result property="remark" column="remark"/>
+        <result property="createDate" column="create_date"/>
+        <result property="createUser" column="create_user"/>
+        <result property="modifyDate" column="modify_date"/>
+        <result property="modifyUser" column="modify_user"/>
+    </resultMap>
+
+    <select id="getPdsSeq" resultType="java.lang.String" parameterType="java.lang.String">
+		select nextID(#{bsCode})
+	</select>
+
+    <select id="getNextId" resultType="java.lang.String" parameterType="java.lang.String">
+  		select nextId(#{bsCode});
+    </select>
+
+    <select id="getNextRid" resultType="java.lang.String" parameterType="java.util.Map">
+  		select nextRID(#{bsCode}, #{refId})
+    </select>
+
+    <select id="getPageItemCharge" resultMap="bItemChargeMap">
+        SELECT
+            t.charge_no,
+            t.charge_name,
+            t.charge_type,
+            tt.dict_destination as charge_type_name,
+            t.create_date,
+            t.create_user,
+            t.modify_date,
+            t.modify_user,
+            t.remark
+        FROM
+            b_item_charge t
+            INNER JOIN b_bus_dict tt ON ( t.charge_type = tt.dict_value AND tt.dict_name = 'chargeCycleMold' )
+        where 1=1
+        <if test="bItemCharge.chargeName !=null and bItemCharge.chargeName !=''">
+            and t.charge_name like concat ('%',#{bItemCharge.chargeName},'%')
+        </if>
+        <if test="bItemCharge.chargeType !=null and bItemCharge.chargeType!=''">
+            and t.charge_type = #{bItemCharge.chargeType}
+        </if>
+        order by t.modify_date desc
+    </select>
+
+</mapper>

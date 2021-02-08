@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.pay.dao.IHomePageDataDao">
+
+    <!-- 统计当日总收入 -->
+    <select id="getTotalAmount" parameterType="map" resultType="map">
+        SELECT
+            c.date AS date,
+            sum(c.amount ) AS amount
+        FROM
+        (
+            SELECT
+                date_format( update_time, '%Y%m%d' ) AS date,
+                business_amount AS amount
+            FROM
+                p_business_journals
+            WHERE
+                date_format( update_time, '%Y%m%d' ) = #{date,jdbcType=VARCHAR}
+        ) c
+    </select>
+
+    <!-- 当日收入最高的小区-->
+    <select id="getMaxAmoutByCid" parameterType="map" resultType="map">
+        SELECT
+            cid as cid,
+            cname as cname,
+            sum(trans_amount) as amout
+        FROM
+            p_trans_journals
+        where
+            1=1
+        AND
+            date_format( update_time, '%Y%m%d' ) = #{date,jdbcType=VARCHAR}
+        AND
+            cid is not null
+        AND
+            cid != ''
+        <if test="cid != null and cid != '' ">
+              and cid = #{cid}
+        </if>
+        group by
+            cid
+        order by
+            amout desc
+        limit 1
+    </select>
+
+    <!-- 当日总收费订单 -->
+    <select id="getOrderSum" parameterType="map" resultType="map">
+        SELECT
+            date_format( now(), '%Y%m%d' ) as date,
+            c.count as count
+        FROM
+            (
+            SELECT
+                COUNT(1) as count
+            FROM
+                p_trans_journals
+            WHERE
+                date_format( update_time, '%Y%m%d' ) = #{date,jdbcType=VARCHAR}
+            ) c
+    </select>
+
+    <!-- 当日收费最多渠道-->
+    <select id="getMaxByPayType" parameterType="map" resultType="map">
+        select
+            b.paytype,
+            sum(a.trans_amount) as amount
+        from
+            p_trans_journals a
+        left join
+            p_transpay_journals b
+        on
+            a.trans_id = b.trans_id
+        WHERE
+                date_format( a.update_time, '%Y%m%d' ) = #{date,jdbcType=VARCHAR}
+        group by
+            b.paytype
+        order by amount desc
+        limit 1
+    </select>
+
+    <!-- 本期收缴率 -->
+
+    <!-- 本期收往期欠费 -->
+
+</mapper>

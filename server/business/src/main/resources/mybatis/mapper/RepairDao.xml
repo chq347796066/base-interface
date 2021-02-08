@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.business.dao.IRepairDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.buiness.RepairEntity" id="repairMap">
+        <result property="id" column="id"/>
+        <result property="repairOrder" column="repair_order"/>
+        <result property="orderType" column="order_type"/>
+        <result property="repairRegion" column="repair_region"/>
+        <result property="repairType" column="repair_type"/>
+        <result property="content" column="content"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="ownerName" column="owner_name"/>
+        <result property="phone" column="phone"/>
+        <result property="address" column="address"/>
+        <result property="hopeBeginTime" column="hope_begin_time"/>
+        <result property="hopeEndTime" column="hope_end_time"/>
+        <result property="handleUser" column="handle_user"/>
+        <result property="cost" column="cost"/>
+        <result property="repairResult" column="repair_result"/>
+		<result property="startDate" column="start_date"/>
+		<result property="finishDate" column="finish_date"/>
+        <result property="communityId" column="community_id"/>
+        <result property="companyId" column="company_id"/>
+		<result property="repairStatus" column="repair_status"/>
+	</resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="repairOrder != null and repairOrder != '' "> and `repair_order` = #{repairOrder} </if>
+			<if test="orderType != null and orderType != '' "> and `order_type` = #{orderType} </if>
+			<if test="repairRegion != null and repairRegion != '' "> and `repair_region` = #{repairRegion} </if>
+			<if test="repairType != null and repairType != '' "> and `repair_type` = #{repairType} </if>
+			<if test="content != null and content != '' "> and `content` = #{content} </if>
+			<if test="ownerId != null and ownerId != '' "> and `owner_id` = #{ownerId} </if>
+			<if test="ownerName != null and ownerName != '' "> and `owner_name` = #{ownerName} </if>
+			<if test="phone != null and phone != '' "> and `phone` = #{phone} </if>
+			<if test="address != null and address != '' "> and `address` = #{address} </if>
+			<if test="hopeBeginTime != null and hopeBeginTime != '' "> and `hope_begin_time` = #{hopeBeginTime} </if>
+			<if test="hopeEndTime != null and hopeEndTime != '' "> and `hope_end_time` = #{hopeEndTime} </if>
+			<if test="handleUser != null and handleUser != '' "> and `handle_user` = #{handleUser} </if>
+			<if test="cost != null and cost != '' "> and `cost` = #{cost} </if>
+			<if test="repairResult != null and repairResult != '' "> and `repair_result` = #{repairResult} </if>
+			<if test="finishDate != null and finishDate != '' "> and `finish_date` = #{finishDate} </if>
+			<if test="startDate != null and startDate != '' "> and `start_date` = #{startDate} </if>
+			<if test="communityId != null and communityId != '' "> and `community_id` = #{communityId} </if>
+			<if test="companyId != null and companyId != '' "> and `company_id` = #{companyId}</if>
+			<if test="repairStatus != null and repairStatus != '' "> and `repair_status` = #{repairStatus}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into r_repair
+		(
+			`id`, 
+			`repair_order`, 
+			`order_type`, 
+			`repair_region`, 
+			`repair_type`, 
+			`content`, 
+			`owner_id`, 
+			`owner_name`, 
+			`phone`, 
+			`address`, 
+			`hope_begin_time`, 
+			`hope_end_time`, 
+			`handle_user`, 
+			`cost`,
+			`repair_result`,
+			`start_date`,
+			`finish_date`,
+			`community_id`, 
+			`company_id`,
+			`repair_status`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.repairOrder}, 
+			#{item.orderType}, 
+			#{item.repairRegion}, 
+			#{item.repairType}, 
+			#{item.content}, 
+			#{item.ownerId}, 
+			#{item.ownerName}, 
+			#{item.phone}, 
+			#{item.address}, 
+			#{item.hopeBeginTime}, 
+			#{item.hopeEndTime}, 
+			#{item.handleUser}, 
+			#{item.cost},
+			#{item.repairResult},
+			#{item.startDate},
+			#{item.finishDate}, 
+			#{item.communityId}, 
+			#{item.companyId},
+			#{item.repairStatus}
+			)
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="repairMap"
+		parameterType="com.spring.base.entity.buiness.RepairEntity">
+		select * from r_repair
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!--web端查询报事报修列表-->
+	<select id="queryWebRepairList" resultType="com.spring.business.dto.WebRepairDto" parameterType="com.spring.business.vo.WebRepairQueryVo">
+		select
+			id,
+			repair_order as repairOrder,
+			repair_region as repairRegion,
+			repair_type as repairType,
+			content as content,
+			owner_id as ownerId,
+			owner_name as ownerName,
+			phone,
+			address,
+			hope_begin_time as hopeBeginTime,
+			hope_end_time as hopeEndTime,
+			handle_user as handleUser,
+			cost,
+			repair_result as repairResult,
+			start_date as startDate,
+			finish_date as finishDate,
+			repair_status as repairStatus,
+			community_id as communityId,
+			company_id as companyId,
+			create_date as repairDate
+		from
+			r_repair
+		where
+			del_flag=0
+		<if test="communityIds != null and communityIds.size != '' ">
+			 and community_id in
+			     <foreach collection="communityIds" item="id" index="index" open="(" close=")" separator=",">
+					#{id}
+			</foreach>
+		</if>
+		<if test="communityId != null and communityId != '' ">
+			and community_id = #{communityId}
+		</if>
+		<if test="dimConditions != null and dimConditions != '' ">
+		  	and (repair_order like concat('%',#{dimConditions},'%')
+		  	    or owner_name like concat('%',#{dimConditions},'%')
+				or phone like concat('%',#{dimConditions},'%'))
+		</if>
+		<if test="repairRegion != null and repairRegion != '' ">
+			and repair_region = #{repairRegion}
+		</if>
+		<if test="repairStartTime != null and repairStartTime != '' ">
+			<![CDATA[ and DATE_FORMAT(create_date, '%Y-%m-%d')>=DATE_FORMAT(#{repairStartTime}, '%Y-%m-%d')]]>
+		</if>
+		<if test="repairEndTime != null and repairEndTime != '' ">
+			<![CDATA[ and DATE_FORMAT(create_date, '%Y-%m-%d')<=DATE_FORMAT(#{repairEndTime}, '%Y-%m-%d')]]>
+		</if>
+		<if test="repairStatus != null and repairStatus != '' ">
+			and repair_status = #{repairStatus}
+		</if>
+		<if test="periodStartTime != null and periodStartTime != '' ">
+			<![CDATA[ and DATE_FORMAT(create_date, '%Y-%m-%d %H:%i:%S')>=DATE_FORMAT(#{periodStartTime}, '%Y-%m-%d %H:%i:%S')]]>
+		</if>
+		<if test="periodEndTime != null and periodEndTime != '' ">
+			<![CDATA[ and DATE_FORMAT(create_date, '%Y-%m-%d %H:%i:%S')<=DATE_FORMAT(#{periodEndTime}, '%Y-%m-%d %H:%i:%S')]]>
+		</if>
+		order by create_date desc
+	</select>
+	<!-- 用户自定义开始 -->
+</mapper>

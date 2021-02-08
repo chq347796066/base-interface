@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.business.dao.IHousingCertificationDao">
+
+    <resultMap id="House_Map_Result" type="com.spring.base.vo.baseinfo.housingcertification.UserHouseListVo">
+        <result column="id" property="id" />
+        <result column="houseId" property="houseId" />
+        <result column="communityId" property="communityId" />
+        <result column="communityAddress" property="communityAddress" />
+        <result column="communityAddressDetails" property="communityAddressDetails" />
+        <result column="communityName" property="communityName" />
+        <result column="buildName" property="buildName" />
+        <result column="cellName" property="cellName" />
+        <result column="houseNo" property="houseNo" />
+        <result column="identityType" property="identityType" />
+        <result column="auditStatus" property="auditStatus" />
+    </resultMap>
+    <select id="queryHousingList" parameterType="java.lang.String"
+            resultMap="House_Map_Result">
+        select
+            id id,
+            community_id communityId,
+            house_id houseId,
+            community_address communityAddress,
+            community_address_details communityAddressDetails,
+            community_name communityName,
+            build_name buildName,
+            cell_name cellName,
+            house_no houseNo,
+            identity_type identityType,
+            audit_status auditStatus
+        from
+            b_my_house
+        where
+            user_id = #{userId} and del_flag = 0 and audit_status != 4
+        order by create_date desc
+    </select>
+
+    <select id="getBindingList" parameterType="com.spring.base.entity.buiness.MyHouseEntity" resultType="java.lang.String">
+        select case when community_address_details is null or community_address_details = '' then community_name
+                else community_address_details end as houseAddress
+            from b_my_house
+            where 1=1
+            <if test="userId != null and userId != '' "> and `user_id` = #{userId} </if>
+            <if test="communityId != null and communityId != '' "> and `community_id` = #{communityId} </if>
+            and del_flag = 0 and audit_status = 1
+            order by create_date desc
+    </select>
+
+    <update id="updateCertificationStatus" parameterType="com.spring.base.vo.baseinfo.housingcertification.CertificationStatusUpdateVo">
+        update b_my_house set audit_status = #{certificationStatus} where id = #{id}
+    </update>
+
+    <select id="getCertificationDetail" parameterType="java.lang.String"
+            resultType="com.spring.base.vo.baseinfo.housingcertification.HouseCertificationDetailVo">
+        select
+            id id,
+            community_address communityAddress,
+            community_address_details communityAddressDetails,
+            community_name communityName,
+            build_name buildName,
+            cell_name cellName,
+            house_no houseNo,
+            identity_type residentsType,
+            certification_way certificationWay,
+            certificate_type certificateType,
+            certificate_no certificateNo,
+            user_name userName,
+            mobile mobile,
+            audit_not_pass rejectedReason,
+            audit_status
+        from
+            b_my_house
+        where
+            id = #{id} and del_flag = 0
+    </select>
+
+    <select id="selectHouseOwnerCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select
+            count(id)
+        from
+            b_my_house
+        where
+            house_id = #{houseId} and identity_type = 1 and audit_status in (0,1)
+            and del_flag = 0
+    </select>
+
+    <insert id="addHouseCertification" parameterType="com.spring.base.vo.baseinfo.housingcertification.CertificationHouseAddVo">
+        insert into
+            b_my_house
+        (
+            id,
+            process_code,
+            process_name,
+            user_id,
+            user_name,
+            community_id,
+            community_name,
+            community_address,
+            community_address_details,
+            build_id,
+            build_name,
+            cell_id,
+            cell_name,
+            house_id,
+            house_no,
+            house_code,
+            audit_status,
+            audit_user_id,
+            audit_user_name,
+            identity_type,
+            certification_way,
+            auth_type,
+            mobile,
+            certificate_type,
+            certificate_no,
+            id_card,
+            create_user,
+            create_date
+        )
+        values
+        (
+            #{id},
+            #{processCode},
+            #{processName},
+            #{userId},
+            #{userName},
+            #{communityId},
+            #{communityName},
+            #{communityAddress},
+            #{communityAddressDetails},
+            #{buildId},
+            #{buildName},
+            #{cellId},
+            #{cellName},
+            #{houseId},
+            #{houseNo},
+            #{houseCode},
+            0,
+            #{auditUserId},
+            #{auditUserName},
+            #{identityType},
+            #{certificationWay},
+            1,
+            #{mobile},
+            #{certificateType},
+            #{certificateNo},
+            #{idCard},
+            #{userId},
+            NOW()
+        )
+    </insert>
+
+    <update id="updateHouseCertification" parameterType="com.spring.base.vo.baseinfo.housingcertification.CertificationHouseAddVo">
+        update b_my_house
+        <set>
+            community_id = #{communityId},
+            community_name = #{communityName},
+            community_address = #{communityAddress},
+            community_address_details = #{communityAddressDetails},
+            build_id = #{buildId},
+            build_name = #{buildName},
+            cell_id = #{cellId},
+            cell_name = #{cellName},
+            house_id = #{houseId},
+            house_no = #{houseNo},
+            house_code = #{houseCode},
+            audit_status = 0,
+            audit_user_id = #{auditUserId},
+            audit_user_name = #{auditUserName},
+            audit_date = NULL,
+            audit_not_pass = NULL,
+            identity_type = #{identityType},
+            certification_way = #{certificationWay},
+            mobile = #{mobile},
+            certificate_type = #{certificateType},
+            certificate_no = #{certificateNo},
+            id_card = #{idCard},
+            modify_user = #{userId},
+            modify_date = NOW()
+        </set>
+        where
+            id = #{id}
+    </update>
+
+    <!--查询报修人信息-->
+    <select id="queryRepairHouseInfo" resultType="com.spring.business.dto.HouseInfoDto" parameterType="java.lang.String">
+        select
+            community_name as communityName,
+            build_name as buildName,
+            cell_name as cellName,
+            house_no as houseName
+        from
+            b_my_house
+        where
+            user_id=#{userId}
+    </select>
+
+
+
+    <!-- resultMap -->
+    <resultMap type="com.spring.base.entity.buiness.MyHouseEntity" id="myHouseMap">
+        <result property="id" column="id"/>
+        <result property="processCode" column="process_code"/>
+        <result property="processName" column="process_name"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="companyId" column="company_id"/>
+        <result property="companyName" column="company_name"/>
+        <result property="communityId" column="community_id"/>
+        <result property="communityName" column="community_name"/>
+        <result property="communityAddress" column="community_address"/>
+        <result property="communityAddressDetails" column="community_address_details"/>
+        <result property="buildId" column="build_id"/>
+        <result property="buildName" column="build_name"/>
+        <result property="cellId" column="cell_id"/>
+        <result property="cellName" column="cell_name"/>
+        <result property="houseId" column="house_id"/>
+        <result property="houseNo" column="house_no"/>
+        <result property="houseCode" column="house_code"/>
+        <result property="ownerName" column="owner_name"/>
+        <result property="ownerPhone" column="owner_phone"/>
+        <result property="auditStatus" column="audit_status"/>
+        <result property="auditUserId" column="audit_user_id"/>
+        <result property="auditUserName" column="audit_user_name"/>
+        <result property="auditDate" column="audit_date"/>
+        <result property="auditAdopt" column="audit_adopt"/>
+        <result property="auditNotPass" column="audit_not_pass"/>
+        <result property="identityType" column="identity_type"/>
+        <result property="certificationWay" column="certification_way"/>
+        <result property="authType" column="auth_type"/>
+        <result property="mobile" column="mobile"/>
+        <result property="sex" column="sex"/>
+        <result property="certificateType" column="certificate_type"/>
+        <result property="certificateNo" column="certificate_no"/>
+        <result property="applyDate" column="apply_date"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <!-- 查询条件 -->
+    <sql id="Where_Clause">
+        <where>
+            <if test="processCode != null and processCode != '' "> and `process_code` = #{processCode} </if>
+            <if test="processName != null and processName != '' "> and `process_name` = #{processName} </if>
+            <if test="userId != null and userId != '' "> and `user_id` = #{userId} </if>
+            <if test="communityId != null and communityId != '' "> and `community_id` = #{communityId} </if>
+            <if test="userName != null and userName != '' "> and `user_name` = #{userName} </if>
+            <if test="companyId != null and companyId != '' "> and `company_id` = #{companyId} </if>
+            <if test="companyName != null and companyName != '' "> and `company_name` = #{companyName} </if>
+
+            <if test="communityName != null and communityName != '' "> and `community_name` = #{communityName} </if>
+            <if test="communityAddress != null and communityAddress != '' "> and `community_address` = #{communityAddress} </if>
+            <if test="communityAddressDetails != null and communityAddressDetails != '' "> and `community_address_details` = #{communityAddressDetails} </if>
+            <if test="buildId != null and buildId != '' "> and `build_id` = #{buildId} </if>
+            <if test="buildName != null and buildName != '' "> and `build_name` = #{buildName} </if>
+            <if test="cellId != null and cellId != '' "> and `cell_id` = #{cellId} </if>
+            <if test="cellName != null and cellName != '' "> and `cell_name` = #{cellName} </if>
+            <if test="houseId != null and houseId != '' "> and `house_id` = #{houseId} </if>
+            <if test="houseNo != null and houseNo != '' "> and `house_no` = #{houseNo} </if>
+            <if test="houseCode != null and houseCode != '' "> and `house_code` = #{houseCode} </if>
+            <if test="ownerName != null and ownerName != '' "> and `owner_name` = #{ownerName} </if>
+            <if test="ownerPhone != null and ownerPhone != '' "> and `owner_phone` = #{ownerPhone} </if>
+            <if test="auditStatus != null and auditStatus != '' "> and `audit_status` = #{auditStatus} </if>
+            <if test="auditUserId != null and auditUserId != '' "> and `audit_user_id` = #{auditUserId} </if>
+            <if test="auditUserName != null and auditUserName != '' "> and `audit_user_name` = #{auditUserName} </if>
+            <if test="auditDate != null "> and `audit_date` = #{auditDate} </if>
+            <if test="auditAdopt != null and auditAdopt != '' "> and `audit_adopt` = #{auditAdopt} </if>
+            <if test="auditNotPass != null and auditNotPass != '' "> and `audit_not_pass` = #{auditNotPass} </if>
+            <if test="identityType != null and identityType != '' "> and `identity_type` = #{identityType} </if>
+            <if test="certificationWay != null and certificationWay != '' "> and `certification_way` = #{certificationWay} </if>
+            <if test="authType != null and authType != '' "> and `auth_type` = #{authType} </if>
+            <if test="mobile != null and mobile != '' "> and `mobile` = #{mobile} </if>
+            <if test="sex != null and sex != '' "> and `sex` = #{sex} </if>
+            <if test="certificateType != null and certificateType != '' "> and `certificate_type` = #{certificateType} </if>
+            <if test="certificateNo != null and certificateNo != '' "> and `certificate_no` = #{certificateNo} </if>
+            <if test="applyDate != null and applyDate != '' "> and `apply_date` = #{applyDate} </if>
+            <if test="tenantId != null and tenantId != '' "> and `tenant_id` = #{tenantId} </if>
+            <if test="createUser != null and createUser != '' "> and `create_user` = #{createUser} </if>
+            <if test="createDate != null and createDate != '' "> and `create_date` = #{createDate} </if>
+            <if test="modifyUser != null and modifyUser != '' "> and `modify_user` = #{modifyUser} </if>
+            <if test="modifyDate != null and modifyDate != '' "> and `modify_date` = #{modifyDate} </if>
+            <if test="delFlag != null and delFlag != '' "> and `del_flag` = #{delFlag}</if>
+        </where>
+    </sql>
+
+    <!-- 根据条件查询列表 -->
+    <select id="queryList" resultMap="myHouseMap"
+            parameterType="com.spring.base.entity.buiness.MyHouseEntity">
+        select * from b_my_house
+       <where>
+           <if test="auditUserId != null and auditUserId != '' "> and `audit_user_id` = #{auditUserId} </if>
+           <if test="applyDate != null"> and DATE_FORMAT(`apply_date`,'%Y-%m') = DATE_FORMAT(#{endDate},'%Y-%m')</if>
+           <if test="identityType != null and identityType != '' "> and `identity_type` = #{identityType} </if>
+           <if test="auditStatus != null and auditStatus != '' "> and `audit_status` = #{auditStatus} </if>
+       </where>
+    </select>
+
+    <!-- 根据主键id查询对象 -->
+    <select id="queryObject" resultMap="myHouseMap">
+		select * from b_my_house where id = #{value}
+	</select>
+
+
+    <!-- 更新 -->
+    <update id="update" parameterType="com.spring.base.entity.buiness.MyHouseEntity">
+        update b_my_house
+        <set>
+            <if test="processCode != null">`process_code` = #{processCode}, </if>
+            <if test="processName != null">`process_name` = #{processName}, </if>
+            <if test="userId != null">`user_id` = #{userId}, </if>
+            <if test="userName != null">`user_name` = #{userName}, </if>
+            <if test="companyId != null">`company_id` = #{companyId}, </if>
+            <if test="companyName != null">`company_name` = #{companyName}, </if>
+            <if test="communityId != null">`community_id` = #{communityId}, </if>
+            <if test="communityName != null">`community_name` = #{communityName}, </if>
+            <if test="communityAddress != null">`community_address` = #{communityAddress}, </if>
+            <if test="communityAddressDetails != null">`community_address_details` = #{communityAddressDetails}, </if>
+            <if test="buildId != null">`build_id` = #{buildId}, </if>
+            <if test="buildName != null">`build_name` = #{buildName}, </if>
+            <if test="cellId != null">`cell_id` = #{cellId}, </if>
+            <if test="cellName != null">`cell_name` = #{cellName}, </if>
+            <if test="houseId != null">`house_id` = #{houseId}, </if>
+            <if test="houseNo != null">`house_no` = #{houseNo}, </if>
+            <if test="houseCode != null">`house_code` = #{houseCode}, </if>
+            <if test="ownerName != null">`owner_name` = #{ownerName}, </if>
+            <if test="ownerPhone != null">`owner_phone` = #{ownerPhone}, </if>
+            <if test="auditStatus != null">`audit_status` = #{auditStatus}, </if>
+            <if test="auditUserId != null">`audit_user_id` = #{auditUserId}, </if>
+            <if test="auditUserName != null">`audit_user_name` = #{auditUserName}, </if>
+            <if test="auditDate != null">`audit_date` = now(), </if>
+            <if test="auditAdopt != null">`audit_adopt` = #{auditAdopt}, </if>
+            <if test="auditNotPass != null">`audit_not_pass` = #{auditNotPass}, </if>
+            <if test="identityType != null">`identity_type` = #{identityType}, </if>
+            <if test="certificationWay != null">`certification_way` = #{certificationWay}, </if>
+            <if test="authType != null">`auth_type` = #{authType}, </if>
+            <if test="mobile != null">`mobile` = #{mobile}, </if>
+            <if test="sex != null">`sex` = #{sex}, </if>
+            <if test="certificateType != null">`certificate_type` = #{certificateType}, </if>
+            <if test="certificateNo != null">`certificate_no` = #{certificateNo}, </if>
+            <if test="applyDate != null">`apply_date` = #{applyDate}, </if>
+            <if test="tenantId != null">`tenant_id` = #{tenantId}, </if>
+            <if test="createUser != null">`create_user` = #{createUser}, </if>
+            <if test="createDate != null">`create_date` = #{createDate}, </if>
+            <if test="modifyUser != null">`modify_user` = #{modifyUser}, </if>
+            <if test="modifyDate != null">`modify_date` = #{modifyDate}, </if>
+            <if test="delFlag != null">`del_flag` = #{delFlag}</if>
+            <if test="idCard != null">`id_card` = #{idCard}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <select id="getOwnerTenantsRelatives" resultMap="myHouseMap">
+        select * from b_my_house
+        where houseId = #{houseId}
+        and identity_type &lt;&gt; 1
+        and audit_status = 1
+    </select>
+
+    <!-- 新增 -->
+    <insert id="add" parameterType="com.spring.base.entity.buiness.MyHouseEntity">
+		insert into b_my_house
+		(
+			`id`,
+			`process_code`,
+			`process_name`,
+			`user_id`,
+			`user_name`,
+			`company_id`,
+			`company_name`,
+			`community_id`,
+			`community_name`,
+			`community_address`,
+			`community_address_details`,
+			`build_id`,
+			`build_name`,
+			`cell_id`,
+			`cell_name`,
+			`house_id`,
+			`house_no`,
+			`house_code`,
+			`owner_name`,
+			`owner_phone`,
+			`audit_status`,
+			`audit_user_id`,
+			`audit_user_name`,
+			`audit_date`,
+			`audit_adopt`,
+			`audit_not_pass`,
+			`identity_type`,
+			`certification_way`,
+			`auth_type`,
+			`mobile`,
+			`sex`,
+			`certificate_type`,
+			`certificate_no`,
+			`apply_date`,
+			`tenant_id`,
+			`create_user`,
+			`create_date`,
+			`modify_user`,
+			`modify_date`,
+			`del_flag`,
+			`id_card`
+		)
+		values
+		(
+			#{id},
+			#{processCode},
+			#{processName},
+			#{userId},
+			#{userName},
+			#{companyId},
+			#{companyName},
+			#{communityId},
+			#{communityName},
+			#{communityAddress},
+			#{communityAddressDetails},
+			#{buildId},
+			#{buildName},
+			#{cellId},
+			#{cellName},
+			#{houseId},
+			#{houseNo},
+			#{houseCode},
+			#{ownerName},
+			#{ownerPhone},
+			#{auditStatus},
+			#{auditUserId},
+			#{auditUserName},
+			#{auditDate},
+			#{auditAdopt},
+			#{auditNotPass},
+			#{identityType},
+			#{certificationWay},
+			#{authType},
+			#{mobile},
+			#{sex},
+			#{certificateType},
+			#{certificateNo},
+			#{applyDate},
+			#{tenantId},
+			#{createUser},
+			#{createDate},
+			#{modifyUser},
+			#{modifyDate},
+			#{delFlag},
+			#{idCard}
+		)
+	</insert>
+
+
+    <update id="updateHouserUserStatus">
+        update b_my_house set del_flag = 1 where id = #{id}
+    </update>
+
+</mapper>

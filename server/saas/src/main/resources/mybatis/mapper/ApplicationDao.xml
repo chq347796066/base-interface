@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.saas.dao.IApplicationDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.saas.ApplicationEntity" id="applicationMap">
+        <result property="id" column="id"/>
+        <result property="appCode" column="app_code"/>
+        <result property="appName" column="app_name"/>
+        <result property="url" column="url"/>
+        <result property="appPrice" column="app_price"/>
+        <result property="appPic" column="app_pic"/>
+        <result property="description" column="description"/>
+        <result property="appStatus" column="app_status"/>
+    </resultMap>
+
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="appCode != null and appCode != '' "> and `app_code` = #{appCode} </if>
+			<if test="appName != null and appName != '' "> and `app_name` = #{appName} </if>
+			<if test="url != null and url != '' "> and `url` = #{url} </if>
+			<if test="appPrice != null and appPrice != '' "> and `app_price` = #{appPrice} </if>
+			<if test="appPic != null and appPic != '' "> and `app_pic` = #{appPic} </if>
+			<if test="description != null and description != '' "> and `description` = #{description} </if>
+			<if test="appStatus != null and appStatus != '' "> and `app_status` = #{appStatus} </if>
+			and del_flag=0
+		</where>
+	</sql>
+
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into s_application
+		(
+			`id`,
+			`app_code`,
+			`app_name`,
+			`url`,
+			`app_price`,
+			`app_pic`,
+			`description`,
+			`app_status`,
+			`create_user`,
+			`create_date`,
+			`modify_user`,
+			`modify_date`,
+			`tenant_id`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id},
+			#{item.appCode},
+			#{item.appName},
+			#{item.url},
+			#{item.appPrice},
+			#{item.appPic},
+			#{item.description},
+			#{item.appStatus},
+			#{item.createUser},
+			#{item.createDate},
+			#{item.modifyUser},
+			#{item.modifyDate},
+			#{item.tenantId}
+        )
+		</foreach>
+	</insert>
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="applicationMap"
+		parameterType="com.spring.base.entity.saas.ApplicationEntity">
+		select * from s_application
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!--根据应该id查询数据-->
+	<select id="queryApplication" resultType="com.spring.base.vo.saas.ApplicationVo"
+			parameterType="java.util.List">
+		select
+			id as applicationId,
+			app_name as applicationName,
+			app_pic as appPic
+		from
+			s_application
+		where
+			id in 
+		<foreach collection="ids" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+		and
+			del_flag=0
+	</select>
+
+	<!-- 查询我的应用 -->
+    <select id="queryMyApplication" parameterType="java.lang.String" resultType="com.spring.base.vo.saas.ApplicationVo">
+        select
+            main.expire_date as expireDate,
+            main.app_id as appId,
+            main.order_status as orderStatus,
+            t1.app_name as appName,
+            t1.app_pic as appPic,
+            t1.url,
+            t1.app_price as appPrice,
+            t1.id as appId
+        from
+            s_order main
+        left join s_application t1 on main.app_id=t1.id
+        where
+            main.mobile=#{mobile}
+        and
+            main.del_flag=0
+        and
+            t1.del_flag=0
+    </select>
+
+	<!--查询我的应用(主应用)-->
+<!--	<select id="queryMainApplication" parameterType="java.lang.String" resultType=" com.spring.base.vo.saas.MyAccountVo">-->
+
+
+<!--	</select>-->
+</mapper>

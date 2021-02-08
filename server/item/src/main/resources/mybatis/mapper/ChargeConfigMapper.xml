@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.item.mapper.ChargeConfigMapper">
+
+    <resultMap id="bChargeConfigMap" type="com.spring.base.entity.item.ChargeConfig">
+        <id property="chargeConfigId" column="charge_config_id"/>
+        <result property="cid" column="cid"/>
+        <result property="communityName" column="community_name"/>
+        <result property="pcid" column="pcid"/>
+        <result property="companyName" column="company_name"/>
+        <result property="chargeNo" column="charge_no"/>
+        <result property="chargeName" column="charge_name"/>
+        <result property="chargeTypeName" column="charge_type_name"/>
+        <result property="chargeType" column="charge_type"/>
+        <result property="valuationDescription" column="valuation_description"/>
+        <result property="ruleType" column="rule_type"/>
+        <result property="fixedAmount" column="fixed_amount"/>
+        <result property="price" column="price"/>
+        <result property="cycle" column="cycle"/>
+        <result property="chargeCategory" column="charge_category"/>
+        <result property="conRuleNo" column="con_rule_no"/>
+        <result property="chargeCategoryName" column="charge_category_name"/>
+        <result property="computingUnit" column="computing_unit"/>
+        <result property="receivableType" column="receivable_type"/>
+        <result property="receivableDate" column="receivable_date"/>
+        <result property="penaltyType" column="penalty_type"/>
+        <result property="penaltyDate" column="penalty_date"/>
+        <result property="penaltyPercentage" column="penalty_percentage"/>
+        <result property="penaltyAuto" column="penalty_auto"/>
+        <result property="penaltyMode" column="penalty_mode"/>
+        <result property="bhcId" column="bhc_id"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="createDate" column="create_date"/>
+        <result property="createUser" column="create_user"/>
+        <result property="modifyDate" column="modify_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="ruleNo" column="ruleNo"/>
+    </resultMap>
+
+    <select id="getPageChargeConfig" resultMap="bChargeConfigMap">
+        SELECT
+        bcc.charge_config_id,
+        bcc.pcid,
+        bcb.company_name,
+        bcc.cid,
+        bcmb.community_name,
+        bic.charge_name,
+        bic.charge_no,
+        bbd.dict_destination AS charge_type_name,
+        bic.charge_type,
+        bcc.charge_category AS charge_category,
+        bbd1.dict_destination AS charge_category_name,
+        bcr.rule_type,
+        bcr.cycle,
+        bcr.fixed_amount,
+        bcr.price,
+        bcr.rule_no AS ruleNo,
+        bbd2.dict_destination as valuation_description,
+        bbd2.remark as computing_unit,
+        bcc.receivable_type,
+        bcc.receivable_date,
+        bcc.penalty_type,
+        bcc.penalty_date,
+        bcc.penalty_auto,
+        bcc.penalty_percentage,
+        bcc.penalty_mode,
+        <if test="bChargeConfig.hid != null and bChargeConfig.hid!=''">
+        bhc.bhc_id,
+        bhc.start_date,
+        bhc.end_date,
+        </if>
+        bcc.modify_date
+
+        FROM
+        wy_item.b_charge_config bcc
+        INNER JOIN wy_baseinfo.b_company bcb ON ( bcc.pcid = bcb.id )
+        INNER JOIN wy_baseinfo.b_community bcmb ON ( bcc.cid = bcmb.id )
+        INNER JOIN wy_item.b_item_charge bic ON ( bcc.charge_no = bic.charge_no )
+        INNER JOIN wy_item.b_bus_dict bbd ON ( bbd.dict_value = bic.charge_type AND bbd.dict_name = 'chargeCycleMold' )
+        INNER JOIN wy_item.b_bus_dict bbd1 ON ( bbd1.dict_value = bcc.charge_category AND bbd1.dict_name = 'chargeMold' )
+        INNER JOIN wy_item.b_charge_rule bcr ON (
+        bcc.con_rule_no = bcr.con_rule_no
+        )
+        left join wy_item.b_bus_dict bbd2 on (bbd2.dict_value=bcr.rule_no and bbd2.dict_name='chargeCalculation')
+        <if test="bChargeConfig.hid != null and bChargeConfig.hid!=''">
+        left join wy_item.b_house_charge bhc on (bcc.charge_config_id=bhc.charge_config_id
+            and bhc.hid=#{bChargeConfig.hid}
+        )
+        </if>
+        <where>
+            <if test="bChargeConfig.pcid != null and bChargeConfig.pcid!=''">
+                and bcc.pcid=#{bChargeConfig.pcid}
+            </if>
+            <if test="bChargeConfig.cid != null and bChargeConfig.cid!=''">
+                and bcc.cid=#{bChargeConfig.cid}
+            </if>
+            <if test="bChargeConfig.chargeType != null and bChargeConfig.chargeType!=''">
+                and bic.charge_type=#{bChargeConfig.chargeType}
+            </if>
+            <if test="bChargeConfig.chargeCategory != null and bChargeConfig.chargeCategory !=''">
+                and bcc.charge_category=#{bChargeConfig.chargeCategory}
+            </if>
+            <if test="bChargeConfig.chargeName != null and bChargeConfig.chargeName!=''">
+                and bic.charge_name like concat ('%',#{bChargeConfig.chargeName},'%')
+            </if>
+        </where>
+
+
+    </select>
+
+    <select id="getbchargeconfigbybatch" resultMap="bChargeConfigMap">
+        SELECT
+            bcc.charge_config_id,
+            bcc.pcid,
+            bcb.company_name,
+            bcc.cid,
+            bcmb.community_name,
+            bic.charge_name,
+            bic.charge_no,
+            bbd.dict_destination AS charge_type_name,
+            bic.charge_type,
+            bcc.charge_category AS charge_category,
+            bbd1.dict_destination AS charge_category_name,
+            bcr.rule_type,
+            bcr.cycle,
+            bcr.fixed_amount,
+            bcr.price,
+            bcr.rule_no AS ruleNo,
+            bcc.receivable_type,
+            bcc.receivable_date,
+            bcc.penalty_type,
+            bcc.penalty_date,
+            bcc.penalty_auto,
+            bcc.penalty_percentage,
+            bcc.penalty_mode,
+            bcc.modify_date
+        FROM
+            wy_item.b_charge_config bcc,
+            wy_baseinfo.b_company bcb,
+            wy_baseinfo.b_community bcmb,
+            wy_item.b_item_charge bic,
+            wy_item.b_bus_dict bbd,
+            wy_item.b_bus_dict bbd1,
+            wy_item.b_charge_rule bcr
+        WHERE
+            bcc.pcid = bcb.id
+            AND bcc.cid = bcmb.id
+            AND bcc.charge_no = bic.charge_no
+            AND bbd.dict_value = bic.charge_type
+            AND bbd.dict_name = 'chargeCycleMold'
+            AND bbd1.dict_value = bcc.charge_category
+            AND bbd1.dict_name = 'chargeMold'
+            AND bcc.con_rule_no = bcr.con_rule_no
+            AND EXISTS (
+            SELECT
+                1
+            FROM
+                wy_item.b_house_charge bhc
+            WHERE
+                bcc.charge_config_id = bhc.charge_config_id
+                <if test="bChargeConfig.hids != null ">
+                    and bhc.hid in
+                    <foreach collection="bChargeConfig.hids" item="hid" index="index"
+                             open="(" close=")" separator=",">
+                        #{hid}
+                    </foreach>
+
+                </if>
+            )
+            <if test="bChargeConfig.pcid != null and bChargeConfig.pcid!=''">
+                and bcc.pcid=#{bChargeConfig.pcid}
+            </if>
+            <if test="bChargeConfig.cid != null and bChargeConfig.cid!=''">
+                and bcc.cid=#{bChargeConfig.cid}
+            </if>
+            <if test="bChargeConfig.chargeType != null and bChargeConfig.chargeType!=''">
+                and bic.charge_type=#{bChargeConfig.chargeType}
+            </if>
+            <if test="bChargeConfig.chargeCategory != null and bChargeConfig.chargeCategory !=''">
+                and bcc.charge_category=#{bChargeConfig.chargeCategory}
+            </if>
+            <if test="bChargeConfig.chargeName != null and bChargeConfig.chargeName!=''">
+                and bic.charge_name like concat ('%',#{bChargeConfig.chargeName},'%')
+            </if>
+
+
+    </select>
+
+    <select id="getChargeTypeByHid" resultMap="bChargeConfigMap">
+        SELECT
+        bcc.charge_config_id,
+        bcc.pcid,
+        bcb.company_name,
+        bcc.cid,
+        bcmb.community_name,
+        bic.charge_name,
+        bic.charge_no,
+        bbd.dict_destination AS charge_type_name,
+        bic.charge_type,
+        bcc.charge_category AS charge_category,
+        bbd1.dict_destination AS charge_category_name,
+        bcr.rule_type,
+        bcr.cycle,
+        bcr.fixed_amount,
+        bcr.price,
+        bbd2.dict_destination as valuation_description,
+        bbd2.remark as computing_unit,
+        bcc.receivable_type,
+        bcc.receivable_date,
+        bcc.penalty_type,
+        bcc.penalty_date,
+        bcc.penalty_auto,
+        bcc.penalty_percentage,
+        bcc.penalty_mode,
+        bhc.bhc_id,
+        bhc.start_date,
+        bhc.end_date,
+        bcc.modify_date
+        FROM
+        wy_item.b_charge_config bcc
+        INNER JOIN wy_baseinfo.b_company bcb ON ( bcc.pcid = bcb.id )
+        INNER JOIN wy_baseinfo.b_community bcmb ON ( bcc.cid = bcmb.id )
+        INNER JOIN wy_item.b_item_charge bic ON ( bcc.charge_no = bic.charge_no )
+        INNER JOIN wy_item.b_bus_dict bbd ON ( bbd.dict_value = bic.charge_type AND bbd.dict_name = 'chargeCycleMold' )
+        INNER JOIN wy_item.b_bus_dict bbd1 ON ( bbd1.dict_value = bcc.charge_category AND bbd1.dict_name = 'chargeMold' )
+        INNER JOIN wy_item.b_charge_rule bcr ON (
+        bcc.con_rule_no = bcr.con_rule_no
+        )
+        left join wy_item.b_bus_dict bbd2 on (bbd2.dict_value=bcr.rule_no and bbd2.dict_name='chargeCalculation')
+        left join wy_item.b_house_charge bhc on (bcc.charge_config_id=bhc.charge_config_id
+        <if test="bChargeConfig.hid != null and bChargeConfig.hid!=''">
+            and bhc.hid=#{bChargeConfig.hid}
+        </if>)
+
+        <where>
+            <if test="bChargeConfig.pcid != null and bChargeConfig.pcid!=''">
+                and bcc.pcid=#{bChargeConfig.pcid}
+            </if>
+            <if test="bChargeConfig.cid != null and bChargeConfig.cid!=''">
+                and bcc.cid=#{bChargeConfig.cid}
+            </if>
+            <if test="bChargeConfig.chargeType != null and bChargeConfig.chargeType!=''">
+                and bic.charge_type=#{bChargeConfig.chargeType}
+            </if>
+            <if test="bChargeConfig.chargeCategory != null and bChargeConfig.chargeCategory !=''">
+                and bcc.charge_category=#{bChargeConfig.chargeCategory}
+            </if>
+            <if test="bChargeConfig.chargeName != null and bChargeConfig.chargeName!=''">
+                and bic.charge_name like concat ('%',#{bChargeConfig.chargeName},'%')
+            </if>
+        </where>
+        group by bic.charge_type
+    </select>
+
+    <select id="getChargeNoByChargeType" resultMap="bChargeConfigMap">
+        SELECT
+        bcc.charge_config_id,
+        bcc.pcid,
+        bcb.company_name,
+        bcc.cid,
+        bcmb.community_name,
+        bic.charge_name,
+        bic.charge_no,
+        bbd.dict_destination AS charge_type_name,
+        bic.charge_type,
+        bcc.charge_category AS charge_category,
+        bbd1.dict_destination AS charge_category_name,
+        bcr.rule_type,
+        bcr.cycle,
+        bcr.fixed_amount,
+        bcr.price,
+        bbd2.dict_destination as valuation_description,
+        bbd2.remark as computing_unit,
+        bcc.receivable_type,
+        bcc.receivable_date,
+        bcc.penalty_type,
+        bcc.penalty_date,
+        bcc.penalty_auto,
+        bcc.penalty_percentage,
+        bcc.penalty_mode,
+        bhc.bhc_id,
+        bhc.start_date,
+        bhc.end_date,
+        bcc.modify_date
+
+        FROM
+        wy_item.b_charge_config bcc
+        INNER JOIN wy_baseinfo.b_company bcb ON ( bcc.pcid = bcb.id )
+        INNER JOIN wy_baseinfo.b_community bcmb ON ( bcc.cid = bcmb.id )
+        INNER JOIN wy_item.b_item_charge bic ON ( bcc.charge_no = bic.charge_no )
+        INNER JOIN wy_item.b_bus_dict bbd ON ( bbd.dict_value = bic.charge_type AND bbd.dict_name = 'chargeCycleMold' )
+        INNER JOIN wy_item.b_bus_dict bbd1 ON ( bbd1.dict_value = bcc.charge_category AND bbd1.dict_name = 'chargeMold' )
+        INNER JOIN wy_item.b_charge_rule bcr ON (
+        bcc.con_rule_no = bcr.con_rule_no
+        )
+        left join wy_item.b_bus_dict bbd2 on (bbd2.dict_value=bcr.rule_no and bbd2.dict_name='chargeCalculation')
+        left join wy_item.b_house_charge bhc on (bcc.charge_config_id=bhc.charge_config_id
+        <if test="bChargeConfig.hid != null and bChargeConfig.hid!=''">
+            and bhc.hid=#{bChargeConfig.hid}
+        </if>)
+
+        <where>
+            <if test="bChargeConfig.pcid != null and bChargeConfig.pcid!=''">
+                and bcc.pcid=#{bChargeConfig.pcid}
+            </if>
+            <if test="bChargeConfig.cid != null and bChargeConfig.cid!=''">
+                and bcc.cid=#{bChargeConfig.cid}
+            </if>
+            <if test="bChargeConfig.chargeType != null and bChargeConfig.chargeType!=''">
+                and bic.charge_type=#{bChargeConfig.chargeType}
+            </if>
+            <if test="bChargeConfig.chargeCategory != null and bChargeConfig.chargeCategory !=''">
+                and bcc.charge_category=#{bChargeConfig.chargeCategory}
+            </if>
+            <if test="bChargeConfig.chargeName != null and bChargeConfig.chargeName!=''">
+                and bic.charge_name like concat ('%',#{bChargeConfig.chargeName},'%')
+            </if>
+        </where>
+
+
+    </select>
+</mapper>

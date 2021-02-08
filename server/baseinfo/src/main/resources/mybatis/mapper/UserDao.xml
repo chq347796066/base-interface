@@ -1,0 +1,769 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.baseinfo.dao.IUserDao">
+    <!-- resultMap -->
+    <resultMap type="com.spring.base.vo.baseinfo.user.UserEntityResponseVO" id="userMap">
+        <result property="id" column="id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="companyId" column="company_id"/>
+        <result property="communityId" column="community_id"/>
+        <result property="userCode" column="user_code"/>
+        <result property="userNickname" column="user_nickname"/>
+        <result property="userName" column="user_name"/>
+        <result property="password" column="password"/>
+        <result property="mobile" column="mobile"/>
+        <result property="sex" column="sex"/>
+        <result property="birthday" column="birthday"/>
+        <result property="idCard" column="id_card"/>
+        <result property="address" column="address"/>
+        <result property="nativePlace" column="native_place"/>
+        <result property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="loginStatus" column="login_status"/>
+        <result property="status" column="status"/>
+        <result property="statusName" column="status_name"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+        <result property="companyName" column="companyName"/>
+        <result property="tenantName" column="tenantName"/>
+        <result property="communityName" column="community_name"/>
+        <result property="url" column="url"/>
+        <result property="jobId" column="job_id"/>
+        <result property="userType" column="user_type"/>
+        <result property="platformAuthority" column="platform_authority"/>
+        <result property="enableStatusFlag" column="enable_status_flag"/>
+        <result property="houseHoldType" column="house_hold_type"/>
+    </resultMap>
+
+    <!-- 查询条件 -->
+    <sql id="Where_Clause">
+        <where>
+            main.del_flag = 0
+            <if test="id != null and id != '' ">
+                and main.id = #{id}
+            </if>
+            <if test="userCode != null and userCode != '' ">
+                and main.user_code = #{userCode}
+            </if>
+            <if test="userNickname != null and userNickname != '' ">
+                and main.user_nickname like concat('%',#{userNickname,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="userName != null and userName != '' ">
+                and main.user_name like concat('%',#{userName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="userType != null and userType != '' ">
+                and main.user_type = #{userType}
+            </if>
+            <if test="companyId != null and companyId != '' ">
+                and main.company_id = #{companyId}
+            </if>
+            <if test="communityId != null and communityId != '' ">
+                and main.community_id = #{communityId}
+            </if>
+            <if test="jobId != null and jobId != '' ">
+                and main.job_id = #{jobId}
+            </if>
+        </where>
+    </sql>
+
+    <!-- 新增 -->
+    <insert id="inserUser" parameterType="com.spring.base.entity.baseinfo.UserEntity">
+        insert into b_user
+        (`id`,
+        `company_id`,
+        `community_id`,
+        `user_code`,
+        `user_nickname`,
+        `user_name`,
+        `password`,
+        `mobile`,
+        `sex`,
+        `birthday`,
+        `id_card`,
+        `address`,
+        `native_place`,
+        `role_id`,
+        `login_status`,
+        `job_id`,
+        `status`,
+        `user_type`,
+        `platform_authority`,
+        `enable_status_flag`,
+        `house_hold_type`,
+        `create_user`,
+        `create_date`,
+        `modify_user`,
+        `tenant_id`,
+        `modify_date`)
+        values(#{id},
+            #{companyId},
+            #{communityId},
+            #{userCode},
+            #{userNickname},
+            #{userName},
+            #{password},
+            #{mobile},
+            #{sex},
+            #{birthday},
+            #{idCard},
+            #{address},
+            #{nativePlace},
+            #{roleId},
+            #{loginStatus},
+            #{jobId},
+            #{status},
+            #{userType},
+            #{platformAuthority},
+            #{enableStatusFlag},
+            #{houseHoldType},
+            #{createUser},
+            #{createDate},
+            #{modifyUser},
+             #{tenantId},
+            #{modifyDate})
+    </insert>
+
+    <!-- 批量新增 -->
+    <insert id="addList" parameterType="java.util.List">
+        insert into b_user
+        (
+        `id`,
+        `company_id`,
+        `community_id`,
+        `user_code`,
+        `user_name`,
+        `password`,
+        `mobile`,
+        `sex`,
+        `birthday`,
+        `id_card`,
+        `address`,
+        `native_place`,
+        `role_id`,
+        `login_status`,
+        `job_id`,
+        `status`,
+        `user_type`,
+        `platform_authority`,
+        `enable_status_flag`,
+        `create_user`,
+        `create_date`,
+        `modify_user`,
+        `tenant_id`,
+        `modify_date`
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.companyId},
+            #{item.communityId},
+            #{item.userCode},
+            #{item.userName},
+            #{item.password},
+            #{item.mobile},
+            #{item.sex},
+            #{item.birthday},
+            #{item.idCard},
+            #{item.address},
+            #{item.nativePlace},
+            #{item.roleId},
+            #{item.loginStatus},
+            #{item.jobId},
+            #{item.status},
+            #{item.userType},
+            #{item.platformAuthority},
+            #{item.enableStatusFlag},
+            #{item.createUser},
+            #{item.createDate},
+            #{item.modifyUser},
+            #{item.tenantId},
+            #{item.modifyDate}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateUser" parameterType="com.spring.base.entity.baseinfo.UserEntity">
+        update b_user
+        <set>
+            <if test="companyId != null and companyId != '' ">
+                `company_id` = #{companyId},
+            </if>
+            <if test="communityId != null and communityId != '' ">
+                `community_id` = #{communityId},
+            </if>
+            <if test="userCode != null and userCode != '' ">
+                `user_code` = #{userCode},
+            </if>
+            <if test="userNickname != null and userNickname != '' ">
+                `user_nickname` = #{userNickname},
+            </if>
+            <if test="userName != null and userName != '' ">
+                `user_name` = #{userName},
+            </if>
+            <if test="password != null and password != '' ">
+                `password` = #{password},
+            </if>
+            <if test="address != null and address != '' ">
+                `address` = #{address},
+            </if>
+            <if test="birthday != null and birthday != '' ">
+                `birthday` = #{birthday},
+            </if>
+            <if test="nativePlace != null and nativePlace != '' ">
+                `native_place` = #{nativePlace},
+            </if>
+            <if test="mobile != null and mobile != '' ">
+                `mobile` = #{mobile},
+            </if>
+            <if test="sex != null">
+                `sex` = #{sex},
+            </if>
+            <if test="idCard != null and idCard != '' ">
+                `id_card` = #{idCard},
+            </if>
+            <if test="roleId != null and roleId != '' ">
+                `role_id` = #{roleId},
+            </if>
+            <if test="jobId != null and jobId != '' ">
+                `job_id` = #{jobId},
+            </if>
+            <if test="userType != null and userType != '' ">
+                `user_type` = #{userType},
+            </if>
+            <if test="platformAuthority != null and platformAuthority != '' ">
+                `platform_authority` = #{platformAuthority},
+            </if>
+            <if test="enableStatusFlag != null">
+                `enable_status_flag` = #{enableStatusFlag},
+            </if>
+            <if test="delFlag != null and delFlag != '' ">
+                `del_flag` = #{delFlag},
+            </if>
+            <if test="houseHoldType != null and houseHoldType != '' ">
+                house_hold_type = #{houseHoldType},
+            </if>
+            <if test="tenantId != null and tenantId != '' ">
+                `tenant_id` = #{tenantId},
+            </if>
+            <if test="status!=null and status!=''">
+                status=#{status}
+            </if>
+        </set>
+        where id =#{id}
+    </update>
+
+    <!-- 员工列表分页查询勿动 -->
+    <select id="queryUserList" resultType="com.spring.base.vo.baseinfo.user.UserEntityResponseVO" parameterType="com.spring.base.entity.baseinfo.UserEntity">
+        SELECT
+        a.id,
+        a.tenant_id as tenantId,
+        a.company_id as companyId,
+        a.community_id as communityId,
+        a.user_code as userCode,
+        a.user_nickname as nickName,
+        a.user_name as userName,
+        a.password,
+        CONCAT(LEFT(a.mobile,3),'*****',RIGHT(a.mobile,4)),
+        a.sex,
+        a.birthday,
+        CONCAT(LEFT(a.id_card,3),'*******',RIGHT(a.id_card,4)) as idCard,
+        a.address,
+        a.native_place as nativePlace,
+        a.role_id as roleId,
+        a.login_status as loginStatus,
+        a.status,
+        a.admin,
+        ifnull(com.company_name,'') as companyName,
+        tem.company_name as tenantName,
+        comm.community_name as communityName,
+        a.mobile
+        FROM b_user a
+        left join b_company as com on a.company_id=com.id
+        left join b_company as tem on a.tenant_id=tem.id
+        left join b_community as comm on a.community_id=comm.id
+        where a.del_flag = 0 and a.user_type = 2 and a.admin = 0
+        <if test="userCode != null and userCode != '' ">
+            and a.user_code = #{userCode}
+        </if>
+        <if test="userName != null and userName != '' ">
+            and a.user_name like concat('%',#{userName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="userType != null and userType != '' ">
+            and a.user_type = #{userType}
+        </if>
+        <if test="tenantId != null and tenantId != '' ">
+            and a.tenant_id = #{tenantId}
+        </if>
+        <if test="companyId != null and companyId != '' ">
+            and a.company_id = #{companyId}
+        </if>
+        <if test="communityId != null and communityId != '' ">
+            and a.community_id = #{communityId}
+        </if>
+        <if test="communityIds != null and communityIds.size != '' ">
+            and a.community_id in
+            <foreach collection="communityIds" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        order by a.modify_date desc
+    </select>
+    <!-- 员工列表回显详情 勿动 -->
+    <select id="queryUserVoInfo" resultType="com.spring.base.vo.baseinfo.user.UserEntityResponseVO"
+            parameterType="com.spring.base.entity.baseinfo.UserEntity">
+        SELECT
+        a.id,
+        a.tenant_id as tenantId,
+        a.company_id as companyId,
+        a.community_id as communityId,
+        a.user_code as userCode,
+        a.user_name as userName,
+        a.password,
+        a.mobile,
+        a.sex,
+        a.birthday,
+        a.id_card as idCard,
+        a.address,
+        a.native_place as nativePlace,
+        a.role_id as roleId,
+        a.login_status as loginStatus,
+        a.status,
+        a.platform_authority as platformAuthority,
+        com.company_name as companyName,
+        comm.community_name as communityName
+        FROM b_user a
+        left join b_company as com on (a.company_id=com.id and com.del_flag = 0)
+        left join b_community as comm on (a.community_id=comm.id and comm.del_flag = 0)
+        where a.del_flag = 0
+        <if test="id != null and id != '' ">
+            and a.id = #{id}
+        </if>
+    </select>
+
+    <!-- 角色用户列表分页 勿动 -->
+    <select id="queryRoleUserList" resultMap="userMap" parameterType="com.spring.base.entity.baseinfo.UserEntity">
+        SELECT
+        main.id,
+        main.user_code,
+        main.user_nickname,
+        main.user_name,
+        main.mobile,
+        main.user_type,
+        main.login_time,
+        main.enable_status_flag,
+        main.create_date,
+        com.id AS company_id,
+        com.company_name,
+        comm.id AS community_id,
+        comm.community_name,
+        main.job_id,
+        main.del_flag,
+        main.platform_authority,
+        main.id_card,
+        main.role_id as role_id,
+        main.sex,
+        main.password
+        FROM b_user AS main
+        LEFT JOIN b_company AS com ON main.company_id = com.id
+        LEFT JOIN b_community AS comm ON main.community_id = comm.id
+        where main.del_flag = 0 and main.admin = 0 and main.role_id is not null
+        <if test="id != null and id != '' ">
+            and main.id = #{id}
+        </if>
+        <if test="userCode != null and userCode != '' ">
+            and main.user_code = #{userCode}
+        </if>
+        <if test="userNickname != null and userNickname != '' ">
+            and main.user_nickname like concat('%',#{userNickname,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="userName != null and userName != '' ">
+            and main.user_name like concat('%',#{userName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="userType != null and userType != '' ">
+            and main.user_type = #{userType}
+        </if>
+        <if test="tenantId != null and tenantId != '' ">
+            and main.tenant_id = #{tenantId}
+        </if>
+        <if test="companyId != null and companyId != '' ">
+            and main.company_id = #{companyId}
+        </if>
+        <if test="communityId != null and communityId != '' ">
+            and main.community_id = #{communityId}
+        </if>
+        <if test="communityIds != null and communityIds.size != '' ">
+            and main.community_id in
+            <foreach collection="communityIds" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        order by main.modify_date desc
+    </select>
+
+    <!-- 用户自定义开始 -->
+    <!-- 根据用户名和密码查询用户 -->
+    <select id="getUserByUserIdPassword" resultType="com.spring.base.vo.baseinfo.user.LoginReturnVo">
+		select
+		usr.id as id,
+		usr.id as userId,
+		usr.user_code as userCode,
+		usr.user_name as userName,
+		usr.role_id as roleId,
+		usr.tenant_id as tenantId,
+		usr.company_id as companyId,
+		usr.community_id as communityId,
+		usr.sex as sex,
+        usr.mobile as mobile,
+		usr.id_card as idCard,
+		usr.user_logo_id as userLogoId,
+		usr.user_nickname as userNickname,
+		usr.del_flag as delFlag,
+		usr.admin,
+        usr.enable_status_flag as enableStatusFlag,
+        usr.user_type,
+        usr.is_saas as isSaas,
+		usr.job_id as jobId
+		from b_user as usr
+		where usr.user_code=#{userId} and usr.password=#{password} and del_flag = 0
+	</select>
+
+    <!-- 批量新增用户角色 -->
+    <insert id="addListUserRole" parameterType="java.util.List">
+        insert into b_user_role
+        (
+        `id`,
+        `role_id`,
+        `user_id`,
+        `status`,
+        `del_flag`,
+        `create_user`,
+        `create_date`,
+        `modify_user`,
+        `modify_date`
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.roleId},
+            #{item.userId},
+            #{item.status},
+            #{item.delFlag},
+            #{item.createUser},
+            #{item.createDate},
+            #{item.modifyUser},
+            #{item.modifyDate}
+            )
+        </foreach>
+    </insert>
+
+    <select id="queryUserInfo" resultMap="userMap" parameterType="com.spring.base.entity.baseinfo.UserEntity">
+        select
+        *
+       from  b_user main
+        <include refid="Where_Clause" />
+        order by modify_date desc
+    </select>
+
+    <!-- 删除 -->
+    <delete id="deleteUserRole">
+        UPDATE b_user_role
+        SET del_flag = '1'
+        WHERE
+            user_id =#{userId}
+	</delete>
+
+    <!-- 忘记密码 -->
+    <update id="modifyPassword">
+		update b_user
+		set password=#{password}
+		where user_code = #{userCode}
+	</update>
+
+    <!--根据id重置用户密码-->
+    <update id="modifyPasswordById">
+		update b_user
+		set password=#{password}
+		where id = #{id}
+	</update>
+
+    <!--修改登录时间-->
+    <update id="modifyLoginTimeSourceChannel">
+       UPDATE b_user
+    SET login_time = #{loginTime},
+        source_channel=#{sourceChannel}
+    WHERE
+        user_code = #{userCode}
+    </update>
+    <!--修改账号状态(禁用或启用)-->
+    <update id="modifyAccountStatus">
+            UPDATE b_user
+        SET enable_status_flag=#{enableStatusFlag}
+        WHERE
+            id = #{id}
+    </update>
+    <select id="queryCustomerAppUserList" parameterType="com.spring.base.vo.baseinfo.user.CustomerAppUserPageVo"
+            resultMap="userMap">
+        SELECT
+        u.id,
+        u.user_name,
+        u.sex,
+        u.mobile,
+        u.id_card,
+        u.source_channel,
+        u.create_date,
+        u.login_time,
+        u.enable_status_flag,
+        u.house_hold_type
+        FROM
+        b_user u
+        WHERE
+        u.user_type = '4'
+        and u.del_flag=0
+        <if test="userName != null and userName != '' and  mobile != null and mobile != ''">
+            and (u.user_name like concat('%',#{userName,jdbcType=VARCHAR},'%') or u.mobile = #{mobile,jdbcType=VARCHAR})
+        </if>
+        <if test="houseHoldType != null and houseHoldType != ''">
+            and (u.house_hold_type = #{houseHoldType,jdbcType=VARCHAR})
+        </if>
+        <if test="communityIds != null and communityIds.size != '' ">
+            and u.community_id in
+            <foreach collection="communityIds" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryCustomerAppUserDetail" resultType="com.spring.base.vo.baseinfo.user.UserAppMyHouseVo">
+        SELECT
+            u.id,
+            u.user_name,
+            u.sex,
+            u.mobile,
+            u.id_card,
+            u.source_channel,
+            u.create_date,
+            u.login_time,
+            u.`password`,
+            u.user_logo_id,
+            u.house_hold_type
+        from b_user u
+        WHERE u.id = #{userId}
+    </select>
+
+    <select id="queryHouseInfoList">
+            SELECT
+        mh.user_name AS userName,
+        mh.mobile,
+        mh.identity_type AS identityType,
+        mh.community_name AS communityName,
+        mh.build_name AS buildName,
+        mh.cell_name AS cellName,
+        mh.house_code AS house_code
+    FROM
+        wy_business.b_my_house mh
+    WHERE
+    mh.user_id=#{userId}
+    </select>
+
+    <select id="queryUserById" parameterType="java.lang.String" resultMap="userMap">
+        SELECT
+        b.user_type,
+        b.user_name,
+        b.user_code,
+        b.mobile,
+        b.id_card,
+        b.platform_authority
+        FROM
+        b_user b,
+        b_role r,
+        b_user_role ur
+        WHERE
+        r.id = ur.role_id
+        AND b.id = ur.user_id
+        AND b.id =#{userId}
+    </select>
+
+    <select id="getUserHadRoles" parameterType="java.lang.String"
+            resultType="com.spring.base.entity.baseinfo.UserRoleEntity">
+        SELECT
+        r.id
+        FROM
+        b_user u,
+        b_role r,
+        b_user_role ur
+        WHERE
+        u.id = ur.user_id
+        AND r.id = ur.role_id
+        <if test="userId != null and userId != '' ">
+            AND u.id=#{userId}
+        </if>
+    </select>
+
+    <!--逻辑删除用户角色中间表-->
+    <update id="updateUserRoleByUserId" parameterType="java.lang.String">
+    UPDATE b_user_role
+    SET `del_flag` = 1
+    WHERE user_id =#{userId}
+    </update>
+
+    <!--用户头像LOgo -->
+    <update id="updateUserLogo" parameterType="com.spring.base.vo.baseinfo.user.UserUpdateLogo">
+        update b_user
+        <set>
+            <if test="userLogoId != null and userLogoId != '' ">
+                user_logo_id = #{userLogoId},
+            </if>
+            <if test="companyId != null and companyId != '' ">
+                company_id = #{companyId},
+            </if>
+            <if test="communityId != null and communityId != '' ">
+                community_id = #{communityId},
+            </if>
+            <if test="userName != null and userName != '' ">
+                user_name = #{userName},
+            </if>
+            <if test="mobile != null and mobile != '' ">
+                mobile = #{mobile},
+            </if>
+            <if test="sex != null and sex != '' ">
+                sex =#{sex},
+            </if>
+            <if test="idCard != null and idCard != '' ">
+                id_card = #{idCard},
+            </if>
+            <if test="userNickname != null and userNickname != '' ">
+                user_nickname = #{userNickname},
+            </if>
+            modify_date = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- app端个人信息 -->
+    <select id="queryLogoUserInfo" parameterType="java.lang.String"
+            resultType="com.spring.base.vo.baseinfo.user.UserUpdateLogo">
+       select
+        id as id,
+        user_nickname as userNickname,
+        user_logo_id as userLogoId,
+        community_id as communityId,
+        user_name as userName,
+        mobile  as mobile,
+        sex as sex,
+        id_card as idCard
+       from  b_user
+       where id = #{id}
+    </select>
+
+    <!-- 查询手机号码只能有一个 -->
+    <select id="queryUserMobile" parameterType="com.spring.base.vo.baseinfo.user.UserVo"
+            resultType="com.spring.base.vo.baseinfo.user.UserVo">
+        select
+         id,
+         mobile
+        from b_user
+        where user_code = #{mobile}
+    </select>
+
+    <update id="updateUserMobile" parameterType="com.spring.base.vo.baseinfo.user.UserVo">
+        update b_user
+        set mobile = #{mobile},
+            user_code = #{mobile},
+            modify_date = now()
+        where id = #{id}
+    </update>
+
+
+    <select id="queryIdCardMobile" parameterType="com.spring.base.entity.baseinfo.UserEntity"
+            resultType="com.spring.base.entity.baseinfo.UserEntity">
+      select * from  b_user
+       where del_flag = 0
+       and mobile =  #{mobile}
+       and id_card = #{idCard}
+    </select>
+
+    <select id="queryUser" parameterType="java.lang.String" resultMap="userMap">
+        SELECT
+            b.id,
+            b.user_type,
+            b.mobile,
+            b.id_card
+        FROM
+            b_user b
+        WHERE
+            b.id =  #{id}
+    </select>
+
+
+    <!-- 角色用户中间表查询用户信息勿动 -->
+    <select id="queryRoleInfoUserList" parameterType="com.spring.base.vo.baseinfo.user.UserUpdateLogo"
+            resultType="com.spring.base.vo.baseinfo.user.UserUpdateLogo">
+        SELECT
+            b.id as id,
+            b.user_name as userName,
+            b.mobile as mobile,
+            b.user_logo_id as userLogoId
+        FROM b_user b
+        WHERE b.user_type = '2'
+        and  b.id =  #{id}
+    </select>
+
+    <!-- 手机号生成密码去重 -->
+     <select id="queryMobileList" parameterType="com.spring.base.entity.baseinfo.UserEntity"
+            resultType="com.spring.base.entity.baseinfo.UserEntity">
+        SELECT
+        b.id as id,
+        b.user_name as userName,
+        b.mobile as mobile,
+        b.create_user as createUser,
+        b.create_date as createDate
+        FROM b_user b
+        WHERE b.del_flag = 0 and IFNULL(b.house_hold_type,0) != '5'
+        <if test="id !=null and id != '' ">
+            and b.id != #{id}
+        </if>
+        <if test="mobile !=null and mobile != '' ">
+            and b.mobile = #{mobile}
+        </if>
+    </select>
+
+
+    <!--saas更新租户下用户角色id为购买的应用角色id-->
+    <update id="updateTenantRole">
+        update b_user set role_id=#{roleId}
+        where tenant_id=#{tenantId}
+    </update>
+
+    <!--升级应用租户管理员新绑定升级的角色-->
+    <update id="upgradeUserRole">
+        update b_user set role_id=CONCAT(role_id, ',' , #{roleId})
+        where tenant_id=#{tenantId} and tenant_admin=1
+    </update>
+
+    <!--获取岗位用户列表-->
+    <select id="getUserJobList" resultType="com.spring.baseinfo.vo.UserJobVo">
+    select us.id as userId,us.user_name as userName,us.mobile as phone,dir.dict_name as job,us.job_id as jobId from b_user as us
+     left outer join b_dictionary as dir on us.job_id=dir.dict_code and dir.dict_type='jobs'
+     where us.user_code is not null
+    </select>
+
+    <select id="getUserJobListByCommunityId" resultType="com.spring.baseinfo.vo.UserJobVo" parameterType="java.util.List">
+     select us.id as userId,us.user_name as userName,us.mobile as phone,dir.dict_name as job,us.job_id as jobId from b_user as us
+     left outer join b_dictionary as dir on us.job_id=dir.dict_code and dir.dict_type='jobs'
+     where us.user_code is not null and us.status = 1
+     <if test="communityIds != null and communityIds.size != '' ">
+            and us.community_id in
+            <foreach collection="communityIds" item="communityId" index="index" open="(" close=")" separator=",">
+                #{communityId}
+            </foreach>
+     </if>
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.account.dao.ISqlDao">
+
+
+	<!-- 执行sql -->
+	<select id="execSqlGetRecordSet"
+		parameterType="java.lang.String" resultType="java.util.LinkedHashMap">
+		${value}
+	</select>
+
+
+	<!-- 执行sql,获取记录数 -->
+	<select id="execSqlGetRecordCount"
+		parameterType="java.lang.String" resultType="java.lang.Integer">
+		${value}
+	</select>
+
+
+	<!-- 批量新增项目 -->
+	<insert id="addListProject" parameterType="java.util.List">
+		insert into p_project
+		(
+		`id`,
+		`pro_no`,
+		`pro_name`,
+		`classify`,
+		`plate`,
+		`source`,
+		`source_no`,
+		`member_no`,
+		`keeper_no`,
+		`company`,
+		`department`,
+		`charger`,
+		`workflow_type`,
+		`process_instance_id`,
+		`audit_process`,
+		`reject`,
+		`status`,
+		`company_by`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id},
+			#{item.proNo},
+			#{item.proName},
+			#{item.classify},
+			#{item.plate},
+			#{item.source},
+			#{item.sourceNo},
+			#{item.memberNo},
+			#{item.keeperNo},
+			#{item.company},
+			#{item.department},
+			#{item.charger},
+			#{item.workflowType},
+			#{item.processInstanceId},
+			#{item.auditProcess},
+			#{item.reject},
+			#{item.status},
+			#{item.companyBy}
+			)
+		</foreach>
+	</insert>
+
+</mapper>

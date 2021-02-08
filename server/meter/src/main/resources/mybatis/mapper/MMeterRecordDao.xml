@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.meter.dao.IMMeterRecordDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.meter.MMeterRecordEntity" id="mMeterRecordMap">
+        <result property="id" column="id"/>
+        <result property="communityId" column="community_id"/>
+        <result property="buildId" column="build_id"/>
+        <result property="cellId" column="cell_id"/>
+        <result property="houseId" column="house_id"/>
+        <result property="meterTypeId" column="meter_type_id"/>
+        <result property="lastData" column="last_data"/>
+        <result property="currentData" column="current_data"/>
+        <result property="dosage" column="dosage"/>
+        <result property="lastReadDate" column="last_read_date"/>
+        <result property="currentReadDate" column="current_read_date"/>
+        <result property="readCheck" column="read_check"/>
+
+		<result property="meterTypeName" column="type_name"/>
+		<result property="houseCode" column="house_code"/>
+		<result property="houseNo" column="house_no"/>
+		<result property="cellName" column="cell_name"/>
+		<result property="buildName" column="build_name"/>
+		<result property="communityName" column="community_name"/>
+    </resultMap>
+
+	<resultMap type="com.spring.base.vo.meter.MMeterRecordStatisVo" id="mMeterStatisMap">
+		<result property="communityId" column="community_id"/>
+		<result property="buildId" column="build_id"/>
+		<result property="communityName" column="community_name"/>
+		<result property="buildName" column="build_name"/>
+		<result property="houseNum" column="house_num"/>
+		<result property="meterNum" column="meter_num"/>
+		<result property="readNum" column="read_num"/>
+		<result property="notReadNum" column="not_read_num"/>
+	</resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="communityId != null and communityId != '' "> and mmr.`community_id` = #{communityId} </if>
+			<if test="buildId != null and buildId != '' "> and  mmr.`build_id` = #{buildId} </if>
+			<if test="cellId != null and cellId != '' "> and  mmr.`cell_id` = #{cellId} </if>
+			<if test="houseId != null and houseId != '' "> and  mmr.`house_id` = #{houseId} </if>
+ 			<if test="houseCode != null and houseCode != '' "> and  bho.`house_code` like concat('%',#{houseCode},'%')  </if>
+			<if test="meterTypeId != null and meterTypeId != '' "> and  mmr.`meter_type_id` = #{meterTypeId} </if>
+			and mmr.del_flag = '0'
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into m_meter_record
+		(
+			`id`, 
+			`community_id`, 
+			`build_id`, 
+			`cell_id`, 
+			`house_id`, 
+			`meter_type_id`, 
+			`last_data`, 
+			`current_data`, 
+			`dosage`,
+			`last_read_date`, 
+			`current_read_date`, 
+			`read_check`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.communityId}, 
+			#{item.buildId}, 
+			#{item.cellId}, 
+			#{item.houseId}, 
+			#{item.meterTypeId}, 
+			#{item.lastData}, 
+			#{item.currentData}, 
+			#{item.dosage},
+			#{item.lastReadDate}, 
+			#{item.currentReadDate}, 
+			#{item.readCheck}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="mMeterRecordMap"
+			parameterType="com.spring.base.entity.meter.MMeterRecordEntity">
+		SELECT
+		mmr.*,
+		mmt.type_name,
+		bho.house_no,
+		bho.house_code,
+		bce.cell_name,
+		bbu.build_name,
+		bco.community_name
+		FROM
+		`m_meter_record` mmr
+		left join m_meter_type mmt on mmr.meter_type_id = mmt.id and mmt.del_flag = 0
+		left JOIN wy_baseinfo.b_house bho ON mmr.house_id = bho.id and bho.del_flag = 0
+		left join wy_baseinfo.b_cell bce on mmr.cell_id = bce.id and bce.del_flag = 0
+		left join wy_baseinfo.b_build bbu on mmr.build_id = bbu.id and bbu.del_flag = 0
+		left join wy_baseinfo.b_community bco on mmr.community_id = bco.id and bco.del_flag = 0
+		<include refid="Where_Clause" />
+		order by mmr.create_date desc
+	</select>
+
+
+
+	<select id="queryStatisList" resultMap="mMeterStatisMap"
+			parameterType="com.spring.base.vo.meter.MMeterRecordStatisParam">
+		select mmr.community_id,mmr.build_id,
+		count(DISTINCT(mmrh.house_id)) house_num,
+		count(mmrh.id) meter_num,
+		sum(IF(mmrh.read_check = '1',1,0)) read_num,
+		sum(if(mmrh.read_check = '0',1,0)) not_read_num
+		from m_meter_record mmr
+		left join m_meter_record_history mmrh on mmr.id = mmrh.id and mmrh.read_month = #{readMonth}
+		<include refid="Where_Clause" />
+		group by mmr.community_id,mmr.build_id
+		order by mmr.community_id,mmr.build_id
+	</select>
+
+	<select id="queryStatisByCommunity" resultMap="mMeterStatisMap"
+			parameterType="com.spring.base.vo.meter.MMeterRecordStatisParam">
+		select mmr.community_id,
+		count(DISTINCT(mmrh.house_id)) house_num,
+		count(mmrh.id) meter_num,
+		sum(IF(mmrh.read_check = '1',1,0)) read_num,
+		sum(if(mmrh.read_check = '0',1,0)) not_read_num
+		from m_meter_record mmr
+		left join m_meter_record_history mmrh on mmr.id = mmrh.id and mmrh.read_month = #{readMonth}
+		<include refid="Where_Clause" />
+		group by mmr.community_id
+		order by mmr.community_id
+	</select>
+
+	<select id="queryStatisDetailList" resultMap="mMeterRecordMap"
+			parameterType="com.spring.base.vo.meter.MMeterRecordStatisParam">
+		select mmr.community_id,mmr.build_id, mmr.house_id,mmt.type_name,
+		mmrh.read_check,mmrh.last_read_date,mmrh.last_data,mmrh.current_read_date,mmrh.current_data,mmrh.dosage
+		from m_meter_record mmr
+		inner join m_meter_record_history mmrh on mmr.id = mmrh.id and mmrh.read_month = #{readMonth}
+		left join m_meter_type mmt on mmt.id =  mmr.meter_type_id and mmt.del_flag = 0
+		<include refid="Where_Clause" />
+		order by mmr.community_id,mmr.build_id
+	</select>
+
+
+
+	<!-- 用户自定义开始 -->
+	<update id="batchDeleteMeterRecord" parameterType="map">
+		update m_meter_record mmr set del_flag = 1,modify_date=now()
+		where id in
+		<foreach collection="ids" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+
+</mapper>

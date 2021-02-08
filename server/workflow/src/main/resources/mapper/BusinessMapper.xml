@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.workflow.dao.BusinessMapper">
+
+    <!-- 根据业务类型查询流程id -->
+    <select id="getProcessId" resultType="java.lang.String">
+		SELECT proc.KEY_ FROM
+		ACT_RE_PROCDEF as proc
+		inner join ACT_RE_MODEL as model on
+		model.DEPLOYMENT_ID_=proc.DEPLOYMENT_ID_
+		where
+		model.KEY_=#{businessType}
+	</select>
+
+    <!-- 执行sql -->
+    <select id="execSql" parameterType="java.lang.String"
+            resultType="java.util.Map">
+		${value}
+	</select>
+
+
+    <!-- 新增业务信息 -->
+    <insert id="addBusinessInfo"
+            parameterType="com.spring.workflow.vo.ActBusinessVo">
+		insert into ACT_BUSINESS
+		(
+		`id`,
+		`business_id`,
+		`business_type`,
+		`business_name`,
+		`process_instance_id`,
+		`project_no`,
+		`project_name`,
+		`submit_id`,
+		`user_id`,
+		`status`,
+		`create_by`,
+		`create_date`
+		)
+		values
+		(
+		#{id},
+		#{businessId},
+		#{businessType},
+		#{businessName},
+		#{processInstanceId},
+		#{projectNo},
+		#{projectName},
+		#{submitId},
+		#{userId},
+		#{status},
+		#{createBy},
+		#{createDate}
+		)
+	</insert>
+
+    <!-- 查询工作流类型 -->
+    <select id="getWorkTypeList"
+            resultType="com.spring.workflow.vo.DictionaryDataVo">
+		select dict_code as value,dict_name as label from
+		b_dictionary where dict_type = 'WorkflowType'
+	</select>
+
+    <!-- 查询我待审核的工作流 -->
+    <select id="getMyAuditList"
+            resultType="com.spring.workflow.vo.WorkflowInfoVo">
+		SELECT
+		task.id_ as taskId,
+		task.PROC_INST_ID_ as
+		processInstanceId,
+		task.NAME_ as auditName,
+		bus.business_name as
+		workflowName,
+		bus.create_by as userId,
+		bus.user_id as createBy,
+		bus.create_date as createDate
+		FROM
+		ACT_RU_TASK AS task
+		INNER JOIN
+		ACT_BUSINESS AS bus ON task.PROC_INST_ID_ =
+		bus.process_instance_id
+		WHERE
+		task.ASSIGNEE_ = #{userId} order by bus.create_date desc
+	</select>
+
+    <!-- 查询流程任务id -->
+    <select id="getTaskId" resultType="java.lang.String">
+		select ID_ from ACT_RU_TASK
+		where PROC_INST_ID_=#{processId} and ASSIGNEE_=#{userId}
+	</select>
+
+    <!-- 根据用户id查询用户姓名 -->
+    <select id="getUserName" resultType="com.spring.workflow.vo.UserCodeNameVo">
+		select user_code as userId,user_name as userName,email from b_user where user_code=#{userId}
+	</select>
+
+    <!-- 保存审核记录 -->
+    <insert id="saveApproveInfo"
+            parameterType="com.spring.workflow.vo.ApproveInfoVo">
+		insert into ACT_BUSINESS_TASK
+		(
+		`id`,
+		`business_id`,
+		`process_instance_id`,
+		`task_id`,
+		`process_name`,
+		`operation`,
+		`operation_man`,
+		`remark`,
+		`status`,
+		`create_by`,
+		`create_date`
+		)
+		values
+		(
+		#{id},
+		#{businessId},
+		#{processInstanceId},
+		#{taskId},
+		#{processName},
+		#{operation},
+		#{operationMan},
+		#{remark},
+		#{status},
+		#{createBy},
+		#{createDate}
+		)
+	</insert>
+
+    <!-- 查询我的已审批列表 -->
+    <select id="getMyAuditOkList"
+            resultType="com.spring.workflow.vo.ApproveInfoVo">
+		select id,business_id as businessId,process_instance_id as
+		processInstanceId,task_id as taskId,
+		process_name as
+		processName,operation,operation_man as operationMan,remark,
+		status,create_by as createBy,create_date as createDate from
+		ACT_BUSINESS_TASK where operation_man=#{userId}
+		order by create_date
+		desc
+	</select>
+
+    <!-- 查询审批记录 -->
+    <select id="getAuditInfoList"
+            resultType="com.spring.workflow.vo.AuditInfoVo">
+		SELECT
+		t.create_date AS createDate,
+		t.process_name
+		processName,
+		t.operation,
+		u.user_name AS operationMan,
+		t.remark
+		FROM
+		ACT_BUSINESS_TASK AS t
+		left join b_user as u on
+		t.operation_man=u.user_code
+		WHERE
+		t.business_id = #{businessId}
+		ORDER BY
+		t.create_date
+	</select>
+
+    <!-- 根据节点id查询角色对应的存储过程 -->
+    <select id="getProcName" resultType="java.lang.String">
+		select proc_name from
+		b_workflow_config as conf
+		left outer join b_workflow_role as ro on
+		conf.role_id=ro.id
+		where conf.node=#{node}
+	</select>
+
+    <!-- 调用存储过程 -->
+    <!-- <select id="callProc" parameterMap="pm" resultType="java.util.Map"
+        statementType="CALLABLE"> -->
+    <!-- CALL pro_workflow(#{businessId,mode=IN},#{userId,mode=OUT,jdbcType=VARCHAR}); -->
+    <!-- </select> -->
+
+    <!-- <parameterMap id="pm" type="java.util.Map"> -->
+    <!-- <parameter property="businessId" jdbcType="VARCHAR" mode="IN"></parameter> -->
+    <!-- <parameter property="userId" jdbcType="VARCHAR" mode="OUT"></parameter> -->
+    <!-- </parameterMap> -->
+
+    <!-- 调用存储过程 -->
+    <select id="callProc" statementType="CALLABLE"
+            parameterType="java.util.Map" resultType="java.lang.String">
+		call proWorkflow(
+		#{businessId,mode=IN,jdbcType=VARCHAR},
+		#{nodeId,mode=IN,jdbcType=VARCHAR}
+		)
+	</select>
+
+    <!-- 获取动态设置审核人节点列表 -->
+    <select id="getAuditList" resultType="java.lang.String">
+		select node from
+		b_workflow_config
+	</select>
+
+    <!-- 判断是否是第一个驳回节点 -->
+    <select id="checkFirstReject" resultType="java.lang.Integer">
+		select count(*) from
+		b_workflow_first_reject where node=#{node}
+	</select>
+
+    <!-- 判断是否需要动态设置审核人 -->
+    <select id="checkIsSetAuditUser" resultType="java.lang.Integer">
+		select count(*) from
+		b_workflow_parallel where node=#{node}
+	</select>
+
+    <!-- 获取所有审核用户 -->
+    <select id="getAllAuditUser"
+            resultType="com.spring.workflow.vo.UserVo">
+		SELECT workus.user_code as userId,us.user_name as userName
+		FROM `b_workflow_user` as workus
+		left outer join b_user as us on
+		workus.user_code=us.user_code
+	</select>
+
+    <!-- 	获取节点变更信息 -->
+    <select id="getNodeChange" resultType="com.spring.workflow.vo.NodeChangeVo">
+		select pro_approval_id as proApprovalId,pro_approval_impl_plan_id as proApprovalImplPlanId,change_declare_date as changeDeclareDate 
+		from p_pro_approval_node_change where id=#{id}
+	</select>
+
+    <!-- 更新实施计划的时间 -->
+    <update id="updatePlanDate" parameterType="com.spring.workflow.vo.NodeChangeVo">
+		update p_pro_approval_implemen_plan set end_date=#{changeDeclareDate} where id=#{proApprovalImplPlanId} 
+	</update>
+
+    <!-- 新增 日志-->
+    <insert id="addLog" parameterType="com.spring.workflow.vo.LogVo">
+		insert into b_log
+		(
+			`id`, 
+			`type`, 
+			`key`, 
+			`info`, 
+			`ip`, 
+			`create_by`, 
+			`create_date`
+		)
+		values
+		(
+			#{id}, 
+			#{type}, 
+			#{key}, 
+			#{info}, 
+			#{ip}, 
+			#{createBy}, 
+			#{createDate}
+		)
+	</insert>
+
+    <!-- 批量新增日志 -->
+    <insert id="addLogList" parameterType="java.util.List">
+        insert into b_log
+        (
+        `id`,
+        `type`,
+        `key`,
+        `info`,
+        `ip`,
+        `create_by`,
+        `create_date`
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.type},
+            #{item.key},
+            #{item.info},
+            #{item.ip},
+            #{item.createBy},
+            #{item.createDate}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getRecEmail" resultType="com.spring.workflow.vo.EmailVo">
+		select us.email,rec.rec_project_no as projectNo from p_rec_project as rec
+		left outer join b_user as us on rec.rec_charge=us.user_code
+		where rec.id=#{id}
+	</select>
+
+    <select id="gettaskEmail" resultType="com.spring.workflow.vo.EmailVo">
+		select us.email,task.task_no as projectNo from p_dev_task as task
+		left outer join b_user as us on task.charger=us.user_code
+		where task.id=#{id}
+	</select>
+
+    <!--获取立项是否是自动化-->
+    <select id="getApprovalType" resultType="java.lang.Integer">
+		select is_auto_attrition from p_pro_approval
+        where id=(select pro_approval_id from p_pro_check_accept where id=#{id})
+	</select>
+
+	<!--结题驳回删除其它节点的审核-->
+	<delete id="deleteAcceptNode">
+		delete from ACT_RU_TASK where PROC_INST_ID_ = #{instId} and ID_!=#{taskId}
+	</delete>
+
+	<!-- resultMap -->
+	<resultMap type="com.spring.workflow.model.BillRepeatDataEntity" id="billRepeatDataMap">
+		<result property="transId" column="trans_id"/>
+		<result property="chargeNo" column="charge_no"/>
+		<result property="chargeName" column="charge_name"/>
+		<result property="transAmount" column="trans_amount"/>
+		<result property="businessAmount" column="business_amount"/>
+		<result property="payType" column="pay_type"/>
+		<result property="businessType" column="business_type"/>
+		<result property="transTime" column="trans_time"/>
+		<result property="transStatus" column="trans_status"/>
+		<result property="terminIdentify" column="termin_identify"/>
+		<result property="operatorNo" column="operator_no"/>
+		<result property="operatorName" column="operator_name"/>
+		<result property="cid" column="cid"/>
+		<result property="cname" column="cname"/>
+		<result property="recordCompanyId" column="record_company_id"/>
+		<result property="recordCompanyName" column="record_company_name"/>
+		<result property="phone" column="phone"/>
+		<result property="rmark" column="rmark"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="businessId" column="business_id"/>
+		<result property="billNo" column="bill_no"/>
+		<result property="pname" column="pname"/>
+		<result property="custNo" column="cust_no"/>
+		<result property="roomNo" column="room_no"/>
+		<result property="billDetialNo" column="bill_detial_no"/>
+		<result property="id" column="id"/>
+	</resultMap>
+
+	<!-- 根据条件查询列表 -->
+	<select id="getData" resultMap="billRepeatDataMap">
+		select * from bill_repeat_data_all
+	</select>
+
+	<select id="getDataTemp" resultMap="billRepeatDataMap">
+		select * from bill_repeat_data_all_ok_copy1
+	</select>
+
+	<!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into bill_repeat_data
+		(
+		`trans_id`,
+		`charge_no`,
+		`charge_name`,
+		`trans_amount`,
+		`business_amount`,
+		`pay_type`,
+		`business_type`,
+		`trans_time`,
+		`trans_status`,
+		`termin_identify`,
+		`operator_no`,
+		`operator_name`,
+		`cid`,
+		`cname`,
+		`record_company_id`,
+		`record_company_name`,
+		`phone`,
+		`rmark`,
+		`update_time`,
+		`business_id`,
+		`bill_no`,
+		`pname`,
+		`cust_no`,
+		`room_no`,
+		`bill_detial_no`,
+		`id`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.transId},
+			#{item.chargeNo},
+			#{item.chargeName},
+			#{item.transAmount},
+			#{item.businessAmount},
+			#{item.payType},
+			#{item.businessType},
+			#{item.transTime},
+			#{item.transStatus},
+			#{item.terminIdentify},
+			#{item.operatorNo},
+			#{item.operatorName},
+			#{item.cid},
+			#{item.cname},
+			#{item.recordCompanyId},
+			#{item.recordCompanyName},
+			#{item.phone},
+			#{item.rmark},
+			#{item.updateTime},
+			#{item.businessId},
+			#{item.billNo},
+			#{item.pname},
+			#{item.custNo},
+			#{item.roomNo},
+			#{item.billDetialNo},
+			#{item.id}
+			)
+		</foreach>
+	</insert>
+
+	<!-- 批量新增 -->
+	<insert id="addListOk" parameterType="java.util.List">
+		insert into bill_repeat_data_all_ok_end
+		(
+		`trans_id`,
+		`charge_no`,
+		`charge_name`,
+		`trans_amount`,
+		`business_amount`,
+		`pay_type`,
+		`business_type`,
+		`trans_time`,
+		`trans_status`,
+		`termin_identify`,
+		`operator_no`,
+		`operator_name`,
+		`cid`,
+		`cname`,
+		`record_company_id`,
+		`record_company_name`,
+		`phone`,
+		`rmark`,
+		`update_time`,
+		`business_id`,
+		`bill_no`,
+		`pname`,
+		`cust_no`,
+		`room_no`,
+		`bill_detial_no`,
+		`id`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.transId},
+			#{item.chargeNo},
+			#{item.chargeName},
+			#{item.transAmount},
+			#{item.businessAmount},
+			#{item.payType},
+			#{item.businessType},
+			#{item.transTime},
+			#{item.transStatus},
+			#{item.terminIdentify},
+			#{item.operatorNo},
+			#{item.operatorName},
+			#{item.cid},
+			#{item.cname},
+			#{item.recordCompanyId},
+			#{item.recordCompanyName},
+			#{item.phone},
+			#{item.rmark},
+			#{item.updateTime},
+			#{item.businessId},
+			#{item.billNo},
+			#{item.pname},
+			#{item.custNo},
+			#{item.roomNo},
+			#{item.billDetialNo},
+			#{item.id}
+			)
+		</foreach>
+	</insert>
+
+	<!-- 批量新增 -->
+	<insert id="addListId" parameterType="java.util.List">
+		insert into bill_repeat_id
+		(
+		`id`,
+		`type`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id},
+			#{item.type}
+			)
+		</foreach>
+	</insert>
+</mapper>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.saas.dao.IInvoiceOrderDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.saas.InvoiceOrderEntity" id="invoiceOrderMap">
+        <result property="id" column="id"/>
+        <result property="invoiceId" column="invoice_id"/>
+        <result property="orderId" column="order_id"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="invoiceId != null and invoiceId != '' "> and `invoice_id` = #{invoiceId} </if>
+			<if test="orderId != null and orderId != '' "> and `order_id` = #{orderId}</if>
+			and del_flag=0
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into s_invoice_order
+		(
+			`id`, 
+			`invoice_id`, 
+			`order_id`,
+			`create_date`,
+			`create_user`,
+			`modify_date`,
+			`modify_user`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.invoiceId}, 
+			#{item.orderId},
+			#{item.createDate},
+			#{item.createUser},
+			#{item.modifyDate},
+			#{item.modifyUser}
+        )
+		</foreach>
+	</insert>
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="invoiceOrderMap"
+		parameterType="com.spring.base.entity.saas.InvoiceOrderEntity">
+		select * from s_invoice_order
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+</mapper>

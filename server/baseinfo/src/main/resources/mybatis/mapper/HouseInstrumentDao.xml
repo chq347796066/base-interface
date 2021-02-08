@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.baseinfo.dao.IHouseInstrumentDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.HouseInstrumentEntity" id="houseInstrumentMap">
+        <result property="id" column="id"/>
+        <result property="houseId" column="house_id"/>
+        <result property="buildId" column="build_id"/>
+        <result property="communityId" column="community_id"/>
+        <result property="instrumentName" column="instrument_name"/>
+        <result property="instrumentId" column="instrument_id"/>
+        <result property="ratio" column="ratio"/>
+        <result property="maxReading" column="max_reading"/>
+        <result property="minReading" column="min_reading"/>
+        <result property="initialDate" column="initial_date"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="tenantId" column="tenant_id"/>
+		<result property="communityName" column="communityName"/>
+		<result property="buildName" column="buildName"/>
+		<result property="houseCode" column="houseCode"/>
+		<result property="instrumentType" column="instrumentType"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+		    main.del_flag = 0
+			<if test="id != null and id != '' ">
+				and main.id = #{id}
+			</if>
+			<if test="houseId != null and houseId != '' ">
+				 and main.house_id = #{houseId}
+			</if>
+			<if test="buildId != null and buildId != '' ">
+				and  main.build_id = #{buildId}
+			</if>
+			<if test="communityId != null and communityId != '' ">
+				 and main.community_id = #{communityId}
+			</if>
+			<if test="instrumentName != null and instrumentName != '' ">
+				 and main.instrument_name = #{instrumentName}
+			</if>
+			<if test="instrumentId != null and instrumentId != '' ">
+				 and main.instrument_id = #{instrumentId}
+			</if>
+			<if test="ratio != null and ratio != '' ">
+				 and main.ratio = #{ratio}
+			</if>
+			<if test="maxReading != null and maxReading != '' ">
+				 and main.max_reading = #{maxReading}
+			</if>
+			<if test="minReading != null and minReading != '' ">
+				 and main.min_reading = #{minReading}
+			</if>
+			<if test="initialDate != null and initialDate != '' ">
+				 and main.initial_date = #{initialDate}
+			</if>
+			<if test="tenantId != null and tenantId != '' ">
+				and main.tenant_id = #{tenantId}
+			</if>
+			<if test="houseCode != null and houseCode != '' ">
+				and ho.house_code = #{houseCode}
+			</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into b_house_instrument
+		(
+			`id`,
+			`community_id`,
+			`house_id`,
+			`build_id`,
+			`instrument_id`,
+			`instrument_name`,
+			`ratio`,
+			`max_reading`, 
+			`min_reading`, 
+			`initial_date`, 
+			`create_user`, 
+			`create_date`, 
+			`modify_user`, 
+			`modify_date`, 
+			`del_flag`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id},
+			#{item.communityId},
+			#{item.houseId}, 
+			#{item.buildId},
+			#{item.instrumentId},
+			#{item.instrumentName},
+			#{item.ratio},
+			#{item.maxReading}, 
+			#{item.minReading}, 
+			#{item.initialDate}, 
+			#{item.createUser}, 
+			#{item.createDate}, 
+			#{item.modifyUser}, 
+			#{item.modifyDate}, 
+			#{item.delFlag}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="houseInstrumentMap" parameterType="com.spring.base.entity.baseinfo.HouseInstrumentEntity">
+		select
+		main.id,
+		main.house_id,
+		main.build_id,
+		main.community_id,
+		main.instrument_name,
+		main.instrument_id,
+		main.ratio,
+		main.max_reading,
+		main.min_reading,
+		main.initial_date,
+		main.del_flag,
+		main.tenant_id,
+		co.community_name as communityName,
+		bu.build_name as buildName,
+		ho.house_code as  houseCode,
+		ins.instrument_type as instrumentType
+		from b_house_instrument as main
+		left join b_community as co on main.community_id = co.id
+		left join b_build  as bu on main.build_id = bu.id
+		left join b_house  as ho on main.house_id = ho.id
+		left join b_instrument_type as ins  on main.instrument_id = ins.id
+		<include refid="Where_Clause" />
+		order by main.modify_date desc
+	</select>
+
+
+	<!-- 根据对象 -->
+	<select id="queryHouseInstrumentInfo" resultType="com.spring.base.entity.baseinfo.HouseInstrumentEntity" parameterType="com.spring.base.entity.baseinfo.HouseInstrumentEntity">
+		select
+		main.id,
+		main.house_id,
+		main.build_id,
+		main.community_id,
+		main.instrument_name,
+		main.instrument_id,
+		main.ratio,
+		main.max_reading,
+		main.min_reading,
+		main.initial_date,
+		main.del_flag,
+		main.tenant_id,
+		co.community_name as communityName,
+		bu.build_name as buildName,
+		ho.house_code as  houseCode,
+		ins.instrument_type as instrumentType
+		from b_house_instrument as main
+		left join b_community as co on main.community_id = co.id
+		left join b_build  as bu on main.build_id = bu.id
+		left join b_house  as ho on main.house_id = ho.id
+		left join b_instrument_type as ins  on main.instrument_id = ins.id
+		<include refid="Where_Clause" />
+	</select>
+
+	<update id="modifyDelFlag" parameterType="com.spring.base.entity.baseinfo.HouseInstrumentEntity">
+		update b_house_instrument
+		set del_flag = 1
+		where id = #{id}
+	</update>
+
+</mapper>

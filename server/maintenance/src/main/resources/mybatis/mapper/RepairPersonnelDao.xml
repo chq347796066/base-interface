@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.maintenance.dao.IRepairPersonnelDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.buiness.RepairPersonnelEntity" id="repairPersonnelMap">
+        <result property="id" column="id"/>
+		<result property="reportingRepairId" column="reporting_repair_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="mobile" column="mobile"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+        <result property="repairReserve" column="repair_Reserve"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="tenantId" column="tenant_id"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+		    `del_flag` = '0'
+			<if test="reportingRepairId != null and reportingRepairId != '' "> and `reporting_repair_id` = #{reportingRepairId} </if>
+			<if test="userId != null and userId != '' "> and `user_id` = #{userId} </if>
+			<if test="userName != null and userName != '' "> and `user_name` = #{userName} </if>
+			<if test="mobile != null and mobile != '' "> and `mobile` = #{mobile} </if>
+			<if test="repairReserve != null and repairReserve != '' "> and `repair_Reserve` = #{repairReserve} </if>
+			<if test="tenantId != null and tenantId != '' "> and `tenant_id` = #{tenantId}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into b_repair_personnel
+		(
+			`id`,
+		    `reporting_repair_id`,
+		    `user_id`,
+			`user_name`, 
+			`mobile`, 
+			`create_user`, 
+			`create_date`, 
+			`modify_user`, 
+			`modify_date`, 
+			`repair_Reserve`, 
+			`del_flag`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id},
+			#{item.reportingRepairId},
+			#{item.userId}, 
+			#{item.userName}, 
+			#{item.mobile}, 
+			#{item.createUser}, 
+			#{item.createDate}, 
+			#{item.modifyUser}, 
+			#{item.modifyDate}, 
+			#{item.repairReserve}, 
+			#{item.delFlag}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="repairPersonnelMap"  parameterType="com.spring.base.entity.buiness.RepairPersonnelEntity">
+		select * from b_repair_personnel
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+
+	<select id="queryRepairPersonnelEntityList" resultMap="repairPersonnelMap"  parameterType="com.spring.base.entity.buiness.RepairPersonnelEntity">
+		select * from b_repair_personnel
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<update id="updateBrepairPersonnel" parameterType="com.spring.base.entity.buiness.RepairPersonnelEntity">
+			update  b_repair_personnel
+			set del_flag = 1
+			where reporting_repair_id = #{reportingRepairId}
+	</update>
+
+</mapper>

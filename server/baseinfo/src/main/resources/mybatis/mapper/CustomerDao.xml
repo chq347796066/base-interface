@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.baseinfo.dao.ICustomerDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.CustomerEntity" id="customerMap">
+        <result property="id" column="id"/>
+        <result property="communityId" column="community_id"/>
+        <result property="communityName" column="community_name"/>
+        <result property="customerType" column="customer_type"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="sex" column="sex"/>
+        <result property="certificatesType" column="certificates_type"/>
+        <result property="certificatesNumber" column="certificates_number"/>
+        <result property="phone" column="phone"/>
+        <result property="nativePlace" column="native_place"/>
+        <result property="education" column="education"/>
+        <result property="occupation" column="occupation"/>
+        <result property="communityAddress" column="community_address"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+		<result property="status" column="status"/>
+		<result property="loginTime" column="login_time"/>
+		<result property="registerTime" column="register_time"/>
+		<result property="sourceChannel" column="source_channel"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			main.del_flag = '0'
+			<if test="id != null and id != '' ">
+				and main.id = #{id}
+			</if>
+			<if test="communityId != null and communityId != '' ">
+				 and main.community_id = #{communityId}
+			</if>
+			<if test="communityName != null and communityName != '' ">
+				 and main.community_name  like concat('%',#{communityName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="customerType != null and customerType != '' ">
+				 and main.customer_type = #{customerType}
+			</if>
+			<if test="customerName != null and customerName != '' ">
+				 and main.customer_name  like concat('%',#{customerName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="sex != null and sex != '' ">
+				 and main.sex = #{sex}
+			</if>
+			<if test="certificatesType != null and certificatesType != '' ">
+				 and main.certificates_type = #{certificatesType}
+			</if>
+			<if test="certificatesNumber != null and certificatesNumber != '' ">
+				 and main.certificates_number = #{certificatesNumber}
+			</if>
+			<if test="phone != null and phone != '' ">
+				 and main.phone = #{phone}
+			</if>
+			<if test="nativePlace != null and nativePlace != '' ">
+				 and main.native_place = #{nativePlace}
+			</if>
+			<if test="education != null and education != '' ">
+				 and main.education = #{education}
+			</if>
+			<if test="occupation != null and occupation != '' ">
+				 and main.occupation = #{occupation}
+			</if>
+			<if test="communityAddress != null and communityAddress != '' ">
+				 and main.community_address = #{communityAddress}
+			</if>
+			<if test="tenantId != null and tenantId != '' ">
+				 and main.tenant_id = #{tenantId}
+			</if>
+			<if test="companyId != null and companyId != '' ">
+				and main.company_id = #{companyId}
+			</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into b_customer
+		(
+			`id`, 
+			`community_id`, 
+			`community_name`, 
+			`customer_type`, 
+			`customer_name`,
+			`sex`, 
+			`certificates_type`, 
+			`certificates_number`, 
+			`phone`, 
+			`native_place`, 
+			`education`, 
+			`occupation`, 
+			`community_address`, 
+			`del_flag`,
+			`create_user`, 
+			`create_date`, 
+			`modify_user`, 
+			`modify_date`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.communityId}, 
+			#{item.communityName}, 
+			#{item.customerType}, 
+			#{item.customerName}, 
+			#{item.sex}, 
+			#{item.certificatesType}, 
+			#{item.certificatesNumber}, 
+			#{item.phone}, 
+			#{item.nativePlace}, 
+			#{item.education}, 
+			#{item.occupation}, 
+			#{item.communityAddress}, 
+			#{item.delFlag},
+			#{item.createUser}, 
+			#{item.createDate}, 
+			#{item.modifyUser}, 
+			#{item.modifyDate}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultType="com.spring.base.entity.baseinfo.CustomerEntity" parameterType="com.spring.base.entity.baseinfo.CustomerEntity">
+		SELECT
+		main.id,
+		main.community_id,
+		main.customer_type,
+		main.customer_name,
+		main.sex,
+		main.certificates_type,
+		CONCAT(LEFT(main.certificates_number,3),'*******',RIGHT(main.certificates_number,4)) certificates_number,
+		CONCAT(LEFT(main.phone,3),'*****',RIGHT(main.phone,4)) phone,
+		main.certificates_number certificates_number_show,
+		main.phone phone_show,
+		main.native_place,
+		main.education,
+		main.occupation,
+		main.community_address,
+		main.del_flag,
+		main.tenant_id,
+		main.register_time,
+		co.community_name,
+		co.`status`,
+		main.login_time
+		FROM
+		b_customer AS main
+		LEFT JOIN b_community AS co ON main.community_id = co.id
+		where 1=1
+		<if test="id !=null and id!=''">
+			and main.id = #{id}
+		</if>
+		<if test="communityIds != null and communityIds.size != '' ">
+			and main.community_id in
+			<foreach collection="communityIds" item="id" index="index" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+		</if>
+		<if test="communityId !=null and communityId !=''">
+			and main.community_id = #{communityId}
+		</if>
+		<if test="customerType !=null and customerType !=''">
+			and main.customer_type = #{customerType}
+		</if>
+		<if test="customerName !=null and customerName !=''">
+			and main.customer_name = #{customerName}
+		</if>
+		order by main.modify_date desc
+	</select>
+
+	<select id="queryCustormAppUserPage" resultMap="customerMap" parameterType="com.spring.base.entity.baseinfo.CustomerEntity">
+		SELECT
+		main.customer_name,
+		main.sex,
+		main.phone,
+		main.certificates_number,
+		main.source_channel,
+		main.register_time,
+		main.login_time
+		FROM
+		b_customer AS main
+		where 1=1
+		<if test="customerName != null and customerName != '' ">
+			and main.customer_name  like concat('%',#{customerName,jdbcType=VARCHAR},'%')
+		</if>
+		order by main.modify_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+	<select id="queryCustomerInfo" resultMap="customerMap" parameterType="com.spring.base.entity.baseinfo.CustomerEntity">
+		SELECT
+		c.customer_name,
+		c.sex,
+		c.phone,
+		c.certificates_number,
+		c.source_channel,
+		c.register_time,
+		c.login_time
+		FROM
+		b_pic b,
+		b_customer c
+		WHERE
+		b.table_id = c.id
+		<if test="id != null and id != '' ">
+			and c.id = #{id}
+		</if>
+	</select>
+
+	<update id="deleteCustomer" parameterType="com.spring.base.entity.baseinfo.CustomerEntity">
+        update b_customer set del_flag = 1
+		where id = #{id}
+		<if test="tenantId != null and tenantId != '' ">
+			and tenant_id = #{tenantId}
+		</if>
+	</update>
+
+	<!-- 查看单条客户信息 -->
+   <select id="queryCustomerVo" parameterType="com.spring.base.entity.baseinfo.CustomerEntity"  resultType="com.spring.base.entity.baseinfo.CustomerEntity">
+         select * from  b_customer as main
+	    <include refid="Where_Clause" />
+	    limit 1
+   </select>
+
+
+</mapper>

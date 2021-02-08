@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.baseinfo.dao.ICompanyDao">
+
+    <!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.CompanyEntity" id="companyMap">
+        <result property="id" column="id"/>
+        <result property="parent" column="parent"/>
+        <result property="companyCode" column="company_code"/>
+        <result property="companyName" column="company_name"/>
+        <result property="mobile" column="mobile"/>
+        <result property="address" column="address"/>
+        <result property="openBank" column="open_bank"/>
+        <result property="bankAccount" column="bank_account"/>
+        <result property="legalName" column="legal_name"/>
+        <result property="legalMobile" column="legal_mobile"/>
+        <result property="logo" column="logo"/>
+        <result property="businessLicense" column="business_license"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="status" column="status"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+    </resultMap>
+
+    <!-- 查询条件 -->
+    <sql id="Where_Clause">
+        <where>
+            <if test="id != null and id != '' ">
+                and main.id = #{id}
+            </if>
+            <if test="parent != null and parent != '' ">
+                and main.parent = #{parent}
+            </if>
+            <if test="companyCode != null and companyCode != '' ">
+                and main.company_code = #{companyCode}
+            </if>
+            <if test="companyName != null and companyName != '' ">
+                and main.company_name like concat('%',#{companyName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="mobile != null and mobile != '' ">
+                and main.mobile = #{mobile}
+            </if>
+            <if test="address != null and address != '' ">
+                and main.address = #{address}
+            </if>
+            <if test="openBank != null and openBank != '' ">
+                and main.open_bank = #{openBank}
+            </if>
+            <if test="bankAccount != null and bankAccount != '' ">
+                and main.bank_account = #{bankAccount}
+            </if>
+            <if test="legalName != null and legalName != '' ">
+                and main.legal_name like concat('%',#{legalName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="legalMobile != null and legalMobile != '' ">
+                and main.legal_mobile = #{legalMobile}
+            </if>
+            <if test="logo != null and logo != '' ">
+                and main.logo = #{logo}
+            </if>
+            <if test="businessLicense != null and businessLicense != '' ">
+                and main.business_license = #{businessLicense}
+            </if>
+            <if test="tenantId != null and tenantId != '' ">
+                and main.tenant_id = #{tenantId}
+            </if>
+            <if test="status != null and status != '' ">
+                and main.status = #{status}
+            </if>
+            <if test="companyAddress != null and companyAddress != '' ">
+                and main.company_address like  CONCAT(#{companyAddress},'%')
+            </if>
+        </where>
+    </sql>
+
+    <insert id="insertCompany" parameterType="com.spring.base.entity.baseinfo.CompanyEntity">
+		insert into b_company
+		(
+		`id`,
+		`parent`,
+		`company_code`,
+		`company_name`,
+		`mobile`,
+		`address`,
+		`open_bank`,
+		`bank_account`,
+		`legal_name`,
+		`legal_mobile`,
+		`logo`,
+		`business_license`,
+		`company_address`,
+		`status`,
+		`create_user`,
+		`create_date`,
+		`modify_user`,
+		`modify_date`
+		)
+		values
+			(
+			#{id},
+			#{parent},
+			#{companyCode},
+			#{companyName},
+			#{mobile},
+			#{address},
+			#{openBank},
+			#{bankAccount},
+			#{legalName},
+			#{legalMobile},
+			#{logo},
+			#{businessLicense},
+			#{companyAddress},
+			#{status},
+			#{createUser},
+			#{createDate},
+			#{modifyUser},
+			#{modifyDate}
+			)
+	</insert>
+
+    <!-- 批量新增 -->
+    <insert id="addList" parameterType="java.util.List">
+        insert into b_company
+        (
+        `id`,
+        `company_code`,
+        `company_name`,
+        `mobile`,
+        `address`,
+        `open_bank`,
+        `bank_account`,
+        `legal_name`,
+        `legal_mobile`,
+        `logo`,
+        `business_license`,
+        `company_address`,
+        `status`,
+        `create_user`,
+        `create_date`,
+        `modify_user`,
+        `modify_date`
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.companyCode},
+            #{item.companyName},
+            #{item.mobile},
+            #{item.address},
+            #{item.openBank},
+            #{item.bankAccount},
+            #{item.legalName},
+            #{item.legalMobile},
+            #{item.logo},
+            #{item.businessLicense},
+            #{item.companyAddress},
+            #{item.status},
+            #{item.createUser},
+            #{item.createDate},
+            #{item.modifyUser},
+            #{item.modifyDate}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateCompany" parameterType="com.spring.base.entity.baseinfo.CompanyEntity">
+        update b_company main
+        <set>
+            <if test="companyName != null and companyName != '' ">
+                main.company_name = #{companyName},
+            </if>
+            <if test="mobile != null and mobile != '' ">
+                main.mobile = #{mobile},
+            </if>
+            <if test="address != null and address != '' ">
+                main.address = #{address},
+            </if>
+            <if test="companyAddress != null and companyAddress != '' ">
+                 main.company_address = #{companyAddress},
+            </if>
+            <if test="openBank != null and openBank != '' ">
+                main.open_bank = #{openBank},
+            </if>
+            <if test="bankAccount != null and bankAccount != '' ">
+                main.bank_account = #{bankAccount},
+            </if>
+            <if test="legalName != null and legalName != '' ">
+                main.legal_name = #{legalName},
+            </if>
+            <if test="legalMobile != null and legalMobile != '' ">
+                main.legal_mobile = #{legalMobile},
+            </if>
+            <if test="logo != null and logo != '' ">
+                main.logo = #{logo},
+            </if>
+            <if test="businessLicense != null and businessLicense != '' ">
+                main.business_license = #{businessLicense},
+            </if>
+            <if test="modifyDate != null">
+                main.modify_date = now(),
+            </if>
+            <if test="modifyUser != null and modifyUser != '' ">
+                main.modify_user = #{modifyUser}
+            </if>
+            <if test="parent != null and parent != '' ">
+                main.parent = #{parent}
+            </if>
+        </set>
+        where main.id = #{id}
+    </update>
+    <!-- 根据条件查询列表 -->
+    <select id="queryList" resultMap="companyMap" parameterType="com.spring.base.entity.baseinfo.CompanyEntity">
+        select
+        main.id,
+        main.parent,
+        main.company_code,
+        main.company_name,
+        main.mobile,
+        main.address,
+        main.open_bank,
+        main.bank_account,
+        main.legal_name,
+        main.legal_mobile,
+        main.logo,
+        main.business_license,
+        main.company_address,
+        main.tenant_id,
+        main.status
+        from b_company as main
+        <include refid="Where_Clause"/>
+        order by main.modify_date desc
+    </select>
+
+    <!-- 用户自定义开始 -->
+
+    <select id="queryCompanyEntity" resultType="com.spring.base.entity.baseinfo.CompanyEntity"
+            parameterType="com.spring.base.entity.baseinfo.CompanyEntity">
+		select
+		main.id,
+		main.parent,
+		main.company_code,
+		main.company_name,
+		main.mobile,
+		main.address,
+		main.open_bank,
+		main.bank_account,
+		main.legal_name,
+		main.legal_mobile,
+		main.logo,
+		main.business_license,
+		main.company_address,
+		main.tenant_id,
+		main.status,
+		main1.company_name as parent_name
+		from b_company  as main
+		left join b_company as main1 on (main.parent=main1.id)
+		where main.id = #{id}
+	</select>
+
+
+    <select id="queryCompanyEntityInfo" resultType="com.spring.base.entity.baseinfo.CompanyEntity"
+            parameterType="com.spring.base.entity.baseinfo.CompanyEntity">
+        select
+        id,
+        company_code,
+        company_name,
+        mobile,
+        address,
+        open_bank,
+        bank_account,
+        legal_name,
+        legal_mobile,
+        logo,
+        business_license,
+        company_address,
+        tenant_id,
+        status
+        from b_company where status = '1' and del_flag = 0
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test="companyName != null and companyName != '' ">
+            and company_name = #{companyName}
+        </if>
+    </select>
+
+    <!-- 公司名唯一性校验 -->
+    <select id="queryCompanyName" resultType="com.spring.base.entity.baseinfo.CompanyEntity"
+            parameterType="com.spring.base.entity.baseinfo.CompanyEntity">
+        select
+        id,
+        company_code,
+        company_name,
+        mobile,
+        address,
+        open_bank,
+        bank_account,
+        legal_name,
+        legal_mobile,
+        logo,
+        business_license,
+        company_address,
+        tenant_id,
+        status,
+        company_level
+        from b_company where status = '1' and del_flag = 0
+        <if test="id != null and id != '' ">
+            and id != #{id}
+        </if>
+        <if test="companyName != null and companyName != '' ">
+            and company_name = #{companyName}
+        </if>
+    </select>
+
+    <!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.CompanyEntity" id="pageCompanyMap">
+        <result property="id" column="id"/>
+        <result property="parent" column="parent"/>
+        <result property="companyCode" column="company_code"/>
+        <result property="companyName" column="company_name"/>
+        <result property="mobile" column="mobile"/>
+        <result property="address" column="address"/>
+        <result property="openBank" column="open_bank"/>
+        <result property="bankAccount" column="bank_account"/>
+        <result property="legalName" column="legal_name"/>
+        <result property="legalMobile" column="legal_mobile"/>
+        <result property="logo" column="logo"/>
+        <result property="businessLicense" column="business_license"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="status" column="status"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+        <collection property="children" column="id"
+                    select="queryObjectByParentId"></collection>
+    </resultMap>
+
+
+    <!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.CompanyEntity" id="parentCompanyMap">
+        <result property="id" column="id"/>
+        <result property="parent" column="parent"/>
+        <result property="companyCode" column="company_code"/>
+        <result property="companyName" column="company_name"/>
+        <result property="mobile" column="mobile"/>
+        <result property="address" column="address"/>
+        <result property="openBank" column="open_bank"/>
+        <result property="bankAccount" column="bank_account"/>
+        <result property="legalName" column="legal_name"/>
+        <result property="legalMobile" column="legal_mobile"/>
+        <result property="logo" column="logo"/>
+        <result property="businessLicense" column="business_license"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="status" column="status"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+        <collection property="parentEntity" column="parent"
+                    select="queryParentByChildrenId"></collection>
+    </resultMap>
+
+    <!-- 根据父id查询对象 -->
+    <select id="queryParentByChildrenId" resultMap="parentCompanyMap">
+		select * from
+		b_company where id = #{value}
+	</select>
+
+    <select id="queryParentListById" resultMap="parentCompanyMap" parameterType="com.spring.base.entity.baseinfo.CompanyEntity">
+        select
+        main.id,
+        main.parent,
+        main.company_code,
+        main.company_name,
+        main.mobile,
+        main.address,
+        main.open_bank,
+        main.bank_account,
+        main.legal_name,
+        main.legal_mobile,
+        main.company_level,
+        main.logo,
+        main.business_license,
+        main.company_address,
+        main.tenant_id,
+        main.status
+        from b_company as main
+         where main.id = #{companyId}
+    </select>
+
+
+    <select id="queryChildrenListByParent" resultMap="pageCompanyMap" parameterType="com.spring.base.entity.baseinfo.CompanyEntity">
+        select
+        main.id,
+        main.parent,
+        main.company_code,
+        main.company_name,
+        main.mobile,
+        main.address,
+        main.open_bank,
+        main.bank_account,
+        main.legal_name,
+        main.legal_mobile,
+        main.company_level,
+        main.logo,
+        main.business_license,
+        main.company_address,
+        main.tenant_id,
+        main.status
+        from b_company as main
+         where main.id = #{companyId}
+    </select>
+
+
+
+
+    <!--分页查询公司-->
+    <select id="queryListPage" resultMap="pageCompanyMap" parameterType="com.spring.base.entity.baseinfo.CompanyEntity">
+        select
+        main.id,
+        main.parent,
+        main.company_code,
+        main.company_name,
+        main.mobile,
+        main.address,
+        main.open_bank,
+        main.bank_account,
+        main.legal_name,
+        main.legal_mobile,
+        main.company_level,
+        main.logo,
+        main.business_license,
+        main.company_address,
+        main.tenant_id,
+        main.status
+        from b_company as main
+        <include refid="Where_Clause"/>
+        order by main.modify_date desc
+    </select>
+
+    <!-- 根据父id查询对象 -->
+    <select id="queryObjectByParentId" resultMap="pageCompanyMap">
+		select * from
+		b_company where parent = #{value}
+	</select>
+
+    <resultMap type="com.spring.base.vo.baseinfo.dictionary.DictionaryDataVo" id="TreeCompanyMap">
+        <result property="value" column="id"/>
+        <result property="label" column="company_name"/>
+        <!--		<collection property="children" column="id"
+                            select="queryTreeByParentId"></collection>-->
+    </resultMap>
+
+    <!--查询第一级公司树形结构-->
+    <select id="queryListTree" resultMap="pageCompanyMap"
+            resultType="com.spring.base.vo.baseinfo.company.CompanySearchVo" parameterType="string">
+        select
+        id,
+        company_name
+        from b_company
+        where parent='0'
+        <if test="_parameter != null and _parameter !='' ">
+            and id=#{id}
+        </if>
+        order by modify_date desc
+    </select>
+
+    <!--查询第二级公司树形结构-->
+    <select id="queryTreeByParentId" resultMap="TreeCompanyMap"
+            resultType="com.spring.base.vo.baseinfo.company.CompanySearchVo">
+        select
+        id,
+        company_name
+        from b_company where parent = #{tenantId}
+        <if test="companyId != null and companyId != '' ">
+            and id=#{companyId}
+        </if>
+        order by modify_date desc
+    </select>
+
+    <!--saas购买应用更新小区数和购买时间-->
+    <update id="saasBuyApp" parameterType="com.spring.base.vo.saas.BuyConfirmVo">
+        update b_company
+        <set>
+            <if test="communityNum != 0  ">
+                `community_num` = #{communityNum},
+            </if>
+            <if test="buyDate != null  ">
+                `try_date` = #{buyDate},
+            </if>
+            saas_status=1
+        </set>
+        where id = #{tenantId}
+    </update>
+</mapper>

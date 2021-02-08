@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.baseinfo.dao.IDictionaryDao">
+
+    <!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.DictionaryEntity" id="dictionaryMap">
+        <result property="id" column="id"/>
+        <result property="dictParentId" column="dict_parent_id"/>
+        <result property="dictParentCode" column="dict_parent_code"/>
+        <result property="dictCode" column="dict_code"/>
+        <result property="dictName" column="dict_name"/>
+        <result property="dictType" column="dict_type"/>
+        <result property="dictLevel" column="dict_level"/>
+        <result property="dictOrder" column="dict_order"/>
+        <result property="dictDesc" column="dict_desc"/>
+        <result property="status" column="status"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+    </resultMap>
+
+    <!-- 查询条件 -->
+    <sql id="Where_Clause">
+        <where>
+            <if test="dictParentId != null and dictParentId != '' ">and `dict_parent_id` = #{dictParentId}</if>
+            <if test="dictParentCode != null and dictParentCode != '' ">and `dict_parent_code` LIKE
+                CONCAT(CONCAT('%',#{dictParentCode}), '%')
+            </if>
+            <if test="dictCode != null and dictCode != '' ">and `dict_code` LIKE CONCAT(CONCAT('%',#{dictCode}),
+                '%')
+            </if>
+            <if test="dictName != null and dictName != '' ">and `dict_name` LIKE CONCAT(CONCAT('%',#{dictName}),
+                '%')
+            </if>
+            <if test="dictType != null and dictType != '' ">and `dict_type` = #{dictType}</if>
+            <if test="dictLevel != null and dictLevel != '' ">and `dict_level` = #{dictLevel}</if>
+            <if test="dictOrder != null and dictOrder != '' ">and `dict_order` = #{dictOrder}</if>
+            <if test="dictDesc != null and dictDesc != '' ">and `dict_desc` = #{dictDesc}</if>
+            <if test="status != null and status != '' ">and `status` = #{status}</if>
+            <if test="createUser != null and createUser != '' ">and `create_user` = #{createUser}</if>
+            <if test="createDate != null and createDate != '' ">and `create_date` = #{createDate}</if>
+            <if test="modifyUser != null and modifyUser != '' ">and `modify_user` = #{modifyUser}</if>
+            <if test="modifyDate != null and modifyDate != '' ">and `modify_date` = #{modifyDate}</if>
+            <if test="tenantId != null and tenantId != '' ">
+                and tenant_id = #{tenantId}
+            </if>
+        </where>
+    </sql>
+
+    <!-- 批量新增 -->
+    <insert id="addList" parameterType="java.util.List">
+        insert into b_dictionary
+        (
+        `id`,
+        `dict_parent_id`,
+        `dict_code`,
+        `dict_name`,
+        `dict_type`,
+        `dict_level`,
+        `dict_order`,
+        `dict_desc`,
+        `status`,
+        `create_user`,
+        `create_date`,
+        `modify_user`,
+        `modify_date`
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.dictParentId},
+            #{item.dictCode},
+            #{item.dictName},
+            #{item.dictType},
+            #{item.dictLevel},
+            #{item.dictOrder},
+            #{item.dictDesc},
+            #{item.status},
+            #{item.createUser},
+            #{item.createDate},
+            #{item.modifyUser},
+            #{item.modifyDate}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 根据条件查询列表 -->
+    <select id="queryList" resultMap="dictionaryMap"
+            parameterType="com.spring.base.entity.baseinfo.DictionaryEntity">
+        select * from b_dictionary
+        <include refid="Where_Clause"/>
+        order by modify_date desc
+    </select>
+
+    <!-- 用户自定义开始 -->
+
+    <!-- 查询树状分页 -->
+    <resultMap
+            type="com.spring.base.vo.baseinfo.dictionary.DictionaryNodeVo"
+            id="pageDictionaryMap">
+        <result property="id" column="id"/>
+        <result property="dictParentId" column="dict_parent_id"/>
+        <result property="dictParentCode" column="dict_parent_code"/>
+        <result property="dictCode" column="dict_code"/>
+        <result property="dictName" column="dict_name"/>
+        <result property="dictType" column="dict_type"/>
+        <result property="dictLevel" column="dict_level"/>
+        <result property="dictOrder" column="dict_order"/>
+        <result property="dictDesc" column="dict_desc"/>
+        <result property="status" column="status"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <collection property="children" column="id"
+                    select="queryObjectByParentId"></collection>
+    </resultMap>
+
+    <!-- 根据条件查询列表 -->
+    <select id="queryListPage" resultMap="pageDictionaryMap"
+            parameterType="com.spring.base.entity.baseinfo.DictionaryEntity">
+        select * from b_dictionary
+        <include refid="Where_Clause"/>
+        order by dict_order asc
+    </select>
+
+    <!-- 根据父id查询对象 -->
+    <select id="queryObjectByParentId" resultMap="pageDictionaryMap">
+		select * from
+		b_dictionary where dict_parent_id = #{value}
+		order by dict_order asc
+	</select>
+
+    <!-- dataMap -->
+    <resultMap
+            type="com.spring.base.vo.baseinfo.dictionary.DictionaryDataVo" id="dataMap">
+        <result property="label" column="dict_name"/>
+        <result property="value" column="dict_code"/>
+        <collection property="children" column="dict_code"
+                    select="getListByParentCode"></collection>
+    </resultMap>
+
+    <!-- 根据字典类型查询字典数据 -->
+    <select id="getListByParentCode" resultMap="dataMap">
+		select dict_code
+		,dict_name from b_dictionary
+		where dict_parent_code = #{value} and
+		status=1 order by dict_order asc
+	</select>
+
+    <!-- 判断字典类型是否重复 -->
+    <select id="dictTypeExist" resultType="java.lang.Integer">
+		select count(*) as count from b_dictionary where dict_parent_id='0' and dict_type=#{dictType}
+	</select>
+</mapper>

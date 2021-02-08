@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.pay.dao.IPayBillsDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.pay.PayBillsEntity" id="payBillsMap">
+        <result property="id" column="id"/>
+        <result property="billNo" column="bill_no"/>
+        <result property="billAmount" column="bill_amount"/>
+        <result property="billDate" column="bill_date"/>
+        <result property="custNo" column="cust_no"/>
+        <result property="hid" column="hid"/>
+        <result property="unitNo" column="unit_no"/>
+        <result property="roomNo" column="room_no"/>
+        <result property="areaNo" column="area_no"/>
+        <result property="plotId" column="plot_id"/>
+        <result property="billStatus" column="bill_status"/>
+        <result property="receivedAmount" column="received_amount"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="ownerNo" column="owner_no"/>
+        <result property="ownerName" column="owner_name"/>
+        <result property="ownerMoble" column="owner_moble"/>
+        <result property="plotName" column="plot_name"/>
+        <result property="companyId" column="company_id"/>
+        <result property="billType" column="bill_type"/>
+        <result property="observation" column="observation"/>
+        <result property="status" column="status"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="billNo != null and billNo != '' "> and `bill_no` = #{billNo} </if>
+			<if test="billAmount != null and billAmount != '' "> and `bill_amount` = #{billAmount} </if>
+			<if test="billDate != null and billDate != '' "> and `bill_date` = #{billDate} </if>
+			<if test="custNo != null and custNo != '' "> and `cust_no` = #{custNo} </if>
+			<if test="hid != null and hid != '' "> and `hid` = #{hid} </if>
+			<if test="unitNo != null and unitNo != '' "> and `unit_no` = #{unitNo} </if>
+			<if test="roomNo != null and roomNo != '' "> and `room_no` = #{roomNo} </if>
+			<if test="areaNo != null and areaNo != '' "> and `area_no` = #{areaNo} </if>
+			<if test="plotId != null and plotId != '' "> and `plot_id` = #{plotId} </if>
+			<if test="billStatus != null and billStatus != '' "> and `bill_status` = #{billStatus} </if>
+			<if test="receivedAmount != null and receivedAmount != '' "> and `received_amount` = #{receivedAmount} </if>
+			<if test="updateTime != null and updateTime != '' "> and `update_time` = #{updateTime} </if>
+			<if test="ownerNo != null and ownerNo != '' "> and `owner_no` = #{ownerNo} </if>
+			<if test="ownerName != null and ownerName != '' "> and `owner_name` = #{ownerName} </if>
+			<if test="ownerMoble != null and ownerMoble != '' "> and `owner_moble` = #{ownerMoble} </if>
+			<if test="plotName != null and plotName != '' "> and `plot_name` = #{plotName} </if>
+			<if test="companyId != null and companyId != '' "> and `company_id` = #{companyId} </if>
+			<if test="billType != null and billType != '' "> and `bill_type` = #{billType} </if>
+			<if test="observation != null and observation != '' "> and `observation` = #{observation} </if>
+			<if test="status != null and status != '' "> and `status` = #{status}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into p_pay_bills
+		(
+			`id`, 
+			`bill_no`, 
+			`bill_amount`, 
+			`bill_date`, 
+			`cust_no`, 
+			`hid`, 
+			`unit_no`, 
+			`room_no`, 
+			`area_no`, 
+			`plot_id`, 
+			`bill_status`, 
+			`received_amount`, 
+			`update_time`, 
+			`owner_no`, 
+			`owner_name`, 
+			`owner_moble`, 
+			`plot_name`, 
+			`company_id`, 
+			`bill_type`, 
+			`observation`, 
+			`status`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.billNo}, 
+			#{item.billAmount}, 
+			#{item.billDate}, 
+			#{item.custNo}, 
+			#{item.hid}, 
+			#{item.unitNo}, 
+			#{item.roomNo}, 
+			#{item.areaNo}, 
+			#{item.plotId}, 
+			#{item.billStatus}, 
+			#{item.receivedAmount}, 
+			#{item.updateTime}, 
+			#{item.ownerNo}, 
+			#{item.ownerName}, 
+			#{item.ownerMoble}, 
+			#{item.plotName}, 
+			#{item.companyId}, 
+			#{item.billType}, 
+			#{item.observation}, 
+			#{item.status}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="payBillsMap"
+		parameterType="com.spring.base.entity.pay.PayBillsEntity">
+		select * from p_pay_bills
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+
+	<select id="createBill" parameterType="com.spring.base.vo.pay.paybills.BillParamVo" resultType="string" statementType="CALLABLE">
+
+		call create_bill_all(
+		#{pcid,mode=IN,jdbcType=VARCHAR},
+		#{cid,mode=IN,jdbcType=VARCHAR},
+		#{hid,mode=IN,jdbcType=VARCHAR},
+		#{startDate,mode=IN,jdbcType=VARCHAR},
+		#{endDate,mode=IN,jdbcType=VARCHAR},
+		#{chargeNo,mode=IN,jdbcType=VARCHAR},
+		#{result,mode=OUT,jdbcType=VARCHAR}
+		);
+
+	</select>
+
+	<select id="createBillPreview" parameterType="com.spring.base.vo.pay.paybills.BillParamVo" resultType="string" statementType="CALLABLE">
+
+		call create_bills_preview_all(
+		#{pcid,mode=IN,jdbcType=VARCHAR},
+		#{cid,mode=IN,jdbcType=VARCHAR},
+		#{hid,mode=IN,jdbcType=VARCHAR},
+		#{startDate,mode=IN,jdbcType=VARCHAR},
+		#{endDate,mode=IN,jdbcType=VARCHAR},
+		#{chargeNo,mode=IN,jdbcType=VARCHAR},
+		#{result,mode=OUT,jdbcType=VARCHAR}
+		);
+
+	</select>
+
+</mapper>

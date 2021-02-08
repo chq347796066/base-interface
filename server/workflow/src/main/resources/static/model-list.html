@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>模型管理</title>
+<script src="/lib/js/jquery-1.10.2.min.js"></script>
+<script src="/lib/js/jquery.cookie.js"></script>
+<script src="/js/ajax-util.js"></script>
+<script src="/lib/js/template.js"></script>
+<script src="/js/custom.js"></script>
+<script src="/js/EZJ.js"></script>
+<script src="/js/DragBinder.js"></script>
+
+<style type="text/css">
+/*********表格的样式********/
+body {
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	text-align: center;
+}
+
+/***********文本框***********/
+.txt_mouseout{border:#51B2F6 1px solid;height:18px;color:#008000;}
+.txt_mouseover{border:#7EBF4F 1px solid;height:18px;}
+.textdate{border:#51B2F6 1px solid;color:#008000; width:100px;}
+
+/**********下拉框************/
+select{width: 100px; color:Green ;border:1px solid #51b2f6; height:22px;}
+
+.table {
+	border-collapse: collapse;
+	margin: 0 auto;
+	text-align: center;
+	width: 100%;
+}
+
+.table td, table th {
+	border: 1px solid #cad9ea;
+	color: #666;
+	height: 40px;
+}
+
+.table thead th {
+	background-color: #CCE8EB;
+	width: 200px;
+}
+
+.table tr:nth-child(odd) {
+	background: #fff;
+}
+
+.table tr:nth-child(even) {
+	background: #F5FAFA;
+}
+
+.table th {
+	height: 25px;
+	background-color: #cdeafb;
+	font-size: 12px;
+	filter: alpha(opacity = 70);
+	opacity: 0.7;
+}
+
+/*******************按钮样式*****************************/
+.button {
+	background-color: #e7e7e7;
+	color: #2C59AA;
+} /* Gray */
+.mytable {
+	border: 1px solid #B5D6E6;
+	width: 100%;
+}
+
+.mytable td {
+	font-size: 12px;
+	text-align: center;
+	border-width: 1px;
+	border: 1px solid #B5D6E6;
+	height: 40px;
+}
+</style>
+
+</head>
+<body>
+	<div id="top"></div>
+	<h2>模型列表</h2>
+	<hr>
+	<div style="text-align: left; padding: 20px;">
+		<input type="button" class="button" onclick="popdiv();" value="绘制模型" />
+	</div>
+	<div>
+		<table border="1" id="model-list" class="table">
+			<tr>
+				<th>模型类型</th>
+				<th>模型名称</th>
+				<th>创建时间</th>
+				<th>操作</th>
+			</tr>
+<script id="models" type="text/html">
+        <tr>
+            <td>模型类型</td>
+            <td>模型名称</td>
+            <td>操作</td>
+        </tr>
+        {{each rows.list}}
+        <tr>
+            <td>{{$value.key}}</td>
+            <td>{{$value.name}}</td>
+            <td>
+                <a href="/editor?modelId={{$value.id}}">编辑</a>
+             <a href="javascript: AJAX.DELETE('/models/{{$value.id}}')">删除</a>
+             <a href="javascript: AJAX.POST('/models/{{$value.id}}/deployment')">发布</a>
+            </td>
+        </tr>
+        {{/each}}
+</script>
+		</table>
+	</div>
+	<div id="panel"
+		style="width: 400px; position: absolute; z-index: 199; display: none; font-size: 12px;">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td height="30" background="/images/tab_05.gif">
+					<div id="paneltitle">
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+							<tr>
+								<td width="12" height="30"><img
+									style="width: 12px; height: 30px;" src="/images/tab_03.gif"
+									width="12" height="30" /></td>
+								<td style="text-align: left;">
+									<table>
+										<tr>
+											<td><img src="/images/tb.gif" width="16" height="16" />
+											</td>
+											<td><span class="STYLE3"> 创建工作流模型</span></td>
+										</tr>
+									</table>
+								</td>
+								<td style="text-align: right;"><img src="/images/del.gif"
+									onclick="divclose();" /></td>
+								<td width="16"><img style="width: 16px; height: 30px;"
+									src="/images/tab_07.gif" width="16" height="30" /></td>
+							</tr>
+						</table>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td width="8" background="/images/tab_12.gif">&nbsp;</td>
+							<td style="background-color: White;" align="center">
+								<table cellpadding="0" style="width: 100%;" cellspacing="0"
+									class="mytable" align="center">
+									<tr>
+										<td>工作流类型:</td>
+										<td style="text-align: left;">&nbsp;&nbsp;&nbsp;&nbsp;
+										<select id="workflowType" style="width: 180px;">
+										</select>
+										</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td style="text-align: left; padding-left: 20px;"><input
+											type="button" class="button" onclick="createWorkflow();"
+											value="绘制模型" />&nbsp;&nbsp;&nbsp;&nbsp;<input type="button"
+											class="button" onclick="divclose();" value="取消" /></td>
+									</tr>
+								</table>
+							</td>
+							<td width="8" background="/images/tab_15.gif">&nbsp;</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td height="35" background="/images/tab_19.gif">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td width="12" style="height: 35px"><img
+								style="width: 12px; height: 35px;" src="/images/tab_18.gif"
+								width="12" height="35" /></td>
+							<td style="width: 100%; height: 35px;"></td>
+							<td width="16" style="height: 35px"><img
+								style="width: 16px; height: 35px;" src="/images/tab_20.gif"
+								width="16" height="35" /></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<script>
+		$(function() {
+			AJAX.GET("/models", null, function(result) {
+				var html = template("models", result);
+				$("#model-list").html(html);
+			});
+
+		})
+		function popdiv() {
+			$.ajax({
+				url : '/workflow/getWorkTypeList',
+				type : 'get',
+				cache : false,
+				success : function(data) {
+					var html = '';
+					data.forEach(ele =>{
+						html += `<option value="${ele.value}">${ele.label}</option>`
+					})
+					$('#workflowType').append(html);
+				},
+				error : function() {
+					alert("异常！");
+				}
+			});
+			$('#panel').css({
+				display : 'block'
+			});
+			popCoverDiv();
+			changeIt("panel");
+			var winDrag = new DragBinder("panel", "paneltitle");
+
+		}
+		function divclose() {
+			close();
+			$('#panel').css({
+				display : 'none'
+			});
+		}
+
+		function createWorkflow() {
+			var workflow = $("#workflowType").val();
+			AJAX.POST('/models/newModel?processType=' + workflow);
+		}
+		
+		 // 第三种方式：函数处理
+	    function formatDate(now) {
+	        var year = now.getYear();
+	        var month = now.getMonth() + 1;
+	        var date = now.getDate();
+	        var hour = now.getHours();
+	        var minute = now.getMinutes();
+	        var second = now.getSeconds();
+	        return year + "-" + month + "-" + date + " " + hour + ":" + minute + ":" + second;
+		 }
+
+	    function timestampToTime(now) {
+	    		//其中now就是一个Date类型
+	    		//如果需要字符串型的时间戳，则需要创建一个Date类型
+	    		// var date = new Date(timestamp);   //其中timestamp为字符串 
+	    		var year=now.getFullYear(); 
+	    		var month=now.getMonth()+1 < 10 ?  '0'+(now.getMonth()+1) : (now.getMonth()+1); 
+	    		var date=now.getDate() < 10 ?  '0'+(now.getDate()) : (now.getDate());
+	    		var hour=now.getHours() < 10 ?  '0'+(now.getHours()) : (now.getHours());
+	    		var minute=now.getMinutes() < 10 ?  '0'+(now.getMinutes()) : (now.getMinutes()); 
+	    		var second=now.getSeconds() < 10 ?  '0'+(now.getSeconds()) : (now.getSeconds()); 
+	    		return year+"-"+month+"-"+date+" "+hour+":"+minute+":"+second; 
+	    }
+	</script>
+</body>
+</html>

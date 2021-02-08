@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.baseinfo.dao.ICommunityDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.CommunityEntity" id="communityMap">
+        <result property="id" column="id"/>
+		<result property="communityId" column="community_id"/>
+        <result property="companyId" column="company_id"/>
+        <result property="communityCode" column="community_code"/>
+        <result property="communityName" column="community_name"/>
+        <result property="communityAddress" column="community_address"/>
+        <result property="communityAddressDetails" column="community_address_details"/>
+		<result property="communityMobile" column="community_mobile"/>
+        <result property="floorArea" column="floor_area"/>
+        <result property="architectureArea" column="architecture_area"/>
+        <result property="allHouseholds" column="all_households"/>
+        <result property="plotRatio" column="plot_ratio"/>
+        <result property="tenantId" column="tenant_id"/>
+		<result property="tenantName" column="tenantName"/>
+        <result property="status" column="status"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+		<result property="companyName" column="companyName"/>
+		<result property="province" column="province"/>
+		<result property="city" column="city"/>
+		<result property="region" column="region"/>
+    </resultMap>
+
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			 main.status = '1'
+			<if test="id != null and id != '' ">
+				and main.id = #{id}
+			</if>
+			<if test="tenantId != null and tenantId != '' ">
+				and main.tenant_id = #{tenantId}
+			</if>
+			<if test="companyId != null and companyId != '' ">
+			     and main.company_id = #{companyId}
+			</if>
+			<if test="communityId != null and communityId != '' ">
+				and main.community_id = #{communityId}
+			</if>
+			<if test="companyName != null and companyName != '' ">
+				and co.company_name like  concat('%',#{companyName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="communityCode != null and communityCode != '' ">
+			     and main.community_code = #{communityCode}
+			</if>
+			<if test="communityName != null and communityName != '' ">
+			     and main.community_name like concat('%',#{communityName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="communityAddress != null and communityAddress != '' ">
+				and main.community_address like  CONCAT(#{communityAddress},'%')
+			</if>
+			<if test="communityMobile != null and communityMobile != '' ">
+				and main.community_mobile = #{communityMobile}
+			</if>
+			<if test="floorArea != null and floorArea != '' ">
+			     and main.floor_area = #{floorArea}
+			</if>
+			<if test="architectureArea != null and architectureArea != '' ">
+			     and main.architecture_area = #{architectureArea}
+			</if>
+			<if test="allHouseholds != null and allHouseholds != '' ">
+			     and main.all_households = #{allHouseholds}
+			</if>
+			<if test="plotRatio != null and plotRatio != '' ">
+			     and main.plot_ratio = #{plotRatio}
+			</if>
+			<if test="province != null and province != '' ">
+				and main.province = #{province}
+			</if>
+			<if test="city != null and city != '' ">
+				and main.city = #{city}
+			</if>
+			<if test="region != null and region != '' ">
+				and main.region = #{region}
+			</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into b_community
+		(
+			`id`, 
+			`company_id`, 
+			`community_code`, 
+			`community_name`, 
+			`community_address`,
+			`community_address_details`,
+			`community_mobile`,
+			`floor_area`, 
+			`architecture_area`, 
+			`all_households`, 
+			`plot_ratio`,
+			`status`, 
+			`create_user`, 
+			`create_date`, 
+			`modify_user`, 
+			`modify_date`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.companyId}, 
+			#{item.communityCode}, 
+			#{item.communityName}, 
+			#{item.communityAddress},
+			#{item.communityAddressDetails},
+			#{item.communityMobile},
+			#{item.floorArea}, 
+			#{item.architectureArea}, 
+			#{item.allHouseholds},
+			#{item.plotRatio},
+			#{item.status}, 
+			#{item.createUser}, 
+			#{item.createDate}, 
+			#{item.modifyUser}, 
+			#{item.modifyDate}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultType="com.spring.base.entity.baseinfo.CommunityEntity"
+		parameterType="com.spring.base.entity.baseinfo.CommunityEntity">
+		select
+		main.id,
+		main.community_id,
+		main.company_id,
+		main.community_code,
+		main.community_name,
+		main.community_address,
+		main.community_address_details,
+		main.community_mobile,
+		main.floor_area,
+		main.architecture_area,
+		main.all_households,
+		main.plot_ratio,
+		main.tenant_id,
+		main.status,
+		co.company_name as companyName,
+		tem.company_name as tenantName
+		from b_community as main
+		left join  b_company as co  on (main.company_id = co.id and co.del_flag = 0)
+		left join  b_company as tem  on (main.tenant_id = tem.id and tem.del_flag = 0)
+		where 1=1
+		and main.del_flag = 0
+		<if test="companyId != null and companyId != '' ">
+			and main.company_id =  #{companyId,jdbcType=VARCHAR}
+		</if>
+		<if test="companyName != null and companyName != '' ">
+			and co.company_name like  concat('%',#{companyName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test="communityName != null and communityName != '' ">
+			and main.community_name like concat('%',#{communityName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test="communityAddress != null and communityAddress != '' ">
+			and main.community_address like  CONCAT(#{communityAddress},'%')
+		</if>
+		<if test="communityIds != null and communityIds.size != '' ">
+			and main.community_id in
+			<foreach collection="communityIds" item="id" index="index" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+		</if>
+		order by main.modify_date desc
+	</select>
+
+	<update  id="deleteId" parameterType="java.lang.String">
+		update b_community set status = '2' where id =#{id}
+	</update>
+
+
+    <select id="queryCommunity" parameterType="com.spring.base.entity.baseinfo.CommunityEntity" resultType="com.spring.base.entity.baseinfo.CommunityEntity">
+         select * from b_community main
+		left join  b_company co  on main.company_id = co.id where main.status = '1'
+		<if test="id != null and id != '' ">
+			and main.id = #{id}
+		</if>
+		<if test="companyId != null and companyId != '' ">
+			and main.company_id = #{companyId}
+		</if>
+		<if test="communityName != null and communityName != '' ">
+			and main.community_name = #{communityName}
+		</if>
+		<if test="communityAddress != null and communityAddress != '' ">
+			and main.community_address like  CONCAT(#{communityAddress},'%')
+		</if>
+	</select>
+
+
+	<!-- 校验公司下小区名唯一性 -->
+	<select id="queryCommunityName" parameterType="com.spring.base.entity.baseinfo.CommunityEntity" resultType="com.spring.base.entity.baseinfo.CommunityEntity">
+		select
+		main.id,
+		main.company_id,
+		main.community_code,
+		main.community_name,
+		main.community_address,
+		main.community_address_details,
+		main.community_mobile,
+		main.floor_area,
+		main.architecture_area,
+		main.all_households,
+		main.plot_ratio,
+		main.tenant_id,
+		main.status
+		from b_community main
+		left join  b_company co  on main.company_id = co.id where main.status = '1'
+		<if test="id != null and id != '' ">
+			and main.id != #{id}
+		</if>
+		<if test="companyId != null and companyId != '' ">
+			and main.company_id = #{companyId}
+		</if>
+		<if test="communityName != null and communityName != '' ">
+			and main.community_name = #{communityName}
+		</if>
+		<if test="communityAddress != null and communityAddress != '' ">
+			and main.community_address like  CONCAT(#{communityAddress},'%')
+		</if>
+	</select>
+
+	<!--获取租户下的小区数量-->
+	<select id="getTenantCommunityNum"  resultType="java.lang.Integer">
+		select count(*) from b_community where tenant_id=#{tenantId}
+	</select>
+
+</mapper>

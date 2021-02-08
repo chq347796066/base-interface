@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.baseinfo.dao.IRoleDao">
+
+    <!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.RoleEntity" id="roleMap">
+        <result property="id" column="id"/>
+        <result property="roleCode" column="role_code"/>
+        <result property="roleName" column="role_name"/>
+        <result property="roleDesc" column="role_desc"/>
+        <result property="dataPowerAll" column="data_power_all"/>
+        <result property="status" column="status"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+    </resultMap>
+
+    <resultMap type="com.spring.base.vo.baseinfo.user.UserUpdateLogo" id="roleMapUserRole">
+        <result property="id" column="id"/>
+        <result property="companyId" column="company_id"/>
+        <result property="communityId" column="community_id"/>
+        <result property="userCode" column="user_code"/>
+        <result property="userName" column="user_name"/>
+        <result property="mobile" column="mobile"/>
+        <result property="sex" column="sex"/>
+        <result property="idCard" column="id_card"/>
+        <result property="userLogoId" column="user_logo_id"/>
+    </resultMap>
+
+    <resultMap type="com.spring.base.entity.baseinfo.UserRoleEntity" id="userRoleMap">
+        <result property="id" column="id"/>
+        <result property="roleId" column="role_id"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+    <!-- 查询条件 -->
+    <sql id="Where_Clause">
+        <where>
+            <if test="roleCode != null and roleCode != '' ">and `role_code` = #{roleCode}</if>
+            <if test="roleName != null and roleName != '' ">and `role_name` = #{roleName}</if>
+            <if test="roleDesc != null and roleDesc != '' ">and `role_desc` = #{roleDesc}</if>
+            <if test="dataPowerAll != null and dataPowerAll != '' ">and `data_power_all` = #{dataPowerAll}</if>
+            <if test="status != null and status != '' ">and `status` = #{status}</if>
+            <if test="createUser != null and createUser != '' ">and `create_user` = #{createUser}</if>
+            <if test="createDate != null and createDate != '' ">and `create_date` = #{createDate}</if>
+            <if test="modifyUser != null and modifyUser != '' ">and `modify_user` = #{modifyUser}</if>
+            <if test="modifyDate != null and modifyDate != '' ">and `modify_date` = #{modifyDate}</if>
+            <if test="tenantId != null and tenantId != '' ">
+                and tenant_id = #{tenantId}
+            </if>
+        </where>
+    </sql>
+
+    <!-- 批量新增 -->
+    <insert id="addList" parameterType="java.util.List">
+        insert into b_role
+        (
+        `id`,
+        `role_code`,
+        `role_name`,
+        `role_desc`,
+        `data_power_all`,
+        `status`,
+        `create_user`,
+        `create_date`,
+        `modify_user`,
+        `modify_date`
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.roleCode},
+            #{item.roleName},
+            #{item.roleDesc},
+            #{item.dataPowerAll},
+            #{item.status},
+            #{item.createUser},
+            #{item.createDate},
+            #{item.modifyUser},
+            #{item.modifyDate}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 根据条件查询列表 -->
+    <select id="queryList" resultMap="roleMap"
+            parameterType="com.spring.base.entity.baseinfo.RoleEntity">
+        select * from b_role
+        <include refid="Where_Clause"/>
+        order by modify_date desc
+    </select>
+
+    <!-- 用户自定义开始 -->
+    <!-- 查询所有角色 -->
+    <select id="getRoleList" resultType="com.spring.base.vo.baseinfo.dictionary.DictionaryDataVo">
+		select id as value,role_name as label from b_role where status=1
+	</select>
+
+    <!-- 查询角色下的用户 -->
+    <select id="queryRoleUser" resultType="com.spring.base.vo.baseinfo.role.RoleVo" resultMap="userRoleMap">
+	  select
+		r.id,
+		r.role_id,
+		r.user_id
+		from b_user_role  r
+		where r.status = 1
+		and  r.del_flag = 0
+    	and  r.role_id = #{id}
+	</select>
+
+    <!-- 批量查询角色下的数据 -->
+    <select id="queryBatchRole" resultMap="roleMap">
+        select
+        id,
+        role_code,
+        role_name,
+        role_desc,
+        data_power_all,
+        status
+        from b_role
+        where id in
+        <foreach collection="array" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and status = 1
+    </select>
+
+    <!--获取saas试用版角色列表-->
+    <select id="getTryRoleList" resultType="com.spring.base.vo.baseinfo.dictionary.DictionaryDataVo">
+		select id as value,role_name as label from b_role where app_type=1 and status=1
+	</select>
+
+    <!--获取saas正式版角色列表-->
+    <select id="getSaasRoleList" resultType="com.spring.base.vo.baseinfo.dictionary.DictionaryDataVo">
+		select role.id as value,role.role_name as label from b_user_role as us
+		left outer join b_role as role on us.role_id=role.id
+		 where us.tenant_id=#{tenantId}
+	</select>
+
+    <!--saas根据条件查询列表-->
+    <select id="querySaasList" resultMap="roleMap"
+            parameterType="com.spring.base.entity.baseinfo.RoleEntity">
+        select ro.* from b_role as ro
+        inner join b_user_role as us on ro.id=us.role_id
+        where us.user_id=#{createUser}
+        order by ro.modify_date desc
+    </select>
+</mapper>

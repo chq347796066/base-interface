@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.baseinfo.dao.IBuildDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.BuildEntity" id="buildMap">
+        <result property="id" column="id"/>
+        <result property="communityId" column="community_id"/>
+        <result property="buildName" column="build_name"/>
+        <result property="buildDesc" column="build_desc"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="status" column="status"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+		<result property="communityName" column="communityName"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			 main.status = '1'
+			<if test="id != null and id != '' ">
+				and main.id = #{id}
+			</if>
+			<if test="communityId != null and communityId != '' ">
+			    and main.community_id = #{communityId}
+			 </if>
+			<if test="buildName != null and buildName != '' ">
+			    and main.build_name  like concat('%',#{buildName,jdbcType=VARCHAR},'%')
+			 </if>
+			<if test="buildDesc != null and buildDesc != '' ">
+			    and main.build_desc = #{buildDesc}
+			 </if>
+			<if test="tenantId != null and tenantId != '' ">
+			    and main.tenant_id = #{tenantId}
+			 </if>
+			<if test="companyId != null and companyId != '' ">
+				and main.company_id = #{companyId}
+			</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into b_build
+		(
+			`id`, 
+			`community_id`, 
+			`build_name`, 
+			`build_desc`,
+			`status`, 
+			`create_user`, 
+			`create_date`, 
+			`modify_user`, 
+			`modify_date`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.communityId}, 
+			#{item.buildName}, 
+			#{item.buildDesc},
+			#{item.status}, 
+			#{item.createUser}, 
+			#{item.createDate}, 
+			#{item.modifyUser}, 
+			#{item.modifyDate}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="buildMap" parameterType="com.spring.base.entity.baseinfo.BuildEntity">
+		select
+		main.id,
+		main.community_id,
+		main.build_name,
+		main.build_desc,
+		main.tenant_id,
+		main.status,
+		b.community_name as communityName
+		from b_build as main
+		left join b_community as b on main.community_id = b.id
+		<include refid="Where_Clause" />
+		order by main.modify_date desc
+	</select>
+	<!-- 用户自定义开始 -->
+
+	<update id="deleteBuild" parameterType="com.spring.base.entity.baseinfo.BuildEntity">
+		update b_build
+		set status = 2
+		where id = #{id}
+		<if test="tenantId != null and tenantId != '' ">
+			and tenant_id = #{tenantId}
+		</if>
+	</update>
+
+	<select id="queryBuildVoList" parameterType="com.spring.base.entity.baseinfo.BuildEntity" resultType="com.spring.base.entity.baseinfo.BuildEntity">
+		select * from b_build where status = '1' and del_flag = 0
+		<if test="id != null and id != '' ">
+			and id = #{id}
+		</if>
+		<if test="communityId != null and communityId != '' ">
+			and community_id = #{communityId}
+		</if>
+		<if test="buildName != null and buildName != '' ">
+			and build_name = #{buildName}
+		</if>
+	</select>
+
+
+	<!--校验楼栋名称唯一性-->
+	<select id="queryBuildName" parameterType="com.spring.base.entity.baseinfo.BuildEntity" resultType="com.spring.base.entity.baseinfo.BuildEntity">
+		select * from b_build where status = '1' and del_flag = 0
+		<if test="id != null and id != '' ">
+			and id != #{id}
+		</if>
+		<if test="communityId != null and communityId != '' ">
+			and community_id = #{communityId}
+		</if>
+		<if test="buildName != null and buildName != '' ">
+			and build_name = #{buildName}
+		</if>
+	</select>
+
+	<select id="queryBuildInfo" parameterType="com.spring.base.entity.baseinfo.BuildEntity" resultMap="buildMap">
+		select
+		main.id,
+		main.community_id,
+		main.build_name,
+		main.build_desc,
+		main.tenant_id,
+		main.status,
+		b.community_name as communityName
+		from b_build as main
+		left join b_community as b on main.community_id = b.id
+		<include refid="Where_Clause" />
+		order by main.modify_date desc limit 1
+	</select>
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryBuildList" resultType="com.spring.base.entity.baseinfo.BuildEntity" parameterType="com.spring.base.entity.baseinfo.BuildEntity">
+		select
+		main.id,
+		main.community_id,
+		main.build_name,
+		main.build_desc,
+		main.tenant_id,
+		main.status,
+		b.community_name as communityName
+		from b_build as main
+		left join b_community as b on main.community_id = b.id
+		where 1=1
+		<if test="communityIds != null and communityIds.size != '' ">
+			and main.community_id in
+			<foreach collection="communityIds" item="id" index="index" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+		</if>
+		<if test="buildName !=null and buildName!=''">
+			and main.build_name=#{buildName}
+		</if>
+		<if test="communityId !=null and communityId!=''">
+			and main.community_id=#{communityId}
+		</if>
+		order by main.modify_date desc
+	</select>
+</mapper>

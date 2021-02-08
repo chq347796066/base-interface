@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.maintenance.dao.IComplaintProposalDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.buiness.ComplaintProposalEntity" id="complaintProposalMap">
+        <result property="id" column="id"/>
+		<result property="communityId" column="community_id"/>
+		<result property="communityName" column="community_name"/>
+		<result property="buildId" column="build_id"/>
+		<result property="buildName" column="build_name"/>
+		<result property="cellId" column="cell_id"/>
+		<result property="cellName" column="cell_name"/>
+		<result property="houseId" column="house_id"/>
+		<result property="houseCode" column="house_code"/>
+        <result property="complaintDescribe" column="complaint_describe"/>
+        <result property="pictureId" column="picture_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="mobile" column="mobile"/>
+        <result property="complaintAddress" column="complaint_address"/>
+        <result property="submitUser" column="submit_user"/>
+        <result property="proposalStatus" column="proposal_status"/>
+        <result property="resultDescribe" column="result_describe"/>
+        <result property="resultId" column="result_id"/>
+        <result property="canceState" column="cance_state"/>
+        <result property="canceDescribe" column="cance_describe"/>
+        <result property="evaluationStatus" column="evaluation_status"/>
+        <result property="evaluationDescribe" column="evaluation_describe"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+        <result property="proposalReserve" column="proposal_Reserve"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="tenantId" column="tenant_id"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			del_flag = 0
+			<if test="id != null and id != '' ">
+			 and `id` = #{id}
+			 </if>
+			<if test="communityId != null and communityId != '' "> and `community_id` = #{communityId} </if>
+			<if test="communityName != null and communityName != '' "> and `community_name` = #{communityName} </if>
+			<if test="buildId != null and buildId != '' "> and `build_id` = #{buildId} </if>
+			<if test="buildName != null and buildName != '' "> and `build_name` = #{buildName} </if>
+			<if test="cellId != null and cellId != '' "> and `cell_id` = #{cellId} </if>
+			<if test="cellName != null and cellName != '' "> and `cell_name` = #{cellName} </if>
+			<if test="houseId != null and houseId != '' "> and `house_id` = #{houseId} </if>
+			<if test="houseCode != null and houseCode != '' "> and `house_code` = #{houseCode} </if>
+			<if test="complaintDescribe != null and complaintDescribe != '' ">
+			 and `complaint_describe` = #{complaintDescribe}
+			 </if>
+			<if test="pictureId != null and pictureId != '' ">
+			 and `picture_id` = #{pictureId}
+			 </if>
+			<if test="userId != null and userId != '' ">
+			 and `user_id` = #{userId}
+			</if>
+			<if test="userName != null and userName != '' ">
+			 and  (`complaint_address`  like concat('%',#{userName,jdbcType=VARCHAR},'%') or
+				`user_name` like concat('%',#{userName,jdbcType=VARCHAR},'%') or
+				`mobile` like concat('%',#{userName,jdbcType=VARCHAR},'%'))
+		    </if>
+			<if test="mobile != null and mobile != '' ">
+			 and (`complaint_address`  like concat('%',#{mobile,jdbcType=VARCHAR},'%') or
+				`user_name` like concat('%',#{mobile,jdbcType=VARCHAR},'%') or
+				`mobile` like concat('%',#{mobile,jdbcType=VARCHAR},'%'))
+			</if>
+			<if test="complaintAddress != null and complaintAddress != '' ">
+			 and  (`complaint_address`  like concat('%',#{complaintAddress,jdbcType=VARCHAR},'%') or
+			         `user_name` like concat('%',#{complaintAddress,jdbcType=VARCHAR},'%') or
+					 `mobile` like concat('%',#{complaintAddress,jdbcType=VARCHAR},'%'))
+			</if>
+			<if test="submitUser != null and submitUser != '' ">
+			 and `submit_user` = #{submitUser}
+		    </if>
+			<if test="proposalStatus != null and proposalStatus != '' ">
+			 and `proposal_status` = #{proposalStatus}
+			</if>
+			<if test="resultDescribe != null and resultDescribe != '' ">
+			 and `result_describe` = #{resultDescribe}
+			</if>
+			<if test="resultId != null and resultId != '' ">
+			 and `result_id` = #{resultId}
+			</if>
+			<if test="canceState != null and canceState != '' ">
+			 and `cance_state` = #{canceState}
+			</if>
+			<if test="canceDescribe != null and canceDescribe != '' ">
+			 and `cance_describe` = #{canceDescribe}
+			</if>
+			<if test="evaluationStatus != null and evaluationStatus != '' ">
+			 and `evaluation_status` = #{evaluationStatus}
+		    </if>
+			<if test="evaluationDescribe != null and evaluationDescribe != '' ">
+			 and `evaluation_describe` = #{evaluationDescribe}
+		    </if>
+			<if test="startDate != null and startDate != '' ">
+				and  DATE_FORMAT(`start_date`,'%Y-%m-%d')  <![CDATA[>=]]> DATE_FORMAT(#{startDate},'%Y-%m-%d')
+			</if>
+			<if test="endDate != null and endDate != '' ">
+				and DATE_FORMAT(`end_date`,'%Y-%m-%d') <![CDATA[<=]]> DATE_FORMAT(#{endDate},'%Y-%m-%d')
+			</if>
+			<if test="complaintReceiveType != null and complaintReceiveType != '' ">
+				and  (`complaint_address`  like concat('%',#{complaintReceiveType,jdbcType=VARCHAR},'%') or
+				`user_name` like concat('%',#{complaintReceiveType,jdbcType=VARCHAR},'%') or
+				`mobile` like concat('%',#{complaintReceiveType,jdbcType=VARCHAR},'%'))
+			</if>
+			<if test="proposalReserve != null and proposalReserve != '' ">
+			 and `proposal_Reserve` = #{proposalReserve}
+			</if>
+			<if test="delFlag != null and delFlag != '' ">
+			 and `del_flag` = #{delFlag}
+			 </if>
+			<if test="companyId != null and companyId != '' ">
+				and company_id = #{companyId}
+			</if>
+			<if test="tenantId != null and tenantId != '' ">
+			 and `tenant_id` = #{tenantId}
+			</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into b_complaint_proposal
+		(
+			`id`, 
+			`complaint_describe`, 
+			`picture_id`, 
+			`user_id`, 
+			`user_name`, 
+			`mobile`, 
+			`complaint_address`, 
+			`submit_user`, 
+			`proposal_status`, 
+			`result_describe`, 
+			`result_id`, 
+			`cance_state`, 
+			`cance_describe`, 
+			`evaluation_status`, 
+			`evaluation_describe`, 
+			`start_date`, 
+			`end_date`, 
+			`create_user`, 
+			`create_date`, 
+			`modify_user`, 
+			`modify_date`, 
+			`proposal_Reserve`, 
+			`del_flag`, 
+			`tenant_id`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.complaintDescribe}, 
+			#{item.pictureId}, 
+			#{item.userId}, 
+			#{item.userName}, 
+			#{item.mobile}, 
+			#{item.complaintAddress}, 
+			#{item.submitUser}, 
+			#{item.proposalStatus}, 
+			#{item.resultDescribe}, 
+			#{item.resultId}, 
+			#{item.canceState}, 
+			#{item.canceDescribe}, 
+			#{item.evaluationStatus}, 
+			#{item.evaluationDescribe}, 
+			#{item.startDate}, 
+			#{item.endDate}, 
+			#{item.createUser}, 
+			#{item.createDate}, 
+			#{item.modifyUser}, 
+			#{item.modifyDate}, 
+			#{item.proposalReserve}, 
+			#{item.delFlag}, 
+			#{item.tenantId}
+        )
+		</foreach>
+	</insert>
+
+
+	<insert id="insertComplaintProposal" parameterType="com.spring.base.entity.buiness.ComplaintProposalEntity">
+		insert into b_complaint_proposal
+		(
+		`id`,
+		`community_id`,
+		`community_name`,
+		`build_id`,
+		`build_name`,
+		`cell_id`,
+		`cell_name`,
+		`house_id`,
+		`house_code`,
+		`complaint_describe`,
+		`picture_id`,
+		`user_id`,
+		`user_name`,
+		`mobile`,
+		`complaint_address`,
+		`submit_user`,
+		`proposal_status`,
+		`result_describe`,
+		`result_id`,
+		`cance_state`,
+		`cance_describe`,
+		`evaluation_status`,
+		`evaluation_describe`,
+		`start_date`,
+		`end_date`,
+		`create_user`,
+		`create_date`,
+		`modify_user`,
+		`modify_date`,
+		`proposal_Reserve`,
+		`del_flag`,
+		`company_id`
+		)
+		values(
+			#{id},
+			#{communityId},
+			#{communityName},
+			#{buildId},
+			#{buildName},
+			#{cellId},
+			#{cellName},
+			#{houseId},
+			#{houseCode},
+			#{complaintDescribe},
+			#{pictureId},
+			#{userId},
+			#{userName},
+			#{mobile},
+			#{complaintAddress},
+			#{submitUser},
+			#{proposalStatus},
+			#{resultDescribe},
+			#{resultId},
+			#{canceState},
+			#{canceDescribe},
+			#{evaluationStatus},
+			#{evaluationDescribe},
+			#{startDate},
+			#{endDate},
+			#{createUser},
+			#{createDate},
+			#{modifyUser},
+			#{modifyDate},
+			#{proposalReserve},
+			#{delFlag},
+			#{companyId}
+			)
+	</insert>
+
+	<update id="updateComplaintProposal" parameterType="com.spring.base.entity.buiness.ComplaintProposalEntity">
+		update b_complaint_proposal
+		<set>
+			<if test="complaintDescribe != null and complaintDescribe != '' ">
+			  `complaint_describe` = #{complaintDescribe},
+			</if>
+			<if test="pictureId != null and pictureId != '' ">
+			   `picture_id` = #{pictureId},
+			</if>
+			<if test="userId != null and userId != '' ">
+			    `user_id` = #{userId},
+			</if>
+			<if test="userName != null and userName != '' ">
+			     `user_name` = #{userName},
+		    </if>
+			<if test="mobile != null and mobile != '' ">
+			      `mobile` = #{mobile},
+			 </if>
+			<if test="complaintAddress != null and complaintAddress != '' ">
+			      `complaint_address` = #{complaintAddress},
+			</if>
+			<if test="submitUser != null and submitUser != '' ">
+			      `submit_user` = #{submitUser},
+		    </if>
+			<if test="proposalStatus != null and proposalStatus != '' ">
+			      `proposal_status` = #{proposalStatus},
+			</if>
+			<if test="resultDescribe != null and resultDescribe != '' ">
+			      `result_describe` = #{resultDescribe},
+			</if>
+			<if test="resultId != null and resultId != '' ">
+			      `result_id` = #{resultId},
+			</if>
+			<if test="canceState != null and canceState != '' ">
+			      `cance_state` = #{canceState},
+			</if>
+			<if test="canceDescribe != null and canceDescribe != '' ">
+			      `cance_describe` = #{canceDescribe},
+			</if>
+			<if test="evaluationStatus != null and evaluationStatus != '' ">
+			      `evaluation_status` = #{evaluationStatus},
+			</if>
+			<if test="evaluationDescribe != null and evaluationDescribe != '' ">
+			     `evaluation_describe` = #{evaluationDescribe},
+			</if>
+			<if test="proposalReserve != null and proposalReserve != '' ">
+				`proposal_Reserve` = #{proposalReserve},
+			</if>
+			<if test="startDate != null and startDate != '' ">
+			     `start_date` = #{startDate},
+			</if>
+			<if test="endDate != null and endDate != '' ">
+			     `end_date` = #{endDate},
+			</if>
+			<if test="modifyDate != null">
+				modify_date = now(),
+			</if>
+			<if test="modifyUser != null and modifyUser != '' ">
+				modify_user = #{modifyUser}
+			</if>
+		</set>
+		where  id = #{id}
+	</update>
+
+
+	<!-- 根据条件查询列表 分页使用查询单表 -->
+	<select id="queryList" resultMap="complaintProposalMap" parameterType="com.spring.base.entity.buiness.ComplaintProposalEntity">
+		select * from b_complaint_proposal
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+	<!-- 用户自定义开始 -->
+
+
+	<!-- 用户自定义开始 关联查询不返回单表 -->
+	<select id="queryListComplaintProposal" resultMap="complaintProposalMap" parameterType="com.spring.base.entity.buiness.ComplaintProposalEntity">
+		select * from b_complaint_proposal
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+	<!-- 用户自定义开始 -->
+
+	<!-- 返回单个对象 -->
+	<select id="queryComplaintProposal" resultType="com.spring.base.entity.buiness.ComplaintProposalEntity" parameterType="com.spring.base.entity.buiness.ComplaintProposalEntity">
+		select * from b_complaint_proposal
+		<include refid="Where_Clause" />
+	</select>
+
+
+</mapper>

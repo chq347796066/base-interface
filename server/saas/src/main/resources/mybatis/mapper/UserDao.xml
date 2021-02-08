@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.saas.dao.IUserDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.saas.UserEntity" id="userMap">
+        <result property="id" column="id"/>
+        <result property="userName" column="user_name"/>
+        <result property="password" column="password"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="userName != null and userName != '' "> and `user_name` = #{userName} </if>
+			<if test="password != null and password != '' "> and `password` = #{password} </if>
+			<if test="createTime != null and createTime != '' "> and `create_time` = #{createTime} </if>
+			<if test="updateTime != null and updateTime != '' "> and `update_time` = #{updateTime}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into s_user
+		(
+			`id`, 
+			`user_name`, 
+			`password`, 
+			`create_time`, 
+			`update_time`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.userName}, 
+			#{item.password}, 
+			#{item.createTime}, 
+			#{item.updateTime}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="userMap"
+		parameterType="com.spring.base.entity.saas.UserEntity">
+		select * from s_user
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+	<!-- 根据用户名和密码查询用户 -->
+	<select id="getUserByUserIdPassword"
+			resultMap="userMap">
+		select * from s_user where  user_name=#{userId} and password=#{password} limit 1
+	</select>
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.pay.dao.IDisttransJournalsDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.pay.DisttransJournalsEntity" id="disttransJournalsMap">
+        <result property="id" column="id"/>
+        <result property="businessId" column="business_id"/>
+        <result property="distAmount" column="dist_amount"/>
+        <result property="distType" column="dist_type"/>
+        <result property="distCode" column="dist_code"/>
+        <result property="distBenchmarkType" column="dist_benchmark_type"/>
+        <result property="distBenchmark" column="dist_benchmark"/>
+        <result property="transId" column="trans_id"/>
+        <result property="distProvideCid" column="dist_provide_cid"/>
+        <result property="distProvideCname" column="dist_provide_cname"/>
+        <result property="orgType" column="org_type"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="discount" column="discount"/>
+        <result property="preChargeNo" column="pre_charge_no"/>
+        <result property="observation" column="observation"/>
+        <result property="status" column="status"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="businessId != null and businessId != '' "> and `business_id` = #{businessId} </if>
+			<if test="distAmount != null and distAmount != '' "> and `dist_amount` = #{distAmount} </if>
+			<if test="distType != null and distType != '' "> and `dist_type` = #{distType} </if>
+			<if test="distCode != null and distCode != '' "> and `dist_code` = #{distCode} </if>
+			<if test="distBenchmarkType != null and distBenchmarkType != '' "> and `dist_benchmark_type` = #{distBenchmarkType} </if>
+			<if test="distBenchmark != null and distBenchmark != '' "> and `dist_benchmark` = #{distBenchmark} </if>
+			<if test="transId != null and transId != '' "> and `trans_id` = #{transId} </if>
+			<if test="distProvideCid != null and distProvideCid != '' "> and `dist_provide_cid` = #{distProvideCid} </if>
+			<if test="distProvideCname != null and distProvideCname != '' "> and `dist_provide_cname` = #{distProvideCname} </if>
+			<if test="orgType != null and orgType != '' "> and `org_type` = #{orgType} </if>
+			<if test="updateTime != null and updateTime != '' "> and `update_time` = #{updateTime} </if>
+			<if test="discount != null and discount != '' "> and `discount` = #{discount} </if>
+			<if test="preChargeNo != null and preChargeNo != '' "> and `pre_charge_no` = #{preChargeNo} </if>
+			<if test="observation != null and observation != '' "> and `observation` = #{observation} </if>
+			<if test="status != null and status != '' "> and `status` = #{status}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into p_disttrans_journals
+		(
+			`id`, 
+			`business_id`, 
+			`dist_amount`, 
+			`dist_type`, 
+			`dist_code`, 
+			`dist_benchmark_type`, 
+			`dist_benchmark`, 
+			`trans_id`, 
+			`dist_provide_cid`, 
+			`dist_provide_cname`, 
+			`org_type`, 
+			`update_time`, 
+			`discount`, 
+			`pre_charge_no`, 
+			`observation`, 
+			`status`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.businessId}, 
+			#{item.distAmount}, 
+			#{item.distType}, 
+			#{item.distCode}, 
+			#{item.distBenchmarkType}, 
+			#{item.distBenchmark}, 
+			#{item.transId}, 
+			#{item.distProvideCid}, 
+			#{item.distProvideCname}, 
+			#{item.orgType}, 
+			#{item.updateTime}, 
+			#{item.discount}, 
+			#{item.preChargeNo}, 
+			#{item.observation}, 
+			#{item.status}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="disttransJournalsMap"
+		parameterType="com.spring.base.entity.pay.DisttransJournalsEntity">
+		select * from p_disttrans_journals
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+</mapper>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.pay.dao.IBusinessExtendDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.pay.BusinessExtendEntity" id="businessExtendMap">
+        <result property="id" column="id"/>
+        <result property="businessId" column="business_id"/>
+        <result property="transId" column="trans_id"/>
+        <result property="chargeWay" column="charge_way"/>
+        <result property="unitPrice" column="unit_price"/>
+        <result property="area" column="area"/>
+        <result property="num" column="num"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="thisReaded" column="this_readed"/>
+        <result property="lastReaded" column="last_readed"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="observation" column="observation"/>
+        <result property="status" column="status"/>
+		<result property="houseType" column="house_type"/>
+		<result property="houseStatus" column="house_status"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="businessId != null and businessId != '' "> and `business_id` = #{businessId} </if>
+			<if test="transId != null and transId != '' "> and `trans_id` = #{transId} </if>
+			<if test="chargeWay != null and chargeWay != '' "> and `charge_way` = #{chargeWay} </if>
+			<if test="unitPrice != null and unitPrice != '' "> and `unit_price` = #{unitPrice} </if>
+			<if test="area != null and area != '' "> and `area` = #{area} </if>
+			<if test="num != null and num != '' "> and `num` = #{num} </if>
+			<if test="startDate != null and startDate != '' "> and `start_date` = #{startDate} </if>
+			<if test="endDate != null and endDate != '' "> and `end_date` = #{endDate} </if>
+			<if test="thisReaded != null and thisReaded != '' "> and `this_readed` = #{thisReaded} </if>
+			<if test="lastReaded != null and lastReaded != '' "> and `last_readed` = #{lastReaded} </if>
+			<if test="updateTime != null and updateTime != '' "> and `update_time` = #{updateTime} </if>
+			<if test="observation != null and observation != '' "> and `observation` = #{observation} </if>
+			<if test="houseType != null and houseType != '' "> and `house_type` = #{houseType} </if>
+			<if test="houseStatus != null and houseStatus != '' "> and `house_status` = #{houseStatus} </if>
+			<if test="status != null and status != '' "> and `status` = #{status}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into p_business_extend
+		(
+			`id`, 
+			`business_id`, 
+			`trans_id`, 
+			`charge_way`, 
+			`unit_price`, 
+			`area`, 
+			`num`, 
+			`start_date`, 
+			`end_date`, 
+			`this_readed`, 
+			`last_readed`, 
+			`update_time`, 
+			`observation`,
+			`house_type`,
+			`house_status`,
+			`status`,
+			`create_user`,
+			`create_date`,
+			`modify_user`,
+			`modify_date`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.businessId}, 
+			#{item.transId}, 
+			#{item.chargeWay}, 
+			#{item.unitPrice}, 
+			#{item.area}, 
+			#{item.num}, 
+			#{item.startDate}, 
+			#{item.endDate}, 
+			#{item.thisReaded}, 
+			#{item.lastReaded}, 
+			#{item.updateTime}, 
+			#{item.observation},
+			#{item.houseType},
+			#{item.houseStatus},
+			#{item.status},
+			#{item.createUser},
+			#{item.createDate},
+			#{item.modifyUser},
+			#{item.modifyDate}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="businessExtendMap"
+		parameterType="com.spring.base.entity.pay.BusinessExtendEntity">
+		select * from p_business_extend
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+</mapper>

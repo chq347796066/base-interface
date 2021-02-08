@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.business.dao.IRepairProcessDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.buiness.RepairProcessEntity" id="repairProcessMap">
+        <result property="id" column="id"/>
+        <result property="repairId" column="repair_id"/>
+        <result property="handleUser" column="handle_user"/>
+        <result property="handleDate" column="handle_date"/>
+        <result property="handlePhone" column="handle_phone"/>
+        <result property="processType" column="process_type"/>
+        <result property="processUser" column="process_user"/>
+        <result property="remark" column="remark"/>
+        <result property="communityId" column="community_id"/>
+		<result property="companyId" column="company_id"/>
+		<result property="handleJobId" column="handle_job_id"/>
+		<result property="handleJobName" column="handle_job_name"/>
+		<result property="processPhone" column="process_phone"/>
+		<result property="processJobId" column="process_job_id"/>
+		<result property="processJobName" column="process_job_name"/>
+	</resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="repairId != null and repairId != '' "> and `repair_id` = #{repairId} </if>
+			<if test="handleUser != null and handleUser != '' "> and `handle_user` = #{handleUser} </if>
+			<if test="handleDate != null and handleDate != '' "> and `handle_date` = #{handleDate} </if>
+			<if test="handlePhone != null and handlePhone != '' "> and `handle_phone` = #{handlePhone} </if>
+			<if test="processType != null and processType != '' "> and `process_type` = #{processType} </if>
+			<if test="processUser != null and processUser != '' "> and `process_user` = #{processUser} </if>
+			<if test="remark != null and remark != '' "> and `remark` = #{remark} </if>
+			<if test="communityId != null and communityId != '' "> and `community_id` = #{communityId} </if>
+			<if test="companyId != null and companyId != '' "> and `company_id` = #{companyId}</if>
+			<if test="handleJobId != null and handleJobId != '' "> and `handle_job_id` = #{handleJobId}</if>
+			<if test="handleJobName != null and handleJobName != '' "> and `handle_job_name` = #{handleJobName}</if>
+			<if test="processPhone != null and processPhone != '' "> and `process_phone` = #{processPhone}</if>
+			<if test="processJobId != null and processJobId != '' "> and `process_job_id` = #{processJobId}</if>
+			<if test="processJobName != null and processJobName != '' "> and `process_job_name` = #{processJobName}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into r_repair_process
+		(
+			`id`, 
+			`repair_id`, 
+			`handle_user`, 
+			`handle_date`, 
+			`handle_phone`, 
+			`process_type`, 
+			`process_user`, 
+			`remark`, 
+			`community_id`, 
+			`company_id`,
+			`handle_job_id`,
+			`handle_job_name`,
+			`process_phone`,
+			`process_job_id`,
+			`process_job_name`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.repairId}, 
+			#{item.handleUser}, 
+			#{item.handleDate}, 
+			#{item.handlePhone}, 
+			#{item.processType}, 
+			#{item.processUser}, 
+			#{item.remark}, 
+			#{item.communityId}, 
+			#{item.companyId},
+			#{item.handleJobId},
+			#{item.handleJobName},
+			#{item.processPhone},
+			#{item.processJobId},
+			#{item.processJobName}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="repairProcessMap"
+		parameterType="com.spring.base.entity.buiness.RepairProcessEntity">
+		select * from r_repair_process
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+</mapper>

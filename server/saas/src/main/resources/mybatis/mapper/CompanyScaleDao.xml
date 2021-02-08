@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.saas.dao.ICompanyScaleDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.saas.CompanyScaleEntity" id="companyScaleMap">
+        <result property="id" column="id"/>
+        <result property="scaleName" column="scale_name"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="scaleName != null and scaleName != '' "> and `scale_name` = #{scaleName}</if>
+			 and del_flag=0
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into s_company_scale
+		(
+			`id`, 
+			`scale_name`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.scaleName}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="companyScaleMap"
+		parameterType="com.spring.base.entity.saas.CompanyScaleEntity">
+		select * from s_company_scale
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+</mapper>

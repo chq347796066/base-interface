@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.meter.dao.IMMeterTypeDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.meter.MMeterTypeEntity" id="mMeterTypeMap">
+        <result property="id" column="id"/>
+        <result property="typeName" column="type_name"/>
+        <result property="unit" column="unit"/>
+        <result property="mark" column="mark"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="typeName != null and typeName != '' "> and `type_name` like concat('%',#{typeName},'%') </if>
+			<if test="unit != null and unit != '' "> and `unit` like concat('%',#{unit},'%') </if>
+			<if test="mark != null and mark != '' "> and `mark` like concat('%',#{mark},'%')</if>
+			and del_flag = 0
+		</where>
+
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into m_meter_type
+		(
+			`id`,
+			`type_name`,
+			`unit`,
+			`mark`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id},
+			#{item.typeName},
+			#{item.unit},
+			#{item.mark}
+        )
+		</foreach>
+	</insert>
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="mMeterTypeMap"
+		parameterType="com.spring.base.entity.meter.MMeterTypeEntity">
+		select * from m_meter_type
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+	<update id="batchDeleteById" parameterType="map">
+		update m_meter_type set del_flag = 1,modify_date=now()
+		where id in
+		<foreach collection="ids" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+
+	<select id="queryMeterTypePage" resultMap="mMeterTypeMap"
+			parameterType="com.spring.base.entity.meter.MMeterTypeEntity">
+		select * from m_meter_type
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+</mapper>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.pay.dao.IBusinessJournalsDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.pay.BusinessJournalsEntity" id="businessJournalsMap">
+        <result property="id" column="id"/>
+        <result property="transId" column="trans_id"/>
+        <result property="businessType" column="business_type"/>
+        <result property="pname" column="pname"/>
+        <result property="pid" column="pid"/>
+        <result property="hid" column="hid"/>
+        <result property="plate" column="plate"/>
+		<result property="building" column="building"/>
+        <result property="roomNo" column="room_no"/>
+		<result property="chargeType" column="charge_type"/>
+		<result property="chargeTypeName" column="charge_type_name"/>
+        <result property="chargeNo" column="charge_no"/>
+        <result property="chargeName" column="charge_name"/>
+        <result property="chargeDesc" column="charge_desc"/>
+        <result property="cycle" column="cycle"/>
+        <result property="lateFee" column="late_fee"/>
+        <result property="businessAmount" column="business_amount"/>
+        <result property="billNo" column="bill_no"/>
+        <result property="billDetialNo" column="bill_detial_no"/>
+        <result property="cycleType" column="cycle_type"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="chargeMark" column="charge_mark"/>
+        <result property="observation" column="observation"/>
+        <result property="status" column="status"/>
+		<result property="paymentAmount" column="payment_amount"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="transId != null and transId != '' "> and `trans_id` = #{transId} </if>
+			<if test="businessType != null and businessType != '' "> and `business_type` = #{businessType} </if>
+			<if test="pname != null and pname != '' "> and `pname` = #{pname} </if>
+			<if test="pid != null and pid != '' "> and `pid` = #{pid} </if>
+			<if test="hid != null and hid != '' "> and `hid` = #{hid} </if>
+			<if test="plate != null and plate != '' "> and `plate` = #{plate} </if>
+			<if test="building != null and building != '' "> and `building` = #{building} </if>
+			<if test="roomNo != null and roomNo != '' "> and `room_no` = #{roomNo} </if>
+			<if test="chargeType != null and chargeType != '' "> and `charge_type` = #{chargeType} </if>
+			<if test="chargeTypeName != null and chargeTypeName != '' "> and `charge_type_name` = #{chargeTypeName} </if>
+			<if test="chargeNo != null and chargeNo != '' "> and `charge_no` = #{chargeNo} </if>
+			<if test="chargeName != null and chargeName != '' "> and `charge_name` = #{chargeName} </if>
+			<if test="chargeDesc != null and chargeDesc != '' "> and `charge_desc` = #{chargeDesc} </if>
+			<if test="cycle != null and cycle != '' "> and `cycle` = #{cycle} </if>
+			<if test="lateFee != null and lateFee != '' "> and `late_fee` = #{lateFee} </if>
+			<if test="businessAmount != null and businessAmount != '' "> and `business_amount` = #{businessAmount} </if>
+			<if test="billNo != null and billNo != '' "> and `bill_no` = #{billNo} </if>
+			<if test="billDetialNo != null and billDetialNo != '' "> and `bill_detial_no` = #{billDetialNo} </if>
+			<if test="cycleType != null and cycleType != '' "> and `cycle_type` = #{cycleType} </if>
+			<if test="updateTime != null and updateTime != '' "> and `update_time` = #{updateTime} </if>
+			<if test="chargeMark != null and chargeMark != '' "> and `charge_mark` = #{chargeMark} </if>
+			<if test="observation != null and observation != '' "> and `observation` = #{observation} </if>
+			<if test="status != null and status != '' "> and `status` = #{status}</if>
+			<if test="paymentAmount != null and paymentAmount != '' "> and `payment_amount` = #{paymentAmount}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into p_business_journals
+		(
+			`id`, 
+			`trans_id`, 
+			`business_type`, 
+			`pname`, 
+			`pid`, 
+			`hid`, 
+			`plate`,
+			`building`,
+			`room_no`,
+			`charge_type`,
+			`charge_type_name`,
+			`charge_no`,
+			`charge_name`, 
+			`charge_desc`, 
+			`cycle`, 
+			`late_fee`, 
+			`business_amount`, 
+			`bill_no`, 
+			`bill_detial_no`, 
+			`cycle_type`, 
+			`update_time`, 
+			`charge_mark`, 
+			`observation`,
+			`status`,
+			`payment_amount`,
+			`create_user`,
+			`create_date`,
+			`modify_user`,
+			`modify_date`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.transId}, 
+			#{item.businessType}, 
+			#{item.pname}, 
+			#{item.pid}, 
+			#{item.hid}, 
+			#{item.plate},
+			#{item.building},
+			#{item.roomNo},
+			#{item.chargeType},
+			#{item.chargeTypeName},
+			#{item.chargeNo}, 
+			#{item.chargeName}, 
+			#{item.chargeDesc}, 
+			#{item.cycle}, 
+			#{item.lateFee}, 
+			#{item.businessAmount}, 
+			#{item.billNo}, 
+			#{item.billDetialNo}, 
+			#{item.cycleType}, 
+			#{item.updateTime}, 
+			#{item.chargeMark}, 
+			#{item.observation},
+			#{item.status},
+			#{item.paymentAmount},
+			#{item.createUser},
+			#{item.createDate},
+			#{item.modifyUser},
+			#{item.modifyDate}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="businessJournalsMap"
+		parameterType="com.spring.base.entity.pay.BusinessJournalsEntity">
+		select * from p_business_journals
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+</mapper>

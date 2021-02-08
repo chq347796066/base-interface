@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.baseinfo.dao.IUserRoleDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.baseinfo.UserRoleEntity" id="userRoleMap">
+        <result property="id" column="id"/>
+        <result property="roleId" column="role_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="userCode" column="user_code"/>
+        <result property="roleName" column="role_name"/>
+        <result property="status" column="status"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="roleId != null and roleId != '' "> and `role_id` = #{roleId} </if>
+			<if test="userId != null and userId != '' "> and `user_id` = #{userId} </if>
+			<if test="status != null and status != '' "> and `status` = #{status}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into b_user_role
+		(
+			`id`, 
+			`role_id`, 
+			`user_id`, 
+			`status`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.roleId}, 
+			#{item.userId}, 
+			#{item.status}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="userRoleMap"
+		parameterType="com.spring.base.entity.baseinfo.UserRoleEntity">
+		select * from b_user_role
+		<include refid="Where_Clause" />
+		order by modify_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+	<!--删除租户下的用户-->
+	<delete id="deleteTenantUser">
+		delete from b_user_role  where tenant_id = #{tenantId}
+	</delete>
+
+	<select id="selectUserRole" resultMap="userRoleMap">
+		SELECT
+			b.user_name,
+			b.user_code,
+			bc.company_name,
+			br.id AS role_id,
+			br.role_name,
+			b.id AS user_id
+		FROM
+			b_user b
+			inner JOIN b_company bc ON ( b.company_id = bc.id and bc.del_flag='0')
+			LEFT JOIN b_user_role bur ON ( b.id = bur.user_id and bur.del_flag='0')
+			LEFT JOIN b_role br ON ( bur.role_id = br.id and br.del_flag='0')
+			where b.del_flag = '0'
+			<if test="userEntity.companyIds != null and userEntity.companyIds.size != '' ">
+				and b.company_id in
+				<foreach collection="userEntity.companyIds" item="id" index="index" open="(" close=")" separator=",">
+					#{id}
+				</foreach>
+			</if>
+			<if test="userEntity.userName !=null">
+				and b.user_name like concat('%',#{userEntity.userName},'%')
+			</if>
+			order by bur.modify_date desc
+	</select>
+</mapper>

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.saas.dao.IInvoiceDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.saas.InvoiceEntity" id="invoiceMap">
+        <result property="id" column="id"/>
+        <result property="invoiceHeadId" column="invoice_head_id"/>
+        <result property="invoiceAmount" column="invoice_amount"/>
+        <result property="invoiceStatus" column="invoice_status"/>
+        <result property="invoiceNum" column="invoice_num"/>
+        <result property="applyTime" column="apply_time"/>
+        <result property="invoiceDate" column="invoice_date"/>
+        <result property="description" column="description"/>
+        <result property="reason" column="reason"/>
+    </resultMap>
+
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="invoiceHeadId != null and invoiceHeadId != '' "> and `invoice_head_id` = #{invoiceHeadId} </if>
+			<if test="invoiceAmount != null and invoiceAmount != '' "> and `invoice_amount` = #{invoiceAmount} </if>
+			<if test="invoiceStatus != null and invoiceStatus != '' "> and `invoice_status` = #{invoiceStatus} </if>
+			<if test="invoiceNum != null and invoiceNum != '' "> and `invoice_num` = #{invoiceNum} </if>
+			<if test="applyTime != null and applyTime != '' "> and `apply_time` = #{applyTime} </if>
+			<if test="invoiceDate != null and invoiceDate != '' "> and `invoice_date` = #{invoiceDate} </if>
+			<if test="description != null and description != '' "> and `description` = #{description} </if>
+			<if test="reason != null and reason != '' "> and `reason` = #{reason}</if>
+			and del_flag=0
+		</where>
+	</sql>
+
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into invoice
+		(
+			`id`,
+			`invoice_head_id`,
+			`invoice_amount`,
+			`invoice_status`,
+			`invoice_num`,
+			`apply_time`,
+			`invoice_date`,
+			`description`,
+			`reason`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id},
+			#{item.invoiceHeadId},
+			#{item.invoiceAmount},
+			#{item.invoiceStatus},
+			#{item.invoiceNum},
+			#{item.applyTime},
+			#{item.invoiceDate},
+			#{item.description},
+			#{item.reason}
+        )
+		</foreach>
+	</insert>
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="invoiceMap"
+		parameterType="com.spring.base.entity.saas.InvoiceEntity">
+		select * from invoice
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 查询发票列表 -->
+	<select id="queryInvoice" parameterType="com.spring.base.vo.saas.InvoiceQueryVo" resultType="com.spring.base.vo.saas.InvoiceResponseVo">
+		select
+			main.id,
+			main.invoice_head_id as invoiceHeadId,
+			main.invoice_amount as invoiceAmount,
+			main.invoice_status as invoiceStatus,
+			main.invoice_num as invoiceNum,
+			main.apply_time as applyTime,
+			main.description,
+			t1.company_name as companyName
+		from
+			s_invoice main
+		left join
+			s_invoice_head t1 on main.invoice_head_id=t1.id
+		where
+			main.del_flag=0
+		and
+			t1.del_flag=0
+			<if test="invoiceNum!=null and invoiceNum!=''">
+				and main.invoice_num=#{invoiceNum}
+			</if>
+			<if test="invoiceStatus!=null and invoiceStatus!=''">
+				and main.invoice_status=#{invoiceStatus}
+			</if>
+			<if test="startTime!=null and startTime!=''">
+				and date_format(main.apply_time,'%Y-%m-%d %H-%i-%s')&gt;=#{startTime}
+			</if>
+			<if test="endTime!=null and endTime!=''">
+				and date_format(main.apply_time,'%Y-%m-%d %H-%i-%s')&lt;=#{endTime}
+			</if>
+		and
+			main.mobile=#{mobile}
+	</select>
+
+	<!-- 分页查询开票查询（运营后台） -->
+	<select id="invoiceInquiryQueryPage" parameterType="com.spring.base.vo.saas.InvoiceInquiryQueryVo"
+			resultType="com.spring.base.vo.saas.InvoiceInquiryPageVo">
+		select si.id               as invoiceId,
+			   si.invoice_date     as invoiceDate,
+			   st.id               as tenantId,
+			   st.company_name     as tenantName,
+			   sih.id              as invoiceHeadId,
+			   sih.company_name    as invoiceRise,
+			   sih.invoice_type    as invoiceType,
+			   case
+				   when sih.invoice_type = 0 then '增值税普通发票'
+				   when sih.invoice_type = 1 then '增值税专用发票'
+				   else null
+				   end             as invoiceTypeValue,
+			   si.invoice_amount   as invoiceAmount,
+			   si.invoice_status   as invoiceStatus,
+			   case
+				   when si.invoice_status = 1 then '待审核'
+				   when si.invoice_status = 2 then '开票失败'
+				   when si.invoice_status = 3 then '已开票'
+				   else null
+				   end             as invoiceStatusValue,
+			   si.description      as description
+		from s_invoice si
+				 left join s_invoice_head sih on sih.id = si.invoice_head_id and sih.del_flag = 0
+				 left join s_tenant st on st.id = sih.tenant_id and st.del_flag = 0
+		where si.del_flag = 0
+		<if test="companyName != null and companyName.trim() != ''">
+			and st.company_name like #{companyName}
+		</if>
+		<if test="invoiceStatus != null">
+			and si.invoice_status = #{invoiceStatus}
+		</if>
+		<if test="startDate != null and endDate != null">
+			and si.invoice_date between #{startDate} and #{endDate}
+		</if>
+	</select>
+
+	<!-- 查询开票摘要 -->
+	<select id="queryInvoiceSummary" parameterType="java.lang.String" resultType="com.spring.base.vo.saas.InvoiceSummaryVo">
+	select si.id             as invoiceId,
+		   si.invoice_num    as invoiceNum,
+		   si.invoice_status as invoiceStatus,
+		   case
+			   when si.invoice_status = 1 then '待审核'
+			   when si.invoice_status = 2 then '开票失败'
+			   when si.invoice_status = 3 then '已开票'
+			   else null
+			   end           as invoiceStatusValue,
+		   si.invoice_date   as invoiceDate,
+		   st.id             as tenantId,
+		   st.company_name   as tenantName,
+		   si.invoice_amount as invoiceAmount,
+		   sih.company_name  as invoiceRise,
+		   sih.tax_num       as invoiceTaxNo,
+		   sih.invoice_type  as invoiceType,
+		   case
+			   when sih.invoice_type = 0 then '增值税普通发票'
+			   when sih.invoice_type = 1 then '增值税专用发票'
+			   else null
+			   end           as invoiceTypeValue,
+		   sih.open_bank     as openBank,
+		   sih.open_account  as openBankAccount,
+		   sih.address       as address,
+		   sih.tel           as tel,
+		   si.description    as description
+	from s_invoice si
+			 left join s_invoice_head sih on sih.id = si.invoice_head_id and si.del_flag = 0
+			 left join s_tenant st on st.id = sih.tenant_id and st.del_flag = 0
+	where si.del_flag = 0 and si.id = #{invoiceId}
+	</select>
+
+	<!-- 查询开票详情 -->
+	<select id="queryInvoiceDetailList" parameterType="java.lang.String" resultType="com.spring.base.vo.saas.InvoiceDetailVo">
+	select sio.id         as invoiceOrderId,
+		   sio.invoice_id as invoiceId,
+		   so.id          as orderId,
+		   so.order_num   as orderNum,
+		   so.order_date  as orderDate,
+		   sa.id          as applicationId,
+		   sa.app_name    as applicationName,
+		   so.buy_num        buyNum,
+		   so.order_amount   orderAmount
+	from s_invoice_order sio
+			 left join s_order so on so.id = sio.order_id and so.del_flag = 0
+			 left join s_application sa on sa.id = so.app_id and sa.del_flag = 0
+	where sio.del_flag = 0 and sio.invoice_id = #{invoiceId}
+	</select>
+
+	<!--查询开票摘要-->
+    <select id="queryMakeInvoiceSummary" resultType="com.spring.base.vo.saas.MakeSummaryVo" parameterType="java.lang.String">
+		select
+			main.invoice_amount as invoiceAmount,
+			main.invoice_status as invoiceStatus,
+			main.invoice_num as invoiceNum,
+			main.apply_time as applyTime,
+			main.description,
+			main.reason,
+			t1.company_name as companyName,
+			t1.invoice_type as invoiceType,
+			t1.tax_num as taxNum,
+			t1.open_bank as openBank,
+			t1.open_account as openAccount,
+			t1.address,
+			t1.tel
+		from
+			s_invoice main
+		left join
+			s_invoice_head t1 on main.invoice_head_id=t1.id
+		where
+		 	main.id=#{id}
+		and
+			main.del_flag=0
+		and
+			t1.del_flag=0
+	</select>
+</mapper>

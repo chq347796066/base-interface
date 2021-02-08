@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.pay.dao.ITransJournalsDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.pay.TransJournalsEntity" id="transJournalsMap">
+        <result property="id" column="id"/>
+        <result property="transId" column="trans_id"/>
+        <result property="custName" column="cust_name"/>
+        <result property="custNo" column="cust_no"/>
+        <result property="transType" column="trans_type"/>
+        <result property="transChargeType" column="trans_charge_type"/>
+        <result property="transAmount" column="trans_amount"/>
+        <result property="transTime" column="trans_time"/>
+        <result property="transStatus" column="trans_status"/>
+        <result property="transInvoiceStatus" column="trans_invoice_status"/>
+        <result property="terminIdentify" column="termin_identify"/>
+        <result property="operatorName" column="operator_name"/>
+        <result property="operatorNo" column="operator_no"/>
+        <result property="cid" column="cid"/>
+        <result property="cname" column="cname"/>
+        <result property="companyId" column="company_id"/>
+        <result property="companyName" column="company_name"/>
+        <result property="phone" column="phone"/>
+        <result property="rmark" column="rmark"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="chargeMark" column="charge_mark"/>
+        <result property="thirdPaymentServiceRate" column="third_payment_service_rate"/>
+        <result property="thirdPaymentServiceCharge" column="third_payment_service_charge"/>
+        <result property="observation" column="observation"/>
+        <result property="status" column="status"/>
+		<result property="houseCode" column="house_code"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="transId != null and transId != '' "> and `trans_id` = #{transId} </if>
+			<if test="custName != null and custName != '' "> and `cust_name` = #{custName} </if>
+			<if test="custNo != null and custNo != '' "> and `cust_no` = #{custNo} </if>
+			<if test="transType != null and transType != '' "> and `trans_type` = #{transType} </if>
+			<if test="transChargeType != null and transChargeType != '' "> and `trans_charge_type` = #{transChargeType} </if>
+			<if test="transAmount != null and transAmount != '' "> and `trans_amount` = #{transAmount} </if>
+			<if test="transTime != null and transTime != '' "> and `trans_time` = #{transTime} </if>
+			<if test="transStatus != null and transStatus != '' "> and `trans_status` = #{transStatus} </if>
+			<if test="transInvoiceStatus != null and transInvoiceStatus != '' "> and `trans_invoice_status` = #{transInvoiceStatus} </if>
+			<if test="terminIdentify != null and terminIdentify != '' "> and `termin_identify` = #{terminIdentify} </if>
+			<if test="operatorName != null and operatorName != '' "> and `operator_name` = #{operatorName} </if>
+			<if test="operatorNo != null and operatorNo != '' "> and `operator_no` = #{operatorNo} </if>
+			<if test="cid != null and cid != '' "> and `cid` = #{cid} </if>
+			<if test="cname != null and cname != '' "> and `cname` = #{cname} </if>
+			<if test="companyId != null and companyId != '' "> and `company_id` = #{companyId} </if>
+			<if test="companyName != null and companyName != '' "> and `company_name` = #{companyName} </if>
+			<if test="phone != null and phone != '' "> and `phone` = #{phone} </if>
+			<if test="rmark != null and rmark != '' "> and `rmark` = #{rmark} </if>
+			<if test="updateTime != null and updateTime != '' "> and `update_time` = #{updateTime} </if>
+			<if test="chargeMark != null and chargeMark != '' "> and `charge_mark` = #{chargeMark} </if>
+			<if test="thirdPaymentServiceRate != null and thirdPaymentServiceRate != '' "> and `third_payment_service_rate` = #{thirdPaymentServiceRate} </if>
+			<if test="thirdPaymentServiceCharge != null and thirdPaymentServiceCharge != '' "> and `third_payment_service_charge` = #{thirdPaymentServiceCharge} </if>
+			<if test="observation != null and observation != '' "> and `observation` = #{observation} </if>
+			<if test="status != null and status != '' "> and `status` = #{status}</if>
+			<if test="houseCode != null and houseCode != '' "> and `house_code` = #{houseCode}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into p_trans_journals
+		(
+			`id`, 
+			`trans_id`, 
+			`cust_name`, 
+			`cust_no`, 
+			`trans_type`, 
+			`trans_charge_type`, 
+			`trans_amount`, 
+			`trans_time`, 
+			`trans_status`, 
+			`trans_invoice_status`, 
+			`termin_identify`, 
+			`operator_name`, 
+			`operator_no`, 
+			`cid`, 
+			`cname`, 
+			`company_id`, 
+			`company_name`, 
+			`phone`, 
+			`rmark`, 
+			`update_time`, 
+			`charge_mark`, 
+			`third_payment_service_rate`, 
+			`third_payment_service_charge`, 
+			`observation`,
+			`status`,
+			`house_code`,
+			`create_user`,
+			`create_date`,
+			`modify_user`,
+			`modify_date`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.transId}, 
+			#{item.custName}, 
+			#{item.custNo}, 
+			#{item.transType}, 
+			#{item.transChargeType}, 
+			#{item.transAmount}, 
+			#{item.transTime}, 
+			#{item.transStatus}, 
+			#{item.transInvoiceStatus}, 
+			#{item.terminIdentify}, 
+			#{item.operatorName}, 
+			#{item.operatorNo}, 
+			#{item.cid}, 
+			#{item.cname}, 
+			#{item.companyId}, 
+			#{item.companyName}, 
+			#{item.phone}, 
+			#{item.rmark}, 
+			#{item.updateTime}, 
+			#{item.chargeMark}, 
+			#{item.thirdPaymentServiceRate}, 
+			#{item.thirdPaymentServiceCharge}, 
+			#{item.observation},
+			#{item.status},
+			#{item.houseCode},
+			#{item.createUser},
+			#{item.createDate},
+			#{item.modifyUser},
+			#{item.modifyDate}
+        )
+		</foreach>
+	</insert>      
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="transJournalsMap"
+		parameterType="com.spring.base.entity.pay.TransJournalsEntity">
+		select * from p_trans_journals
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+
+	<select id="getPdsSeq" resultType="java.lang.String" parameterType="java.lang.String">
+		select nextID(#{bsCode})
+	</select>
+
+	<select id="getNextId" resultType="java.lang.String" parameterType="java.lang.String">
+  		select nextId(#{bsCode});
+    </select>
+
+	<select id="getNextRid" resultType="java.lang.String" parameterType="java.util.Map">
+  		select nextRID(#{bsCode}, #{refId})
+    </select>
+
+
+	<resultMap id="ResultMap" type="com.spring.base.entity.pay.TransJournalsEntity">
+		<result property="id" column="id"/>
+		<result property="transId" column="trans_id"/>
+		<result property="custName" column="cust_name"/>
+		<result property="custNo" column="cust_no"/>
+		<result property="transType" column="trans_type"/>
+		<result property="transChargeType" column="trans_charge_type"/>
+		<result property="transAmount" column="trans_amount"/>
+		<result property="transTime" column="trans_time"/>
+		<result property="transStatus" column="trans_status"/>
+		<result property="transInvoiceStatus" column="trans_invoice_status"/>
+		<result property="terminIdentify" column="termin_identify"/>
+		<result property="operatorName" column="operator_name"/>
+		<result property="operatorNo" column="operator_no"/>
+		<result property="cid" column="cid"/>
+		<result property="cname" column="cname"/>
+		<result property="companyId" column="company_id"/>
+		<result property="companyName" column="company_name"/>
+		<result property="phone" column="phone"/>
+		<result property="rmark" column="rmark"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="chargeMark" column="charge_mark"/>
+		<result property="thirdPaymentServiceRate" column="third_payment_service_rate"/>
+		<result property="thirdPaymentServiceCharge" column="third_payment_service_charge"/>
+		<result property="observation" column="observation"/>
+		<result property="status" column="status"/>
+		<result property="roomNo" column="room_no"/>
+		<result property="houseCode" column="house_code"/>
+		<association property="transpayJournalsEntity" javaType="com.spring.base.entity.pay.TranspayJournalsEntity">
+			<result property="id" column="transpay_id"/>
+			<result property="transId" column="transpay_trans_id"/>
+			<result property="paytype" column="paytype"/>
+			<result property="thirdTranspayId" column="third_transpay_id"/>
+			<result property="recordCompanyName" column="record_company_name"/>
+			<result property="recordCompanyId" column="record_company_id"/>
+			<result property="updateTime" column="transpay_update_time"/>
+			<result property="subPaytype" column="sub_paytype"/>
+			<result property="payAccName" column="pay_acc_name"/>
+			<result property="observation" column="transpay_observation"/>
+			<result property="status" column="transpay_status"/>
+		</association>
+		<collection property="businessJournalsEntities" column="{transId = trans_id}" ofType="com.spring.base.entity.pay.BusinessJournalsEntity" select="getBusinessJournals">
+			<result property="id" column="business_id"/>
+			<result property="transId" column="business_trans_id"/>
+			<result property="businessType" column="business_type"/>
+			<result property="pname" column="pname"/>
+			<result property="pid" column="pid"/>
+			<result property="hid" column="hid"/>
+			<result property="plate" column="plate"/>
+			<result property="building" column="building"/>
+			<result property="roomNo" column="room_no"/>
+			<result property="chargeType" column="charge_type"/>
+			<result property="chargeTypeName" column="charge_type_name"/>
+			<result property="chargeNo" column="charge_no"/>
+			<result property="chargeName" column="charge_name"/>
+			<result property="chargeDesc" column="charge_desc"/>
+			<result property="cycle" column="cycle"/>
+			<result property="lateFee" column="late_fee"/>
+			<result property="businessAmount" column="business_amount"/>
+			<result property="billNo" column="bill_no"/>
+			<result property="billDetialNo" column="bill_detial_no"/>
+			<result property="cycleType" column="cycle_type"/>
+			<result property="updateTime" column="business_update_time"/>
+			<result property="chargeMark" column="charge_mark"/>
+			<result property="observation" column="business_observation"/>
+			<result property="status" column="business_status"/>
+		</collection>
+		<collection property="businessExtendEntities" column="{transId = trans_id}"  ofType="com.spring.base.entity.pay.BusinessExtendEntity" select="getBusinessExtend">
+			<result property="id" column="extend_id"/>
+			<result property="businessId" column="extend_business_id"/>
+			<result property="transId" column="extend_trans_id"/>
+			<result property="chargeWay" column="charge_way"/>
+			<result property="unitPrice" column="unit_price"/>
+			<result property="area" column="area"/>
+			<result property="num" column="num"/>
+			<result property="startDate" column="start_date"/>
+			<result property="endDate" column="end_date"/>
+			<result property="thisReaded" column="this_readed"/>
+			<result property="lastReaded" column="last_readed"/>
+			<result property="updateTime" column="extend_update_time"/>
+			<result property="observation" column="extend_observation"/>
+			<result property="status" column="extend_status"/>
+			<result property="houseType" column="house_type"/>
+			<result property="houseStatus" column="house_status"/>
+		</collection>
+	</resultMap>
+
+	<select id="payQueryRecordList"  resultMap="ResultMap" parameterType="com.spring.base.vo.pay.queryrecord.QueryRecordVo">
+		SELECT
+		journals.`id` AS id,
+		journals.`trans_id` AS trans_id,
+		journals.`cust_name` AS cust_name,
+		journals.`cust_no` AS cust_no,
+		journals.`trans_type` AS trans_type,
+		journals.`trans_charge_type` AS trans_charge_type,
+		journals.`trans_amount` AS trans_amount,
+		journals.`trans_time` AS trans_time,
+		journals.`trans_status` AS trans_status,
+		journals.`trans_invoice_status` AS trans_invoice_status,
+		journals.`termin_identify` AS termin_identify,
+		journals.`operator_name` AS operator_name,
+		journals.`operator_no` AS operator_no,
+		journals.`cid` AS cid,
+		journals.`cname` AS cname,
+		journals.`company_id` AS company_id,
+		journals.`company_name` AS company_name,
+		journals.`phone` AS phone,
+		journals.`rmark` AS rmark,
+		journals.`update_time` AS update_time,
+		journals.`charge_mark` AS charge_mark,
+		journals.`third_payment_service_rate` AS third_payment_service_rate,
+		journals.`third_payment_service_charge` AS third_payment_service_charge,
+		journals.`observation` AS observation,
+		journals.`status` AS status,
+		journals.`house_code` AS house_code,
+		transpay.`id` AS transpay_id,
+		transpay.`trans_id` AS transpay_trans_id,
+		transpay.`paytype` AS paytype,
+		transpay.`third_transpay_id` AS third_transpay_id,
+		transpay.`record_company_name` AS record_company_name,
+		transpay.`record_company_id` AS record_company_id,
+		transpay.`update_time` AS transpay_update_time,
+		transpay.`sub_paytype` AS sub_paytype,
+		transpay.`pay_acc_name` AS pay_acc_name,
+		transpay.`observation` AS transpay_observation,
+		transpay.`status` AS transpay_status
+		FROM p_trans_journals AS journals
+		LEFT JOIN p_transpay_journals AS transpay ON journals.trans_id = transpay.trans_id
+		<where>
+			<if test="transId != null and transId != '' ">  journals.`trans_id` = #{transId} </if>
+			<if test="cid != null and cid != '' ">  journals.`cid` = #{cid} </if>
+			<if test="paytype != null and paytype != '' "> and transpay.`paytype` = #{paytype} </if>
+			<if test="transStatus != null and transStatus != '' "> and journals.`trans_status` = #{transStatus} </if>
+			<if test="updateTime != null and updateTime != '' "> and date_format(journals.`update_time`,'%Y%m') = #{updateTime} </if>
+		</where>
+		ORDER BY journals.update_time DESC
+	</select>
+
+	<resultMap id="businessResultMap" type="com.spring.base.entity.pay.BusinessJournalsEntity">
+		<result property="id" column="business_id"/>
+		<result property="transId" column="business_trans_id"/>
+		<result property="businessType" column="business_type"/>
+		<result property="pname" column="pname"/>
+		<result property="pid" column="pid"/>
+		<result property="hid" column="hid"/>
+		<result property="plate" column="plate"/>
+		<result property="building" column="building"/>
+		<result property="roomNo" column="room_no"/>
+		<result property="chargeType" column="charge_type"/>
+		<result property="chargeTypeName" column="charge_type_name"/>
+		<result property="chargeNo" column="charge_no"/>
+		<result property="chargeName" column="charge_name"/>
+		<result property="chargeDesc" column="charge_desc"/>
+		<result property="cycle" column="cycle"/>
+		<result property="lateFee" column="late_fee"/>
+		<result property="businessAmount" column="business_amount"/>
+		<result property="billNo" column="bill_no"/>
+		<result property="billDetialNo" column="bill_detial_no"/>
+		<result property="cycleType" column="cycle_type"/>
+		<result property="updateTime" column="business_update_time"/>
+		<result property="chargeMark" column="charge_mark"/>
+		<result property="observation" column="business_observation"/>
+		<result property="status" column="business_status"/>
+	</resultMap>
+	<select id="getBusinessJournals" resultMap="businessResultMap"  parameterType="com.spring.base.vo.pay.queryrecord.QueryRecordVo">
+		select
+		    business.`id` AS business_id,
+			business.`trans_id` AS business_trans_id,
+			business.`business_type` AS business_type,
+			business.`pname` AS pname,
+			business.`pid` AS pid,
+			business.`hid` AS hid,
+			business.`plate` AS plate,
+			business.`building` AS building,
+			business.`room_no` AS room_no,
+			business.`charge_type` AS charge_type,
+			business.`charge_type_name` AS charge_type_name,
+			business.`charge_no` AS charge_no,
+			business.`charge_name` AS charge_name,
+			business.`charge_desc` AS charge_desc,
+			business.`cycle` AS cycle,
+			business.`late_fee` AS late_fee,
+			business.`business_amount` AS business_amount,
+			business.`bill_no` AS bill_no,
+			business.`bill_detial_no` AS bill_detial_no,
+			business.`cycle_type` AS cycle_type,
+			business.`update_time` AS business_update_time,
+			business.`charge_mark` AS charge_mark,
+			business.`observation` AS business_observation,
+			business.`status` AS business_status
+		from p_business_journals AS business
+		<where>
+			business.trans_id = #{transId}
+			<if test="building != null and building != '' "> and business.`building` = #{building} </if>
+			<if test="hid != null and hid != '' "> and business.`hid` = #{hid} </if>
+			<if test="pid != null and pid != '' "> and business.`pid` = #{pid} </if>
+			<if test="pname != null and pname != '' "> and business.`pname` = #{pname} </if>
+			<if test="chargeType != null and chargeType != '' "> and business.`charge_type` = #{chargeType} </if>
+			<if test="detailNo != null and detailNo != '' "> and business.`bill_detial_no` = #{detailNo} </if>
+		</where>
+	</select>
+
+	<resultMap id="businessExtendResultMap" type="com.spring.base.entity.pay.BusinessExtendEntity">
+		<result property="id" column="extend_id"/>
+		<result property="businessId" column="extend_business_id"/>
+		<result property="transId" column="extend_trans_id"/>
+		<result property="chargeWay" column="charge_way"/>
+		<result property="unitPrice" column="unit_price"/>
+		<result property="area" column="area"/>
+		<result property="num" column="num"/>
+		<result property="startDate" column="start_date"/>
+		<result property="endDate" column="end_date"/>
+		<result property="thisReaded" column="this_readed"/>
+		<result property="lastReaded" column="last_readed"/>
+		<result property="updateTime" column="extend_update_time"/>
+		<result property="observation" column="extend_observation"/>
+		<result property="status" column="extend_status"/>
+		<result property="houseType" column="house_type"/>
+		<result property="houseStatus" column="house_status"/>
+	</resultMap>
+
+	<select id="getBusinessExtend" resultMap="businessExtendResultMap" parameterType="com.spring.base.vo.pay.queryrecord.QueryRecordVo">
+		select
+		 extend.`id` AS extend_id,
+		 extend.`business_id` AS extend_business_id,
+		 extend.`trans_id` AS extend_trans_id,
+		 extend.`charge_way` AS charge_way,
+		 extend.`unit_price` AS unit_price,
+		 extend.`area` AS area,
+		 extend.`num` AS num,
+		 extend.`start_date` AS start_date,
+		 extend.`end_date` AS end_date,
+		 extend.`this_readed` AS this_readed,
+		 extend.`last_readed` AS last_readed,
+		 extend.`update_time` AS extend_update_time,
+		 extend.`observation` AS extend_observation,
+		 extend.`house_type` AS house_type,
+		 extend.`house_status` AS house_status,
+		 extend.`status` AS extend_status
+	 from p_business_extend AS extend
+	 <where>
+		 extend.trans_id = #{transId}
+		 <if test="startDate != null and startDate != '' "> <![CDATA[and extend.`start_date` >=#{startDate}  ]]> </if>
+		 <if test="endDate != null and endDate != '' "> <![CDATA[and extend.`end_date` <=#{endDate}  ]]> </if>
+	 </where>
+
+	</select>
+
+
+
+
+
+
+	<resultMap id="TodayResultMap" type="com.spring.base.vo.pay.transjournals.TodayIncomeResult">
+		<result property="days" column="days"/>
+		<result property="transAmount" column="transAmount"/>
+	</resultMap>
+	<!--总收入-->
+	<select id="getTotalIncome" resultMap="TodayResultMap" parameterType="com.spring.base.vo.pay.transjournals.TotalIncome">
+		select 'today' AS days,sum(t1.trans_amount) AS transAmount from p_trans_journals AS t1
+		<where>
+			<if test="pcid != null and pcid != '' "> t1.`company_id` = #{pcid} </if>
+			<![CDATA[and t1.`update_time` >=#{firstCurrentDate}  ]]>
+		</where>
+		union all
+		select 'yesterday' AS days,sum(t2.trans_amount) AS transAmount from p_trans_journals AS t2
+		<where>
+			<if test="pcid != null and pcid != '' "> t2.`company_id` = #{pcid} </if>
+			<![CDATA[and t2.`update_time` >=#{yesterdayStartDate}  ]]>
+			<![CDATA[and t2.`update_time` <=#{yesterdayEndDate}  ]]>
+		</where>
+
+	</select>
+
+	<resultMap id="AmountResultMap" type="com.spring.base.vo.pay.transjournals.TodayResult">
+		<result property="totalIncome" column="totalIncome"/>
+		<result property="incomeRate" column="incomeRate"/>
+		<result property="highestPlotIncome" column="highestPlotIncome"/>
+		<result property="highestPlotName" column="highestPlotName"/>
+		<result property="totalChargeOrder" column="totalChargeOrder"/>
+		<result property="totalChargeOrderRate" column="totalChargeOrderRate"/>
+		<result property="highestChannelMoney" column="highestChannelMoney"/>
+		<result property="highestChannel" column="highestChannel"/>
+		<result property="currentCollectionRate" column="currentCollectionRate"/>
+		<result property="overdueBillAmount" column="overdueBillAmount"/>
+	</resultMap>
+	<!--收费最高小区-->
+	<select id="highestPlotIncome" resultMap="AmountResultMap" parameterType="com.spring.base.vo.pay.transjournals.TotalIncome">
+        select max(maxTransAmount.transAmount) AS highestPlotIncome,maxTransAmount.cname AS highestPlotName  from(
+		select sum(t1.trans_amount) AS transAmount,cname AS cname from p_trans_journals AS t1
+		<where>
+			<if test="pcid != null and pcid != '' "> t1.`company_id` = #{pcid} </if>
+			<![CDATA[and t1.`update_time` >=#{firstCurrentDate}  ]]>
+		</where>
+			 group by cid ) AS maxTransAmount
+	</select>
+    <!--总收费订单-->
+	<select id="getTotalChargeOrder" resultMap="TodayResultMap" parameterType="com.spring.base.vo.pay.transjournals.TotalIncome">
+		select 'today' AS days,count(t1.trans_id) AS transAmount from p_trans_journals AS t1
+		<where>
+			<if test="pcid != null and pcid != '' "> t1.`company_id` = #{pcid} </if>
+			<![CDATA[and t1.`update_time` >=#{firstCurrentDate}  ]]>
+		</where>
+		union all
+		select 'yesterday' AS days,count(t2.trans_id) AS transAmount from p_trans_journals AS t2
+		<where>
+			<if test="pcid != null and pcid != '' "> t2.`company_id` = #{pcid} </if>
+			<![CDATA[and t2.`update_time` >=#{yesterdayStartDate}  ]]>
+			<![CDATA[and t2.`update_time` <=#{yesterdayEndDate}  ]]>
+		</where>
+
+	</select>
+    <!--收费最多渠道-->
+	<select id="getHighestChannel" resultMap="AmountResultMap" parameterType="com.spring.base.vo.pay.transjournals.TotalIncome">
+		select max(maxTransAmount.transAmount) AS highestChannelMoney,maxTransAmount.paytype AS highestChannel  from(
+		select sum(t1.trans_amount) AS transAmount,t2.paytype AS paytype from p_trans_journals AS t1
+		left join p_transpay_journals AS t2 on t1.trans_id = t2.trans_id
+		<where>
+			<if test="pcid != null and pcid != '' "> t1.`company_id` = #{pcid} </if>
+			<![CDATA[and t1.`update_time` >=#{firstCurrentDate}  ]]>
+		</where>
+		group by t2.paytype ) AS maxTransAmount
+	</select>
+
+	<!--本期收缴率之实收本期欠费账单-->
+	<select id="getCurrentCollection" resultType="String" parameterType="com.spring.base.vo.pay.transjournals.TotalIncome">
+		select sum(t1.trans_amount) AS transAmount from p_trans_journals AS t1
+		<where>
+			<if test="pcid != null and pcid != '' "> t1.`company_id` = #{pcid} </if>
+			<![CDATA[and t1.`update_time` >=#{fristDayOfCurrentMonth}  ]]>
+		</where>
+	</select>
+
+	<!--本期收缴率之本期应收账单总金额-->
+	<select id="getCurrentAllCollection" resultType="String" parameterType="com.spring.base.vo.pay.transjournals.TotalIncome">
+		select CONVERT(CONVERT(sum(if(t1.is_collect_latefee = '1',t1.payment_amount+ifnull(t1.d_penalty,'0'), t1.payment_amount)),DECIMAL (10 , 2 )),CHAR) AS transAmount  from p_bill_details AS t1
+		left join p_pay_bills AS t2
+		<where>
+			<if test="pcid != null and pcid != '' "> t2.`company_id` = #{pcid} </if>
+			<![CDATA[and t1.`update_time` >=#{fristDayOfCurrentMonth}  ]]>
+		</where>
+	</select>
+
+
+
+
+</mapper>

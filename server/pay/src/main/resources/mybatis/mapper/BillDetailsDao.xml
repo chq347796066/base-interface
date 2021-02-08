@@ -1,0 +1,752 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.pay.dao.IBillDetailsDao">
+
+	<!-- resultMap -->
+	<resultMap type="com.spring.base.entity.pay.BillDetailsEntity" id="billDetailsMap">
+		<result property="id" column="id"/>
+		<result property="detailNo" column="detail_no"/>
+		<result property="chargeNo" column="charge_no"/>
+		<result property="chargeName" column="charge_name"/>
+		<result property="paymentAmount" column="payment_amount"/>
+		<result property="startDate" column="start_date"/>
+		<result property="endDate" column="end_date"/>
+		<result property="unitPrice" column="unit_price"/>
+		<result property="useNumber" column="use_number"/>
+		<result property="dPenalty" column="d_penalty"/>
+		<result property="billNo" column="bill_no"/>
+		<result property="chargeStatus" column="charge_status"/>
+		<result property="chargeChannel" column="charge_channel"/>
+		<result property="paymentDate" column="payment_date"/>
+		<result property="overdueDate" column="overdue_date"/>
+		<result property="lastReading" column="last_reading"/>
+		<result property="thisReading" column="this_reading"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="chargeWay" column="charge_way"/>
+		<result property="receivedAmount" column="received_amount"/>
+		<result property="licensePlate" column="license_plate"/>
+		<result property="thisReadingdate" column="this_readingdate"/>
+		<result property="chargeType" column="charge_type"/>
+		<result property="chargeMark" column="charge_mark"/>
+		<result property="isCollectLatefee" column="is_collect_latefee"/>
+		<result property="formula" column="formula"/>
+		<result property="observation" column="observation"/>
+		<result property="lastReadingdate" column="last_readingdate"/>
+		<result property="status" column="status"/>
+	</resultMap>
+
+	<!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="detailNo != null and detailNo != '' "> and `detail_no` = #{detailNo} </if>
+			<if test="chargeNo != null and chargeNo != '' "> and `charge_no` = #{chargeNo} </if>
+			<if test="chargeName != null and chargeName != '' "> and `charge_name` = #{chargeName} </if>
+			<if test="paymentAmount != null and paymentAmount != '' "> and `payment_amount` = #{paymentAmount} </if>
+			<if test="startDate != null and startDate != '' "> <![CDATA[and `start_date` >=#{startDate}  ]]> </if>
+			<if test="endDate != null and endDate != '' "> <![CDATA[and `end_date` <=#{endDate}  ]]>  </if>
+			<if test="unitPrice != null and unitPrice != '' "> and `unit_price` = #{unitPrice} </if>
+			<if test="useNumber != null and useNumber != '' "> and `use_number` = #{useNumber} </if>
+			<if test="dPenalty != null and dPenalty != '' "> and `d_penalty` = #{dPenalty} </if>
+			<if test="billNo != null and billNo != '' "> and `bill_no` = #{billNo} </if>
+			<if test="chargeStatus != null and chargeStatus != '' "> and `charge_status` = #{chargeStatus} </if>
+			<if test="chargeChannel != null and chargeChannel != '' "> and `charge_channel` = #{chargeChannel} </if>
+			<if test="paymentDate != null and paymentDate != '' "> and `payment_date` = #{paymentDate} </if>
+			<if test="overdueDate != null and overdueDate != '' "> and `overdue_date` = #{overdueDate} </if>
+			<if test="lastReading != null and lastReading != '' "> and `last_reading` = #{lastReading} </if>
+			<if test="thisReading != null and thisReading != '' "> and `this_reading` = #{thisReading} </if>
+			<if test="updateTime != null and updateTime != '' "> and `update_time` = #{updateTime} </if>
+			<if test="chargeWay != null and chargeWay != '' "> and `charge_way` = #{chargeWay} </if>
+			<if test="receivedAmount != null and receivedAmount != '' "> and `received_amount` = #{receivedAmount} </if>
+			<if test="licensePlate != null and licensePlate != '' "> and `license_plate` = #{licensePlate} </if>
+			<if test="thisReadingdate != null and thisReadingdate != '' "> and `this_readingdate` = #{thisReadingdate} </if>
+			<if test="chargeType != null and chargeType != '' "> and `charge_type` = #{chargeType} </if>
+			<if test="chargeMark != null and chargeMark != '' "> and `charge_mark` = #{chargeMark} </if>
+			<if test="isCollectLatefee != null and isCollectLatefee != '' "> and `is_collect_latefee` = #{isCollectLatefee} </if>
+			<if test="formula != null and formula != '' "> and `formula` = #{formula} </if>
+			<if test="observation != null and observation != '' "> and `observation` = #{observation} </if>
+			<if test="lastReadingdate != null and lastReadingdate != '' "> and `last_readingdate` = #{lastReadingdate} </if>
+			<if test="status != null and status != '' "> and `status` = #{status}</if>
+		</where>
+	</sql>
+
+	<!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into p_bill_details
+		(
+		`id`,
+		`detail_no`,
+		`charge_no`,
+		`charge_name`,
+		`payment_amount`,
+		`start_date`,
+		`end_date`,
+		`unit_price`,
+		`use_number`,
+		`d_penalty`,
+		`bill_no`,
+		`charge_status`,
+		`charge_channel`,
+		`payment_date`,
+		`overdue_date`,
+		`last_reading`,
+		`this_reading`,
+		`update_time`,
+		`charge_way`,
+		`received_amount`,
+		`license_plate`,
+		`this_readingdate`,
+		`charge_type`,
+		`charge_mark`,
+		`is_collect_latefee`,
+		`formula`,
+		`observation`,
+		`last_readingdate`,
+		`status`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id},
+			#{item.detailNo},
+			#{item.chargeNo},
+			#{item.chargeName},
+			#{item.paymentAmount},
+			#{item.startDate},
+			#{item.endDate},
+			#{item.unitPrice},
+			#{item.useNumber},
+			#{item.dPenalty},
+			#{item.billNo},
+			#{item.chargeStatus},
+			#{item.chargeChannel},
+			#{item.paymentDate},
+			#{item.overdueDate},
+			#{item.lastReading},
+			#{item.thisReading},
+			#{item.updateTime},
+			#{item.chargeWay},
+			#{item.receivedAmount},
+			#{item.licensePlate},
+			#{item.thisReadingdate},
+			#{item.chargeType},
+			#{item.chargeMark},
+			#{item.isCollectLatefee},
+			#{item.formula},
+			#{item.observation},
+			#{item.lastReadingdate},
+			#{item.status}
+			)
+		</foreach>
+	</insert>
+
+	<!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="billDetailsMap"
+			parameterType="com.spring.base.entity.pay.BillDetailsEntity">
+		select * from p_bill_details
+		<include refid="Where_Clause" />
+		order by update_time desc
+	</select>
+
+	<!-- 用户自定义开始 -->
+
+	<!--根据条件查询账单-->
+	<select id="queryPayDetial" resultType="map"
+			parameterType="map">
+		select T1.CHARGE_NO as chargeNo,
+		T1.PAYMENT_AMOUNT as paidAmount,
+		T1.RECEIVED_AMOUNT as receiveAmount,
+		T2.BILL_DATE as billDate,
+		T1.LAST_READING as lastReading,
+		T1.THIS_READING as thisReading,
+		T1.UNIT_PRICE as unitPrice,
+		T2.BILL_NO as billNo,
+		T2.RECEIVED_AMOUNT as receivedAmount,
+		T2.BILL_TYPE as billType,
+		T1.DETAIL_NO as detailNo,
+		T1.OVERDUE_DATE,T1.D_PENALTY as penalty,
+		T1.LICENSE_PLATE as licensePlate,
+		T1.USE_NUMBER as useNumber,T2.BILL_AMOUNT as billAmount,T1.CHARGE_STATUS as chargeStatus,
+		T1.CHARGE_TYPE as chargeMold,T1.CHARGE_WAY as ChargeWay,START_DATE as startDate,END_DATE as endDate,
+		T1.IS_COLLECT_LATEFEE as iscollDelayPay,T1.CHARGE_MARK as chargeMark
+		from p_bill_details T1 left join
+		p_pay_bills T2 on
+		T1.bill_no = T2.bill_no
+		<where>
+			<if test="billNo !=null">
+				and T2.bill_no = #{billNo,jdbcType=VARCHAR}
+			</if>
+			<if test="status!=null">
+				and T1.CHARGE_STATUS in
+				<foreach collection="status" item="item" index="index"
+						 open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="chargeStatus !=null">
+				and T1.CHARGE_STATUS != #{chargeStatus,jdbcType=VARCHAR}
+			</if>
+			<if test="custNo !=null">
+				and T2.CUST_NO = #{custNo,jdbcType=VARCHAR}
+			</if>
+			<if test="ownerNo != null">
+				and T2.OWNER_NO = #{ownerNo,jdbcType=VARCHAR},
+			</if>
+			<if test="chargeNos!=null">
+				and
+				<foreach collection="chargeNos" index="index" item="item"
+						 open="(" separator=" or " close=")">
+					T1.CHARGE_NO like CONCAT(#{item,jdbcType=CHAR},'%')
+				</foreach>
+			</if>
+			<if test="houseId !=null">
+				and T2.HID = #{houseId,jdbcType=VARCHAR}
+			</if>
+			<if test="detailNos != null">
+				and T1.DETAIL_NO in
+				<foreach collection="detailNos" item="item" index="index"
+						 open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="chargeNo != null and chargeNo != ''">
+				AND T1.CHARGE_NO like CONCAT(#{chargeNo,jdbcType=CHAR},'%')
+			</if>
+			<if test="chargeMold != null and chargeMold != ''">
+				AND T1.CHARGE_TYPE = #{chargeMold, jdbcType=VARCHAR}
+			</if>
+			<if test="billNos != null and billNos.length > 0">
+				AND T2.bill_no IN
+				<foreach collection="billNos" item="billNo" open="(" separator="," close=")">
+					#{billNo}
+				</foreach>
+			</if>
+			<if test="billDate !=null">
+				and date_format(T2.BILL_DATE,'%Y%m') =
+				date_format(#{billDate,jdbcType=VARCHAR},'%Y%m')
+			</if>
+			<if test="isFuture !=null">
+				and T1.CHARGE_STATUS != '05'
+			</if>
+			and T1.OBSERVATION = 0
+		</where>
+		<if test="(chargeNo != null and chargeNo != '') or (billNos != null and billNos.length > 0)">
+			ORDER BY T2.BILL_DATE DESC LIMIT 0,1
+		</if>
+
+	</select>
+
+	<resultMap type="com.spring.base.entity.pay.BillDetailsEntity" id="billDetailsResultMap">
+		<result property="id" column="id"/>
+		<result property="detailNo" column="detail_no"/>
+		<result property="chargeNo" column="charge_no"/>
+		<result property="chargeName" column="charge_name"/>
+		<result property="paymentAmount" column="payment_amount"/>
+		<result property="startDate" column="start_date"/>
+		<result property="endDate" column="end_date"/>
+		<result property="unitPrice" column="unit_price"/>
+		<result property="useNumber" column="use_number"/>
+		<result property="dPenalty" column="d_penalty"/>
+		<result property="billNo" column="bill_no"/>
+		<result property="chargeStatus" column="charge_status"/>
+		<result property="chargeChannel" column="charge_channel"/>
+		<result property="paymentDate" column="payment_date"/>
+		<result property="overdueDate" column="overdue_date"/>
+		<result property="lastReading" column="last_reading"/>
+		<result property="thisReading" column="this_reading"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="chargeWay" column="charge_way"/>
+		<result property="receivedAmount" column="received_amount"/>
+		<result property="licensePlate" column="license_plate"/>
+		<result property="thisReadingdate" column="this_readingdate"/>
+		<result property="chargeType" column="charge_type"/>
+		<result property="chargeTypeName" column="charge_type_name"/>
+		<result property="chargeMark" column="charge_mark"/>
+		<result property="isCollectLatefee" column="is_collect_latefee"/>
+		<result property="formula" column="formula"/>
+		<result property="observation" column="observation"/>
+		<result property="lastReadingdate" column="last_readingdate"/>
+        <result property="houseName" column="houseName"/>
+		<result property="houseCode" column="houseCode"/>
+		<result property="status" column="status"/>
+		<result property="chargeCategory" column="chargeCategory"/>
+		<association property="payBillsEntity" javaType="com.spring.base.entity.pay.PayBillsEntity">
+			<result property="id" column="pay_id"/>
+			<result property="billNo" column="pay_bill_no"/>
+			<result property="billAmount" column="bill_amount"/>
+			<result property="billDate" column="bill_date"/>
+			<result property="custNo" column="cust_no"/>
+			<result property="hid" column="hid"/>
+			<result property="unitNo" column="unit_no"/>
+			<result property="roomNo" column="room_no"/>
+			<result property="areaNo" column="area_no"/>
+			<result property="plotId" column="plot_id"/>
+			<result property="billStatus" column="bill_status"/>
+			<result property="receivedAmount" column="pay_received_amount"/>
+			<result property="updateTime" column="pay_update_time"/>
+			<result property="ownerNo" column="owner_no"/>
+			<result property="ownerName" column="owner_name"/>
+			<result property="ownerMoble" column="owner_moble"/>
+			<result property="plotName" column="plot_name"/>
+			<result property="companyId" column="company_id"/>
+			<result property="billType" column="bill_type"/>
+			<result property="observation" column="pay_observation"/>
+			<result property="status" column="pay_status"/>
+            <result property="houseName" column="houseName"/>
+			<result property="houseCode" column="houseCode"/>
+		</association>
+	</resultMap>
+
+	<!--查询欠费账单多对一-->
+	<select id="queryDebtBillPage" resultMap="billDetailsResultMap"
+			parameterType="com.spring.base.vo.pay.billdetail.BillDetailParamVo">
+		select
+		detail.`id` AS id,
+		detail.`detail_no` AS detail_no,
+		detail.`charge_no` AS charge_no,
+		charge.`charge_name` AS charge_name,
+		detail.`payment_amount` AS payment_amount,
+		detail.`start_date` AS start_date,
+		detail.`end_date` AS end_date,
+		detail.`unit_price` AS unit_price,
+		detail.`use_number` AS use_number,
+		detail.`d_penalty` AS d_penalty,
+		detail.`bill_no` AS bill_no,
+		detail.`charge_status` AS charge_status,
+		detail.`charge_channel` AS charge_channel,
+		detail.`payment_date` AS payment_date,
+		detail.`overdue_date` AS overdue_date,
+		detail.`last_reading` AS last_reading,
+		detail.`this_reading` AS this_reading,
+		DATE_FORMAT(detail.`update_time`,'%Y-%m-%d %H:%i:%s')  AS update_time,
+		detail.`charge_way` AS charge_way,
+		detail.`received_amount` AS received_amount,
+		detail.`license_plate` AS license_plate,
+		detail.`this_readingdate` AS this_readingdate,
+		detail.`charge_type` AS charge_type,
+		(select dict_destination from wy_item.b_bus_dict where dict_name = 'chargeCycleMold' and detail.`charge_type` = dict_value) AS charge_type_name,
+		detail.`charge_mark` AS charge_mark,
+		detail.`is_collect_latefee` AS is_collect_latefee,
+		detail.`formula` AS formula,
+		detail.`observation` AS observation,
+		detail.`last_readingdate` AS last_readingdate,
+		detail.`status` AS status,
+		bill.`id` AS pay_id,
+		bill.`bill_no` AS pay_bill_no,
+		bill.`bill_amount` AS bill_amount,
+		bill.`bill_date` AS bill_date,
+		bill.`cust_no` AS cust_no,
+		bill.`hid` AS hid,
+		(select house_code from wy_baseinfo.b_house AS house  where house.id =  bill.`hid`) AS houseCode,
+		(select concat(ifnull(d.build_name,''),' ',ifnull(l.cell_name,''),' ',ifnull(main.house_code,'')) from wy_baseinfo.b_house AS main
+		left join wy_baseinfo.b_build d on main.build_id = d.id
+		left join wy_baseinfo.b_cell  l on main.cell_id = l.id where main.id = bill.`hid`) AS houseName,
+		bill.`unit_no` AS unit_no,
+		bill.`room_no` AS room_no,
+		bill.`area_no` AS area_no,
+		bill.`plot_id` AS plot_id,
+		bill.`bill_status` AS bill_status,
+		bill.`received_amount` AS pay_received_amount,
+		DATE_FORMAT(bill.`update_time`,'%Y-%m-%d %H:%i:%s')AS pay_update_time,
+		bill.`owner_no` AS owner_no,
+		cu.`customer_name` AS owner_name,
+		cu.`phone` AS owner_moble,
+		bill.`plot_name` AS plot_name,
+		bill.`company_id` AS company_id,
+		bill.`bill_type` AS bill_type,
+		bill.`observation` AS pay_observation,
+		config.charge_category AS chargeCategory,
+		bill.`status` AS pay_status
+		from wy_pay.p_bill_details AS detail
+		left join wy_pay.p_pay_bills AS bill on bill.bill_no = detail.bill_no
+		left join wy_baseinfo.b_customer AS  cu on cu.id = bill.`owner_no`
+		left join wy_item.b_item_charge AS charge on charge.charge_no = detail.charge_no
+		left join wy_item.b_charge_config AS config on config.charge_no = detail.charge_no and config.cid = bill.plot_id
+		<where>
+			<if test="chargeNo != null and chargeNo != '' "> and detail.`charge_no` = #{chargeNo} </if>
+			<if test="startDate != null and startDate != '' "> <![CDATA[and detail.`start_date` >= date_format(#{startDate},'%Y-%m-%d')  ]]> </if>
+			<if test="endDate != null and endDate != '' "> <![CDATA[and detail.`end_date` <=date_format(#{endDate},'%Y-%m-%d')  ]]>  </if>
+			<if test="chargeType != null and chargeType != '' "> and detail.`charge_type` = #{chargeType} </if>
+			<if test="pcid != null and pcid != '' "> and bill.`company_id` = #{pcid} </if>
+			<if test="cid != null and cid != '' "> and bill.`plot_id` = #{cid} </if>
+			<if test="hid != null and hid != '' "> and bill.`hid` = #{hid} </if>
+			<if test="areaNo != null and areaNo != '' "> and bill.`area_no` = #{areaNo} </if>
+			<![CDATA[and charge_status != '02'  ]]>
+		</where>
+		order by bill.`bill_date` desc
+	</select>
+
+
+	<resultMap type="com.spring.base.entity.pay.PayBillsEntity" id="billDetailsResultMapFor">
+		<result property="id" column="pay_id"/>
+		<result property="billNo" column="pay_bill_no"/>
+		<result property="billAmount" column="bill_amount"/>
+		<result property="billDate" column="bill_date"/>
+		<result property="custNo" column="cust_no"/>
+		<result property="hid" column="hid"/>
+		<result property="unitNo" column="unit_no"/>
+		<result property="roomNo" column="room_no"/>
+		<result property="areaNo" column="area_no"/>
+		<result property="plotId" column="plot_id"/>
+		<result property="billStatus" column="bill_status"/>
+		<result property="receivedAmount" column="pay_received_amount"/>
+		<result property="updateTime" column="pay_update_time"/>
+		<result property="ownerNo" column="owner_no"/>
+		<result property="ownerName" column="owner_name"/>
+		<result property="ownerMoble" column="owner_moble"/>
+		<result property="plotName" column="plot_name"/>
+		<result property="companyId" column="company_id"/>
+		<result property="billType" column="bill_type"/>
+		<result property="observation" column="pay_observation"/>
+		<result property="status" column="pay_status"/>
+		<result property="houseName" column="houseName"/>
+		<result property="houseCode" column="houseCode"/>
+		<collection property="billDetailsEntitys" ofType="com.spring.base.entity.pay.BillDetailsEntity">
+			<result property="id" column="id"/>
+			<result property="detailNo" column="detail_no"/>
+			<result property="chargeNo" column="charge_no"/>
+			<result property="chargeName" column="charge_name"/>
+			<result property="paymentAmount" column="payment_amount"/>
+			<result property="startDate" column="start_date"/>
+			<result property="endDate" column="end_date"/>
+			<result property="unitPrice" column="unit_price"/>
+			<result property="useNumber" column="use_number"/>
+			<result property="dPenalty" column="d_penalty"/>
+			<result property="billNo" column="bill_no"/>
+			<result property="chargeStatus" column="charge_status"/>
+			<result property="chargeChannel" column="charge_channel"/>
+			<result property="paymentDate" column="payment_date"/>
+			<result property="overdueDate" column="overdue_date"/>
+			<result property="lastReading" column="last_reading"/>
+			<result property="thisReading" column="this_reading"/>
+			<result property="updateTime" column="update_time"/>
+			<result property="chargeWay" column="charge_way"/>
+			<result property="receivedAmount" column="received_amount"/>
+			<result property="licensePlate" column="license_plate"/>
+			<result property="thisReadingdate" column="this_readingdate"/>
+			<result property="chargeType" column="charge_type"/>
+			<result property="chargeTypeName" column="charge_type_name"/>
+			<result property="chargeMark" column="charge_mark"/>
+			<result property="isCollectLatefee" column="is_collect_latefee"/>
+			<result property="formula" column="formula"/>
+			<result property="observation" column="observation"/>
+			<result property="lastReadingdate" column="last_readingdate"/>
+			<result property="status" column="status"/>
+			<result property="houseName" column="houseName"/>
+			<result property="houseCode" column="houseCode"/>
+		</collection>
+	</resultMap>
+	<select id="queryDebtBillPageForOne" resultMap="billDetailsResultMapFor"
+			parameterType="com.spring.base.vo.pay.billdetail.BillDetailParamVo">
+		select
+		detail.`id` AS id,
+		detail.`detail_no` AS detail_no,
+		detail.`charge_no` AS charge_no,
+		charge.`charge_name` AS charge_name,
+		detail.`payment_amount` AS payment_amount,
+		detail.`start_date` AS start_date,
+		detail.`end_date` AS end_date,
+		detail.`unit_price` AS unit_price,
+		detail.`use_number` AS use_number,
+		detail.`d_penalty` AS d_penalty,
+		detail.`bill_no` AS bill_no,
+		detail.`charge_status` AS charge_status,
+		detail.`charge_channel` AS charge_channel,
+		detail.`payment_date` AS payment_date,
+		detail.`overdue_date` AS overdue_date,
+		detail.`last_reading` AS last_reading,
+		detail.`this_reading` AS this_reading,
+		DATE_FORMAT(detail.`update_time`,'%Y-%m-%d %H:%i:%s')  AS update_time,
+		detail.`charge_way` AS charge_way,
+		detail.`received_amount` AS received_amount,
+		detail.`license_plate` AS license_plate,
+		detail.`this_readingdate` AS this_readingdate,
+		detail.`charge_type` AS charge_type,
+		(select dict_destination from wy_item.b_bus_dict where dict_name = 'chargeCycleMold' and detail.`charge_type` = dict_value) AS charge_type_name,
+		detail.`charge_mark` AS charge_mark,
+		detail.`is_collect_latefee` AS is_collect_latefee,
+		detail.`formula` AS formula,
+		detail.`observation` AS observation,
+		detail.`last_readingdate` AS last_readingdate,
+		detail.`status` AS status,
+		bill.`id` AS pay_id,
+		bill.`bill_no` AS pay_bill_no,
+		bill.`bill_amount` AS bill_amount,
+		bill.`bill_date` AS bill_date,
+		bill.`cust_no` AS cust_no,
+		bill.`hid` AS hid,
+		(select house_code from wy_baseinfo.b_house AS house  where house.id =  bill.`hid`) AS houseCode,
+		(select concat(ifnull(d.build_name,''),' ',ifnull(l.cell_name,''),' ',ifnull(main.house_code,'')) from wy_baseinfo.b_house AS main
+		left join wy_baseinfo.b_build d on main.build_id = d.id
+		left join wy_baseinfo.b_cell  l on main.cell_id = l.id where main.id = bill.`hid`) AS houseName,
+		bill.`unit_no` AS unit_no,
+		bill.`room_no` AS room_no,
+		bill.`area_no` AS area_no,
+		bill.`plot_id` AS plot_id,
+		bill.`bill_status` AS bill_status,
+		bill.`received_amount` AS pay_received_amount,
+		DATE_FORMAT(bill.`update_time`,'%Y-%m-%d %H:%i:%s')AS pay_update_time,
+		bill.`owner_no` AS owner_no,
+		cu.`customer_name` AS owner_name,
+		cu.`phone` AS owner_moble,
+		bill.`plot_name` AS plot_name,
+		bill.`company_id` AS company_id,
+		bill.`bill_type` AS bill_type,
+		bill.`observation` AS pay_observation,
+		bill.`status` AS pay_status
+		from wy_pay.p_pay_bills AS bill
+		left join wy_pay.p_bill_details AS detail on bill.bill_no = detail.bill_no
+		left join wy_baseinfo.b_customer AS  cu on cu.id = bill.`owner_no`
+		left join wy_item.b_item_charge AS charge on charge.charge_no = detail.charge_no
+		<where>
+			<if test="chargeNo != null and chargeNo != '' "> and detail.`charge_no` = #{chargeNo} </if>
+			<if test="startDate != null and startDate != '' "> <![CDATA[and detail.`start_date` >= date_format(#{startDate},'%Y-%m-%d')  ]]> </if>
+			<if test="endDate != null and endDate != '' "> <![CDATA[and detail.`end_date` <=date_format(#{endDate},'%Y-%m-%d')  ]]>  </if>
+			<if test="chargeType != null and chargeType != '' "> and detail.`charge_type` = #{chargeType} </if>
+			<if test="pcid != null and pcid != '' "> and bill.`company_id` = #{pcid} </if>
+			<if test="cid != null and cid != '' "> and bill.`plot_id` = #{cid} </if>
+			<if test="hid != null and hid != '' "> and bill.`hid` = #{hid} </if>
+			<if test="areaNo != null and areaNo != '' "> and bill.`area_no` = #{areaNo} </if>
+			<if test="unitNo != null and unitNo != '' "> and bill.`unit_no` = #{unitNo} </if>
+			<![CDATA[and charge_status != '02'  ]]>
+		</where>
+		order by bill.`bill_date` desc
+	</select>
+
+
+	<select id="queryAllBills" resultMap="billDetailsResultMap"
+			parameterType="com.spring.base.vo.pay.billdetail.BillDetailParamVo">
+		 select
+		detail.`id` AS id,
+		detail.`detail_no` AS detail_no,
+		detail.`charge_no` AS charge_no,
+		charge.`charge_name` AS charge_name,
+		detail.`payment_amount` AS payment_amount,
+		detail.`start_date` AS start_date,
+		detail.`end_date` AS end_date,
+		detail.`unit_price` AS unit_price,
+		detail.`use_number` AS use_number,
+		detail.`d_penalty` AS d_penalty,
+		detail.`bill_no` AS bill_no,
+		detail.`charge_status` AS charge_status,
+		detail.`charge_channel` AS charge_channel,
+		detail.`payment_date` AS payment_date,
+		detail.`overdue_date` AS overdue_date,
+		detail.`last_reading` AS last_reading,
+		detail.`this_reading` AS this_reading,
+		DATE_FORMAT(detail.`update_time`,'%Y-%m-%d %H:%i:%s')  AS update_time,
+		detail.`charge_way` AS charge_way,
+		detail.`received_amount` AS received_amount,
+		detail.`license_plate` AS license_plate,
+		detail.`this_readingdate` AS this_readingdate,
+		detail.`charge_type` AS charge_type,
+		(select dict_destination from wy_item.b_bus_dict where dict_name = 'chargeCycleMold' and detail.`charge_type` = dict_value) AS charge_type_name,
+		detail.`charge_mark` AS charge_mark,
+		detail.`is_collect_latefee` AS is_collect_latefee,
+		detail.`formula` AS formula,
+		detail.`observation` AS observation,
+		detail.`last_readingdate` AS last_readingdate,
+		detail.`status` AS status,
+		bill.`id` AS pay_id,
+		bill.`bill_no` AS pay_bill_no,
+		bill.`bill_amount` AS bill_amount,
+		bill.`bill_date` AS bill_date,
+		bill.`cust_no` AS cust_no,
+		bill.`hid` AS hid,
+		(select house_code from wy_baseinfo.b_house AS house  where house.id =  bill.`hid`) AS houseCode,
+		(select concat(ifnull(d.build_name,''),' ',ifnull(l.cell_name,''),' ',ifnull(main.house_code,'')) from wy_baseinfo.b_house AS main
+		left join wy_baseinfo.b_build d on main.build_id = d.id
+		left join wy_baseinfo.b_cell  l on main.cell_id = l.id where main.id = bill.`hid`) AS houseName,
+		bill.`unit_no` AS unit_no,
+		bill.`room_no` AS room_no,
+		bill.`area_no` AS area_no,
+		bill.`plot_id` AS plot_id,
+		bill.`bill_status` AS bill_status,
+		bill.`received_amount` AS pay_received_amount,
+		DATE_FORMAT(bill.`update_time`,'%Y-%m-%d %H:%i:%s')AS pay_update_time,
+		bill.`owner_no` AS owner_no,
+		cu.`customer_name` AS owner_name,
+		cu.`phone` AS owner_moble,
+		bill.`plot_name` AS plot_name,
+		bill.`company_id` AS company_id,
+		bill.`bill_type` AS bill_type,
+		bill.`observation` AS pay_observation,
+		bill.`status` AS pay_status
+		from wy_pay.p_bill_details AS detail
+		left join wy_pay.p_pay_bills AS bill on bill.bill_no = detail.bill_no
+		left join wy_baseinfo.b_customer AS  cu on cu.id = bill.`owner_no`
+		left join wy_item.b_item_charge AS charge on charge.charge_no = detail.charge_no
+		<where>
+			detail.del_flag = 0
+			<![CDATA[and detail.charge_status != '02'  ]]>
+			<if test="chargeNo != null and chargeNo != '' "> and detail.`charge_no` = #{chargeNo} </if>
+			<if test="startDate != null and startDate != '' "> <![CDATA[and detail.`start_date` >= date_format(#{startDate},'%Y-%m-%d')  ]]> </if>
+			<if test="endDate != null and endDate != '' "> <![CDATA[and detail.`end_date` <=date_format(#{endDate},'%Y-%m-%d')  ]]>  </if>
+			<if test="chargeType != null and chargeType != '' "> and detail.`charge_type` = #{chargeType} </if>
+			<if test="pcid != null and pcid != '' "> and bill.`company_id` = #{pcid} </if>
+			<if test="cid != null and cid != '' "> and bill.`plot_id` = #{cid} </if>
+			<if test="hid != null and hid != '' "> and bill.`hid` = #{hid} </if>
+			<if test="areaNo != null and areaNo != '' "> and bill.`area_no` = #{areaNo} </if>
+		</where>
+		order by bill.`bill_date` desc
+	</select>
+
+
+
+
+
+	<select id="queryAllBillsForOne" resultMap="billDetailsResultMapFor"
+			parameterType="com.spring.base.vo.pay.billdetail.BillDetailParamVo">
+		select
+		detail.`id` AS id,
+		detail.`detail_no` AS detail_no,
+		detail.`charge_no` AS charge_no,
+		charge.`charge_name` AS charge_name,
+		detail.`payment_amount` AS payment_amount,
+		detail.`start_date` AS start_date,
+		detail.`end_date` AS end_date,
+		detail.`unit_price` AS unit_price,
+		detail.`use_number` AS use_number,
+		detail.`d_penalty` AS d_penalty,
+		detail.`bill_no` AS bill_no,
+		detail.`charge_status` AS charge_status,
+		detail.`charge_channel` AS charge_channel,
+		detail.`payment_date` AS payment_date,
+		detail.`overdue_date` AS overdue_date,
+		detail.`last_reading` AS last_reading,
+		detail.`this_reading` AS this_reading,
+		DATE_FORMAT(detail.`update_time`,'%Y-%m-%d %H:%i:%s')  AS update_time,
+		detail.`charge_way` AS charge_way,
+		detail.`received_amount` AS received_amount,
+		detail.`license_plate` AS license_plate,
+		detail.`this_readingdate` AS this_readingdate,
+		detail.`charge_type` AS charge_type,
+		(select dict_destination from wy_item.b_bus_dict where dict_name = 'chargeCycleMold' and detail.`charge_type` = dict_value) AS charge_type_name,
+		detail.`charge_mark` AS charge_mark,
+		detail.`is_collect_latefee` AS is_collect_latefee,
+		detail.`formula` AS formula,
+		detail.`observation` AS observation,
+		detail.`last_readingdate` AS last_readingdate,
+		detail.`status` AS status,
+		bill.`id` AS pay_id,
+		bill.`bill_no` AS pay_bill_no,
+		bill.`bill_amount` AS bill_amount,
+		bill.`bill_date` AS bill_date,
+		bill.`cust_no` AS cust_no,
+		bill.`hid` AS hid,
+		(select house_code from wy_baseinfo.b_house AS house  where house.id =  bill.`hid`) AS houseCode,
+		(select concat(ifnull(d.build_name,''),' ',ifnull(l.cell_name,''),' ',ifnull(main.house_code,'')) from wy_baseinfo.b_house AS main
+		left join wy_baseinfo.b_build d on main.build_id = d.id
+		left join wy_baseinfo.b_cell  l on main.cell_id = l.id where main.id = bill.`hid`) AS houseName,
+		bill.`unit_no` AS unit_no,
+		bill.`room_no` AS room_no,
+		bill.`area_no` AS area_no,
+		bill.`plot_id` AS plot_id,
+		bill.`bill_status` AS bill_status,
+		bill.`received_amount` AS pay_received_amount,
+		DATE_FORMAT(bill.`update_time`,'%Y-%m-%d %H:%i:%s')AS pay_update_time,
+		bill.`owner_no` AS owner_no,
+		cu.`customer_name` AS owner_name,
+		cu.`phone` AS owner_moble,
+		bill.`plot_name` AS plot_name,
+		bill.`company_id` AS company_id,
+		bill.`bill_type` AS bill_type,
+		bill.`observation` AS pay_observation,
+		bill.`status` AS pay_status
+		from wy_pay.p_bill_details AS detail
+		left join wy_pay.p_pay_bills AS bill on bill.bill_no = detail.bill_no
+		left join wy_baseinfo.b_customer AS  cu on cu.id = bill.`owner_no`
+		left join wy_item.b_item_charge AS charge on charge.charge_no = detail.charge_no
+		<where>
+			<if test="chargeNo != null and chargeNo != '' "> and detail.`charge_no` = #{chargeNo} </if>
+			<if test="startDate != null and startDate != '' "> <![CDATA[and detail.`start_date` >= date_format(#{startDate},'%Y-%m-%d')  ]]> </if>
+			<if test="endDate != null and endDate != '' "> <![CDATA[and detail.`end_date` <=date_format(#{endDate},'%Y-%m-%d')  ]]>  </if>
+			<if test="chargeType != null and chargeType != '' "> and detail.`charge_type` = #{chargeType} </if>
+			<if test="pcid != null and pcid != '' "> and bill.`company_id` = #{pcid} </if>
+			<if test="cid != null and cid != '' "> and bill.`plot_id` = #{cid} </if>
+			<if test="hid != null and hid != '' "> and bill.`hid` = #{hid} </if>
+			<if test="areaNo != null and areaNo != '' "> and bill.`area_no` = #{areaNo} </if>
+			<if test="billDate != null and billDate != '' "> and date_format(bill.`bill_date`,'%Y%m')=#{billDate} </if>
+		</where>
+		order by bill.`bill_date` desc
+	</select>
+
+
+
+	<select id="queryAllBillPreview" resultMap="billDetailsResultMap"
+			parameterType="com.spring.base.vo.pay.billdetail.BillDetailParamVo">
+		 select
+		detail.`id` AS id,
+		detail.`detail_no` AS detail_no,
+		detail.`charge_no` AS charge_no,
+		charge.`charge_name` AS charge_name,
+		detail.`payment_amount` AS payment_amount,
+		detail.`start_date` AS start_date,
+		detail.`end_date` AS end_date,
+		detail.`unit_price` AS unit_price,
+		detail.`use_number` AS use_number,
+		detail.`d_penalty` AS d_penalty,
+		detail.`bill_no` AS bill_no,
+		detail.`charge_status` AS charge_status,
+		detail.`charge_channel` AS charge_channel,
+		detail.`payment_date` AS payment_date,
+		detail.`overdue_date` AS overdue_date,
+		detail.`last_reading` AS last_reading,
+		detail.`this_reading` AS this_reading,
+		DATE_FORMAT(detail.`update_time`,'%Y-%m-%d %H:%i:%s')  AS update_time,
+		detail.`charge_way` AS charge_way,
+		detail.`received_amount` AS received_amount,
+		detail.`license_plate` AS license_plate,
+		detail.`this_readingdate` AS this_readingdate,
+		detail.`charge_type` AS charge_type,
+		(select dict_destination from wy_item.b_bus_dict where dict_name = 'chargeCycleMold' and detail.`charge_type` = dict_value) AS charge_type_name,
+		detail.`charge_mark` AS charge_mark,
+		detail.`is_collect_latefee` AS is_collect_latefee,
+		detail.`formula` AS formula,
+		detail.`observation` AS observation,
+		detail.`last_readingdate` AS last_readingdate,
+		detail.`status` AS status,
+		bill.`id` AS pay_id,
+		bill.`bill_no` AS pay_bill_no,
+		bill.`bill_amount` AS bill_amount,
+		bill.`bill_date` AS bill_date,
+		bill.`cust_no` AS cust_no,
+		bill.`hid` AS hid,
+		(select house_code from wy_baseinfo.b_house AS house  where house.id =  bill.`hid`) AS houseCode,
+		(select concat(ifnull(d.build_name,''),' ',ifnull(l.cell_name,''),' ',ifnull(main.house_code,'')) from wy_baseinfo.b_house AS main
+		left join wy_baseinfo.b_build d on main.build_id = d.id
+		left join wy_baseinfo.b_cell  l on main.cell_id = l.id where main.id = bill.`hid`) AS houseName,
+		bill.`unit_no` AS unit_no,
+		bill.`room_no` AS room_no,
+		bill.`area_no` AS area_no,
+		bill.`plot_id` AS plot_id,
+		bill.`bill_status` AS bill_status,
+		bill.`received_amount` AS pay_received_amount,
+		DATE_FORMAT(bill.`update_time`,'%Y-%m-%d %H:%i:%s')AS pay_update_time,
+		bill.`owner_no` AS owner_no,
+		cu.`customer_name` AS owner_name,
+		cu.`phone` AS owner_moble,
+		bill.`plot_name` AS plot_name,
+		bill.`company_id` AS company_id,
+		bill.`bill_type` AS bill_type,
+		bill.`observation` AS pay_observation,
+		config.charge_category AS chargeCategory,
+		bill.`status` AS pay_status
+		from wy_pay.p_bill_details_preview AS detail
+		left join wy_pay.p_pay_bills_preview AS bill on bill.bill_no = detail.bill_no
+		left join wy_baseinfo.b_customer AS  cu on cu.id = bill.`owner_no`
+		left join wy_item.b_item_charge AS charge on charge.charge_no = detail.charge_no
+		left join wy_item.b_charge_config AS config on config.charge_no = detail.charge_no and config.cid = bill.plot_id
+	    where bill.order_no = #{orderNo}
+	     and detail.order_no = bill.order_no
+		order by bill.`bill_date` desc
+	</select>
+
+
+	<delete id="deleteDelFlag" parameterType="com.spring.base.entity.pay.BillDetailsEntity">
+		 update wy_pay.p_bill_details
+		 set del_flag = 1,
+		 modify_date = now()
+		 where id = #{id}
+	</delete>
+</mapper>

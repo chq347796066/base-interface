@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.maintenance.dao.IReportingRepairDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.buiness.ReportingRepairEntity" id="reportingRepairMap">
+        <result property="id" column="id"/>
+		<result property="communityId" column="community_id"/>
+		<result property="communityName" column="community_name"/>
+		<result property="buildId" column="build_id"/>
+		<result property="buildName" column="build_name"/>
+		<result property="cellId" column="cell_id"/>
+		<result property="cellName" column="cell_name"/>
+		<result property="houseId" column="house_id"/>
+		<result property="houseCode" column="house_code"/>
+        <result property="reportingDescribe" column="reporting_describe"/>
+        <result property="repairId" column="repair_id"/>
+        <result property="repairType" column="repair_type"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="mobile" column="mobile"/>
+        <result property="complaintAddress" column="complaint_address"/>
+        <result property="submitUser" column="submit_user"/>
+        <result property="reportingStatus" column="reporting_status"/>
+        <result property="canceState" column="cance_state"/>
+        <result property="canceDescribe" column="cance_describe"/>
+        <result property="outlay" column="outlay"/>
+        <result property="repairDetail" column="repair_detail"/>
+        <result property="outlayId" column="outlay_id"/>
+        <result property="evaluationStatus" column="evaluation_status"/>
+        <result property="evaluationDescribe" column="evaluation_describe"/>
+		<result property="dispatchDate" column="dispatch_date"/>
+		<result property="finishDate" column="finish_date"/>
+		<result property="repairerReacceptDate" column="repairer_reaccept_date"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyUser" column="modify_user"/>
+        <result property="modifyDate" column="modify_date"/>
+        <result property="repairReserve" column="repair_Reserve"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="tenantId" column="tenant_id"/>
+    </resultMap>
+    
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			del_flag = 0
+			<if test="id != null and id != '' "> and `id` = #{id} </if>
+			<if test="communityId != null and communityId != '' "> and `community_id` = #{communityId} </if>
+			<if test="communityName != null and communityName != '' "> and `community_name` = #{communityName} </if>
+			<if test="buildId != null and buildId != '' "> and `build_id` = #{buildId} </if>
+			<if test="buildName != null and buildName != '' "> and `build_name` = #{buildName} </if>
+			<if test="cellId != null and cellId != '' "> and `cell_id` = #{cellId} </if>
+			<if test="cellName != null and cellName != '' "> and `cell_name` = #{cellName} </if>
+			<if test="houseId != null and houseId != '' "> and `house_id` = #{houseId} </if>
+			<if test="houseCode != null and houseCode != '' "> and `house_code` = #{houseCode} </if>
+			<if test="reportingDescribe != null and reportingDescribe != '' "> and `reporting_describe` = #{reportingDescribe} </if>
+			<if test="repairId != null and repairId != '' "> and `repair_id` = #{repairId} </if>
+			<if test="repairType != null and repairType != '' "> and `repair_type` = #{repairType} </if>
+			<if test="userId != null and userId != '' "> and `user_id` = #{userId} </if>
+			<if test="userName != null and userName != '' ">
+				and (`complaint_address`  like concat('%',#{userName,jdbcType=VARCHAR},'%') or
+				`user_name` like concat('%',#{userName,jdbcType=VARCHAR},'%') or
+				`mobile` like concat('%',#{userName,jdbcType=VARCHAR},'%'))
+			</if>
+			<if test="mobile != null and mobile != '' ">
+			 and  (`complaint_address`  like concat('%',#{mobile,jdbcType=VARCHAR},'%') or
+				`user_name` like concat('%',#{mobile,jdbcType=VARCHAR},'%') or
+				`mobile` like concat('%',#{mobile,jdbcType=VARCHAR},'%'))
+			</if>
+			<if test="complaintAddress != null and complaintAddress != '' ">
+			 and (`complaint_address`  like concat('%',#{complaintAddress,jdbcType=VARCHAR},'%') or
+				`user_name` like concat('%',#{complaintAddress,jdbcType=VARCHAR},'%') or
+				`mobile` like concat('%',#{complaintAddress,jdbcType=VARCHAR},'%'))
+			 </if>
+			<if test="submitUser != null and submitUser != '' "> and `submit_user` = #{submitUser} </if>
+			<if test="reportingStatus != null and reportingStatus != '' "> and `reporting_status` = #{reportingStatus} </if>
+			<if test="canceState != null and canceState != '' "> and `cance_state` = #{canceState} </if>
+			<if test="canceDescribe != null and canceDescribe != '' "> and `cance_describe` = #{canceDescribe} </if>
+			<if test="outlay != null and outlay != '' "> and `outlay` = #{outlay} </if>
+			<if test="repairDetail != null and repairDetail != '' "> and `repair_detail` = #{repairDetail} </if>
+			<if test="outlayId != null and outlayId != '' "> and `outlay_id` = #{outlayId} </if>
+			<if test="evaluationStatus != null and evaluationStatus != '' "> and `evaluation_status` = #{evaluationStatus} </if>
+			<if test="evaluationDescribe != null and evaluationDescribe != '' "> and `evaluation_describe` = #{evaluationDescribe} </if>
+			<if test="startDate != null and startDate != '' ">
+			 and  DATE_FORMAT(`start_date`,'%Y-%m-%d')  <![CDATA[>=]]> DATE_FORMAT(#{startDate},'%Y-%m-%d')
+			 </if>
+			<if test="endDate != null and endDate != '' ">
+			 and DATE_FORMAT(`end_date`,'%Y-%m-%d') <![CDATA[<=]]> DATE_FORMAT(#{endDate},'%Y-%m-%d')
+			 </if>
+			<if test="repairReceiveType !=null and repairReceiveType !='' " >
+			and (`complaint_address`  like concat('%',#{repairReceiveType,jdbcType=VARCHAR},'%') or
+				`user_name` like concat('%',#{repairReceiveType,jdbcType=VARCHAR},'%') or
+				`mobile` like concat('%',#{repairReceiveType,jdbcType=VARCHAR},'%'))
+			</if>
+			<if test="repairReserve != null and repairReserve != '' "> and `repair_Reserve` = #{repairReserve} </if>
+			<if test="companyId != null and companyId != '' ">
+				and company_id = #{companyId}
+			</if>
+			<if test="tenantId != null and tenantId != '' "> and `tenant_id` = #{tenantId}</if>
+		</where>
+	</sql>
+    
+    <!-- 批量新增 -->
+	<insert id="addList" parameterType="java.util.List">
+		insert into b_reporting_repair
+		(
+			`id`, 
+			`reporting_describe`, 
+			`repair_id`, 
+			`repair_type`, 
+			`user_id`, 
+			`user_name`, 
+			`mobile`, 
+			`complaint_address`, 
+			`submit_user`, 
+			`reporting_status`, 
+			`cance_state`, 
+			`cance_describe`, 
+			`outlay`, 
+			`repair_detail`, 
+			`outlay_id`, 
+			`evaluation_status`, 
+			`evaluation_describe`, 
+			`start_date`, 
+			`end_date`, 
+			`create_user`, 
+			`create_date`, 
+			`modify_user`, 
+			`modify_date`, 
+			`repair_Reserve`, 
+			`del_flag`, 
+			`community_id`,
+			`company_id`
+
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id}, 
+			#{item.reportingDescribe}, 
+			#{item.repairId}, 
+			#{item.repairType}, 
+			#{item.userId}, 
+			#{item.userName}, 
+			#{item.mobile}, 
+			#{item.complaintAddress}, 
+			#{item.submitUser}, 
+			#{item.reportingStatus}, 
+			#{item.canceState}, 
+			#{item.canceDescribe}, 
+			#{item.outlay}, 
+			#{item.repairDetail}, 
+			#{item.outlayId}, 
+			#{item.evaluationStatus}, 
+			#{item.evaluationDescribe}, 
+			#{item.startDate}, 
+			#{item.endDate}, 
+			#{item.createUser}, 
+			#{item.createDate}, 
+			#{item.modifyUser}, 
+			#{item.modifyDate}, 
+			#{item.repairReserve}, 
+			#{item.delFlag}, 
+			#{item.communityId},
+			#{item.companyId}
+        )
+		</foreach>
+	</insert>
+
+	<!-- 批量新增 -->
+	<insert id="addReportingRepair" parameterType="com.spring.base.entity.buiness.ReportingRepairEntity">
+		insert into b_reporting_repair
+		(`id`,
+		`community_id`,
+		`community_name`,
+		`build_id`,
+		`build_name`,
+		`cell_id`,
+		`cell_name`,
+		`house_id`,
+		`house_code`,
+		`reporting_describe`,
+		`repair_id`,
+		`repair_type`,
+		`user_id`,
+		`user_name`,
+		`mobile`,
+		`complaint_address`,
+		`submit_user`,
+		`reporting_status`,
+		`cance_state`,
+		`cance_describe`,
+		`outlay`,
+		`repair_detail`,
+		`outlay_id`,
+		`evaluation_status`,
+		`evaluation_describe`,
+		`start_date`,
+		`end_date`,
+		`create_user`,
+		`create_date`,
+		`modify_user`,
+		`modify_date`,
+		`repair_Reserve`,
+		`del_flag`,
+		`company_id`
+		)
+		values
+			(#{id},
+			#{communityId},
+			#{communityName},
+			#{buildId},
+			#{buildName},
+			#{cellId},
+			#{cellName},
+			#{houseId},
+			#{houseCode},
+			#{reportingDescribe},
+			#{repairId},
+			#{repairType},
+			#{userId},
+			#{userName},
+			#{mobile},
+			#{complaintAddress},
+			#{submitUser},
+			#{reportingStatus},
+			#{canceState},
+			#{canceDescribe},
+			#{outlay},
+			#{repairDetail},
+			#{outlayId},
+			#{evaluationStatus},
+			#{evaluationDescribe},
+			#{startDate},
+			#{endDate},
+			#{createUser},
+			#{createDate},
+			#{modifyUser},
+			#{modifyDate},
+			#{repairReserve},
+			#{delFlag},
+			#{companyId}
+			)
+	</insert>
+
+	<select id="queryList" resultMap="reportingRepairMap" parameterType="com.spring.base.entity.buiness.ReportingRepairEntity">
+		select * from b_reporting_repair
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<select id="getReportingRepair" resultType="com.spring.base.entity.buiness.ReportingRepairEntity" parameterType="com.spring.base.entity.buiness.ReportingRepairEntity">
+		select * from b_reporting_repair
+		<include refid="Where_Clause" />
+	</select>
+
+	<update id="updateReportingRepair" parameterType="com.spring.base.entity.buiness.ReportingRepairEntity">
+			update b_reporting_repair
+		    <set>
+				<if test="reportingStatus != null and reportingStatus != '' ">
+				     `reporting_status` = #{reportingStatus},
+				</if>
+				<if test="canceState != null and canceState != '' ">
+				     `cance_state` = #{canceState},
+			    </if>
+				<if test="canceDescribe != null and canceDescribe != '' ">
+				     `cance_describe` = #{canceDescribe},
+				</if>
+				<if test="outlay != null and outlay != '' ">
+				     `outlay` = #{outlay},
+				</if>
+				<if test="repairDetail != null and repairDetail != '' ">
+				     `repair_detail` = #{repairDetail},
+				</if>
+				<if test="outlayId != null and outlayId != '' ">
+				     `outlay_id` = #{outlayId},
+				</if>
+				<if test="evaluationStatus != null and evaluationStatus != '' ">
+				     `evaluation_status` = #{evaluationStatus},
+				</if>
+				<if test="evaluationDescribe != null and evaluationDescribe != '' ">
+				    `evaluation_describe` = #{evaluationDescribe},
+				</if>
+				<if test="repairerReacceptDate != null and repairerReacceptDate != '' ">
+					`repairer_reaccept_date` = #{repairerReacceptDate},
+				</if>
+				<if test="dispatchDate != null and dispatchDate != '' ">
+					`dispatch_date` = #{dispatchDate},
+				</if>
+				<if test="finishDate != null and finishDate != '' ">
+					`finish_date` = #{finishDate},
+				</if>
+				<if test="submitUser != null and submitUser != '' ">
+					 `submit_user` = #{submitUser},
+				</if>
+				<if test="startDate != null and startDate != '' ">
+				    `start_date` = #{startDate},
+			    </if>
+				<if test="endDate != null and endDate != '' ">
+				     `end_date` = #{endDate},
+				</if>
+				<if test="repairReserve != null and repairReserve != '' ">
+				     `repair_Reserve` = #{repairReserve},
+				</if>
+				<if test="modifyUser != null and modifyUser != '' ">
+					modify_user = #{modifyUser},
+				</if>
+				<if test="modifyDate != null">
+					  modify_date = now()
+				</if>
+			</set>
+			where id =  #{id}
+	</update>
+
+
+	<select id="queryReportingRepairList" resultMap="reportingRepairMap" parameterType="com.spring.base.entity.buiness.ReportingRepairEntity">
+		select * from b_reporting_repair
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+</mapper>

@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.saas.dao.IOrderDao">
+
+	<!-- resultMap -->
+    <resultMap type="com.spring.base.entity.saas.OrderEntity" id="orderMap">
+        <result property="id" column="id"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="orderDate" column="order_date"/>
+        <result property="orderAmount" column="order_amount"/>
+        <result property="buyNum" column="buy_num"/>
+        <result property="buyTime" column="buy_time"/>
+        <result property="orderType" column="order_type"/>
+        <result property="payType" column="pay_type"/>
+        <result property="orderStatus" column="order_status"/>
+        <result property="payNum" column="pay_num"/>
+        <result property="payDate" column="pay_date"/>
+        <result property="description" column="description"/>
+        <result property="payCompany" column="pay_company"/>
+        <result property="contactMan" column="contact_man"/>
+        <result property="contactMobile" column="contact_mobile"/>
+    </resultMap>
+
+    <!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where>
+			<if test="orderNum != null and orderNum != '' "> and `order_num` = #{orderNum} </if>
+			<if test="orderDate != null and orderDate != '' "> and `order_date` = #{orderDate} </if>
+			<if test="orderAmount != null and orderAmount != '' "> and `order_amount` = #{orderAmount} </if>
+			<if test="buyNum != null and buyNum != '' "> and `buy_num` = #{buyNum} </if>
+			<if test="buyTime != null and buyTime != '' "> and `buy_time` = #{buyTime} </if>
+			<if test="orderType != null and orderType != '' "> and `order_type` = #{orderType} </if>
+			<if test="payType != null and payType != '' "> and `pay_type` = #{payType} </if>
+			<if test="orderStatus != null and orderStatus != '' "> and `order_status` = #{orderStatus} </if>
+			<if test="payNum != null and payNum != '' "> and `pay_num` = #{payNum} </if>
+			<if test="payDate != null and payDate != '' "> and `pay_date` = #{payDate} </if>
+			<if test="description != null and description != '' "> and `description` = #{description} </if>
+			<if test="payCompany != null and payCompany != '' "> and `pay_company` = #{payCompany} </if>
+			<if test="contactMan != null and contactMan != '' "> and `contact_man` = #{contactMan} </if>
+			<if test="contactMobile != null and contactMobile != '' "> and `contact_mobile` = #{contactMobile}</if>
+			<if test="mobile != null and mobile != '' "> and `mobile` = #{mobile}</if>
+			and del_flag=0
+		</where>
+	</sql>
+
+    <!-- 根据条件查询列表 -->
+	<select id="queryList" resultMap="orderMap"
+		parameterType="com.spring.base.entity.saas.OrderEntity">
+		select * from s_order
+		<include refid="Where_Clause" />
+		order by create_date desc
+	</select>
+
+	<!-- 取消订单 -->
+	<update id="cancelOrder" parameterType="java.lang.String">
+		update
+			s_order
+		set
+			order_status=3
+		where
+			order_num=#{orderNum}
+		and
+			del_flag=0
+	</update>
+
+	<!--支付完成修改订单状态-->
+	<update id="updatePay" parameterType="com.spring.base.vo.saas.OrderUpdateVo">
+		update
+			s_order
+		set
+		<if test="payType!=null and payType!=''">
+			pay_type=#{payType},
+		</if>
+		<if test="orderStatus!=null and orderStatus!=''">
+			order_status=#{orderStatus},
+		</if>
+		<if test="payNum!=null and payNum!=''">
+			pay_num=#{payNum},
+		</if>
+		<if test="payDate!=null">
+			pay_date=#{payDate}
+		</if>
+		where
+			order_num=#{orderNum}
+		and
+			del_flag=0
+	</update>
+
+	<select id="queryAlreadyPayOrder" parameterType="java.lang.String" resultType="com.spring.base.vo.saas.OrderResponseVo">
+		select
+			main.id,
+			main.order_num as orderNum,
+			t1.app_name appName,
+			main.pay_type as payType,
+			main.order_amount as orderAmount,
+			main.pay_date as payDate
+		from
+			s_order main
+		left join
+			s_application t1
+		on  main.app_id=t1.id
+		where
+			main.order_status=2
+		and
+			main.make_invoice_status in (3,4)
+		and
+			main.del_flag=0
+		and
+		    main.mobile=#{mobile}
+	</select>
+
+	<!-- 查询租户应用关系 -->
+	<select id="queryTenantAppRelationByTenantIds" resultType="com.spring.base.vo.saas.TenantAppVo">
+		select
+			concat(st.id, '|', sa.id) as tenantAppId,
+			st.id as tenantId,
+			st.company_name as tenantName,
+			sa.id as applicationId,
+			sa.app_name as applicationName,
+			max(so.expire_date) as expireDate
+		from
+			s_order so
+		left join s_tenant st
+			on st.id = so.tenant_id and st.del_flag = 0
+		left join s_application sa
+			on sa.id = so.app_id and sa.del_flag = 0
+		where
+			so.del_flag=0
+		and so.tenant_id in
+		<foreach item="id" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		group by st.id, st.company_name
+	</select>
+
+	<select id="queryExpenseBillPageList" resultType="com.spring.base.vo.saas.ExpenseBillPageVo"
+			parameterType="com.spring.base.vo.saas.ExpenseBillQueryVo">
+		select so.id           as orderId,
+			   so.order_num    as orderNum,
+			   so.order_type   as orderType,
+			   case
+				   when so.order_type = 1 then '试用'
+				   when so.order_type = 2 then '订购'
+				   when so.order_type = 3 then '续费'
+				   when so.order_type = 4 then '升级'
+				   else null
+				   end         as orderTypeValue,
+			   so.order_amount as orderAmount,
+			   so.order_date   as orderDate,
+			   st.id           as tenantId,
+			   st.company_name as tenantName,
+			   sa.id           as applicationId,
+			   sa.app_name     as applicationName,
+			   so.order_status as orderStatus,
+			   case
+				   when so.order_status = 1 then '待支付'
+				   when so.order_status = 2 then '支付成功'
+				   when so.order_status = 3 then '已取消'
+				   when so.order_status = 4 then '支付失败'
+				   else null
+				   end         as orderStatusValue,
+			   so.pay_type     as payType,
+			   case
+				   when so.pay_type = 1 then '微信支付'
+				   when so.pay_type = 2 then '支付宝'
+				   else null
+				   end         as payTypeValue,
+			   so.pay_num      as payNum,
+			   so.pay_date     as payDate,
+			   so.description  as description
+		from s_order so
+				 left join s_tenant st
+						   on st.id = so.tenant_id and st.del_flag = 0
+				 left join s_application sa
+						   on sa.id = so.app_id and sa.del_flag = 0
+		where so.del_flag = 0
+
+		<if test="orderNumOrTenantCode != null and orderNumOrTenantCode.trim() != ''">
+			and (so.order_num like #{orderNumOrTenantCode} or st.tenant_code like #{orderNumOrTenantCode})
+		</if>
+		<if test="payType != null">
+			and so.pay_type = #{payType}
+		</if>
+		<if test="orderStatus != null">
+			and so.order_status = #{orderStatus}
+		</if>
+		<if test="startDate != null and endDate != null">
+			and so.order_date between #{startDate} and #{endDate}
+		</if>
+	</select>
+
+	<!-- 批量更新订单的发票状态 -->
+	<update id="batchUpdate" parameterType="java.util.List">
+		<foreach collection="orderIds" item="item" index="index" open="" close="" separator=";">
+			update s_order
+			<set>
+				make_invoice_status=1
+			</set>
+			where id=#{item}
+			and del_flag=0
+		</foreach>
+	</update>
+
+    <!--根据订单ids查询订单信息-->
+    <select id="queryOrderByOrderId" parameterType="java.util.List" resultType="com.spring.base.vo.saas.OrderResponseVo">
+		select
+			main.id,
+			main.order_num as orderNum,
+			t1.app_name appName,
+			main.order_type as orderType,
+			main.order_date as orderDate,
+			main.pay_type as payType,
+			main.pay_date as payDate,
+			main.description,
+			main.pay_num as payNum,
+			main.order_amount as orderAmount,
+			main.order_status as orderStatus,
+			main.buy_time as buyTime,
+			main.buy_num as buyNum,
+			main.expire_date as expireDate
+		from
+			s_order main
+		left join
+			s_application t1
+		on  main.app_id=t1.id
+		where main.id in
+			<foreach collection="orderIds" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		and
+			main.del_flag=0
+    </select>
+
+	<!--查询订单列表-->
+	<select id="queryOrderList" resultType="com.spring.base.vo.saas.OrderResponseVo" parameterType="com.spring.base.vo.saas.OrderQueryVo">
+		select
+			main.id,
+			main.order_num as orderNum,
+			t1.app_name appName,
+			main.order_type as orderType,
+			main.order_date as orderDate,
+			main.pay_type as payType,
+			main.pay_date as payDate,
+			main.description,
+			main.pay_num as payNum,
+			main.order_amount as orderAmount,
+			main.order_status as orderStatus,
+			main.buy_time as buyTime,
+			main.buy_num as buyNum,
+			main.expire_date as expireDate,
+			main.app_id as appId
+		from
+			s_order main
+		left join
+			s_application t1
+		on  main.app_id=t1.id
+		where
+			main.del_flag=0
+			<if test="orderNum!=null and orderNum!=''">
+				and main.order_num=#{orderNum}
+			</if>
+			<if test="payType!=null and payType!=''">
+				and main.pay_type=#{payType}
+			</if>
+			<if test="orderStatus!=null and orderStatus!=''">
+				and main.order_status=#{orderStatus}
+			</if>
+			<if test="startTime!=null and startTime!=''">
+				and date_format(main.order_date,'%Y-%m-%d %H-%i-%s')&gt;=#{startTime}
+			</if>
+			<if test="endTime!=null and endTime!=''">
+				and date_format(main.order_date,'%Y-%m-%d %H-%i-%s')&lt;=#{endTime}
+			</if>
+		and
+			main.mobile=#{mobile}
+	</select>
+
+	<!--根据id查询订单详情-->
+	<select id="queryOrderDetail" resultType="com.spring.base.vo.saas.OrderResponseVo" parameterType="java.lang.String">
+		select
+			main.id,
+			main.order_num as orderNum,
+			t1.app_name appName,
+			main.order_type as orderType,
+			main.order_date as orderDate,
+			main.pay_type as payType,
+			main.pay_date as payDate,
+			main.description,
+			main.pay_num as payNum,
+			main.order_amount as orderAmount,
+			main.order_status as orderStatus,
+			main.buy_time as buyTime,
+			main.buy_num as buyNum,
+			main.expire_date as expireDate,
+			main.app_id as appId
+		from
+			s_order main
+		left join
+			s_application t1
+		on  main.app_id=t1.id
+		where
+			main.del_flag=0
+		and
+			main.id=#{id}
+	</select>
+
+	<!-- 查询本月订单金额 -->
+	<select id="queryOrderAmountByThisMonth" resultType="java.math.BigDecimal">
+        select ifnull(sum(so.order_amount), 0) as orderAmonut
+		from s_tenant st
+				 inner join s_order so on so.tenant_id = st.id and so.del_flag = 0
+		where st.del_flag = 0
+		  and so.order_status = 2
+		  and so.order_type in (2, 3, 4)
+		  and date_format(so.pay_date, '%Y-%m') = date_format(now(), '%Y-%m');
+	</select>
+
+	<!-- 查询上月订单金额 -->
+	<select id="queryOrderAmountByLastMonth" resultType="java.math.BigDecimal">
+        select ifnull(sum(so.order_amount), 0) as lastOrderAmonut
+		from s_tenant st
+				 inner join s_order so on so.tenant_id = st.id and so.del_flag = 0
+		where st.del_flag = 0
+		  and so.order_status = 2
+		  and so.order_type in (2, 3, 4)
+		  and date_format(so.pay_date, '%Y-%m') = date_format(date_sub(now(), interval 1 month), '%Y-%m')
+	</select>
+
+	<!-- 查询统计所有订购应用的数量 -->
+	<select id="queryAllAppBuyCount" resultType="java.lang.Long">
+		select count(1) as allAppBuyCount
+		from (
+			select
+				sa.id appId,
+				so.id orderId
+			from s_application sa
+					 inner join s_order so on so.app_id = sa.id and so.del_flag = 0
+			where sa.del_flag = 0
+			  and so.order_type = 2
+		) as t
+    </select>
+
+	<!-- 查询每个应用订购的数量 -->
+	<select id="queryEachAppBuyCount" resultType="com.spring.base.vo.saas.AppOrderingRankingVo">
+        select sa.id       as appId,
+			   sa.app_name as appName,
+			   count(so.id)   appBuyCount
+		from s_application sa
+				 inner join s_order so on so.app_id = sa.id and so.del_flag = 0
+		where sa.del_flag = 0
+		  and so.order_type = 2
+		group by sa.id
+    </select>
+
+	<!-- 查询租户订购信息 -->
+	<select id="queryTenantOrderInfo" parameterType="com.spring.base.vo.saas.TenantOrderSituationQueryVo"
+			resultType="com.spring.base.entity.saas.OrderEntity">
+		select so.id as id, so.order_type as orderType, so.pay_date as payDate
+		from s_tenant st
+		inner join s_order so on so.tenant_id = st.id and so.del_flag = 0
+		where st.del_flag = 0 and so.order_status = 2
+		<if test="startDate != null and endDate != null">
+			and so.pay_date between #{startDate} and #{endDate}
+		</if>
+	</select>
+
+	<!-- 查询订单状况信息 -->
+	<select id="queryOrderStatusInfo" parameterType="com.spring.base.vo.saas.OrderStatusQueryVo"
+			resultType="com.spring.base.vo.saas.OrderAmountSumVo">
+		select so.id as orderId,
+			so.pay_date as paymentDate,
+			so.order_amount as orderAmount
+		from s_order so
+		where so.del_flag = 0
+			and so.order_status = 2
+			<if test="startDate != null and endDate != null">
+				and so.pay_date between #{startDate} and #{endDate}
+			</if>
+	</select>
+
+	<select id="queryOrderAmountByAll" resultType="java.math.BigDecimal">
+		select ifnull(sum(so.order_amount), 0) as orderAmount
+		from s_tenant st
+				 inner join s_order so on so.tenant_id = st.id and so.del_flag = 0
+		where st.del_flag = 0
+		  and so.order_status = 2
+		  and so.order_type in (2, 3, 4)
+	</select>
+</mapper>
